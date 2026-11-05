@@ -24,8 +24,8 @@ namespace xiao::x86_64
 
         [[nodiscard]] VCode< X86Inst > lower( ir::IRFunction& fn, CallConv cc = CallConv::SystemV )
         {
-            m_fn     = &fn;
-            m_vreg_c = 0;
+            m_fn        = &fn;
+            m_vreg_c    = 0;
             m_cur_block = 0;
             m_value_regs.clear( );
             m_builder = codegen::VCodeBuilder< X86Inst > { };
@@ -65,30 +65,31 @@ namespace xiao::x86_64
         void on_function_end( ir::IRFunction& ) { }
 
         void on_block( ir::IRFunction&, ir::IRBlock& )
+        { m_builder.set_block( m_block_map[ m_cur_block++ ] ); }
+
+        void on_block_end( ir::IRFunction& fn, ir::IRBlock& block )
         {
-            m_builder.set_block( m_block_map[ m_cur_block++ ] );
+            std::vector< BlockId > succ { };
+            for ( auto i { 0u }; i < block.succs_count; ++i ) succ.push_back( m_block_map[ fn.succs[ block.succs_offset + i ].id ] );
+
+            m_builder.end_block( succ );
         }
 
-        void on_block_end( ir::IRFunction&, ir::IRBlock& )
-        {
-            m_builder.end_block( {} );
-        }
-
-        void on_inst( ir::IRFunction&, ir::IRBlock&, ir::IRInst& inst )
+        void on_inst( ir::IRFunction&, ir::IRBlock& block, ir::IRInst& inst )
         {
             using enum ir::IROp;
             switch ( inst.op )
             {
                 case iconst: lower_iconst( inst ); break;
-                case iadd: lower_binop( inst, AluOp::Add ); break;
-                case isub: lower_binop( inst, AluOp::Sub ); break;
-                case imul: lower_binop( inst, AluOp::Mul ); break;
-                case ret: lower_ret( inst ); break;
+                case iadd:   lower_binop( inst, AluOp::Add ); break;
+                case isub:   lower_binop( inst, AluOp::Sub ); break;
+                case imul:   lower_binop( inst, AluOp::Mul ); break;
+                case ret:    lower_ret( inst ); break;
+                case icmp:   lower_icmp( inst ); break;
+                case br:     lower_br( block, inst ); break;
+                case brif:   lower_brif( block, inst ); break;
                 case idiv:
-                case icmp:
-                case br:
-                case brif:
-                case call: std::unreachable( );
+                case call:   std::unreachable( );
             }
         }
 
@@ -152,6 +153,54 @@ namespace xiao::x86_64
             }
 
             m_builder.push( inst::Ret { } );
+        }
+
+        void lower_icmp( const ir::IRInst& inst )
+        {
+            const auto lhs = reg_for( m_fn->operands[ inst.ops_offset ] );
+            const auto rhs = reg_for( m_fn->operands[ inst.ops_offset + 1 ] );
+            const auto cc = icmp_cc( inst.cc );
+
+            m_builder.push( inst::Alu { .op = AluOp::Cmp, .dst = lhs, .src = rhs } );
+            m_builder.push( inst::SetCC { .cc = cc, .dst = reg_for( inst.result ) } );
+        }
+
+        void lower_br( ir::IRBlock& block, const ir::IRInst& inst )
+        {
+            const auto succ = m_fn->succs[ block.succs_offset ];
+            const auto ref = m_block_map[ succ.id ];
+            m_builder.push( inst::Jmp { .target = ref } );
+        }
+
+        void lower_brif( ir::IRBlock& block, const ir::IRInst& inst )
+        {
+            const auto [ a_id ] = m_fn->succs[ block.succs_offset ];
+            const auto [ b_id ] = m_fn->succs[ block.succs_offset + 1];
+            const auto cond = reg_for( m_fn->operands[ inst.ops_offset ] );
+
+            const auto then_id = m_block_map[ a_id ];
+            const auto else_id = m_block_map[ b_id ];
+
+            m_builder.push( inst::Alu { .op = AluOp::Test, .dst = cond, .src = cond } );
+            m_builder.push( inst::Jcc { .cc = CC::NE, .target = then_id  } );
+            m_builder.push( inst::Jmp { .target = else_id } );
+        }
+
+        [[nodiscard]] static constexpr CC icmp_cc( const ir::ICmpCC cc ) noexcept
+        {
+            switch ( cc )
+            {
+                case ir::ICmpCC::eq:  return CC::E;
+                case ir::ICmpCC::ne:  return CC::NE;
+                case ir::ICmpCC::slt: return CC::L;
+                case ir::ICmpCC::sle: return CC::LE;
+                case ir::ICmpCC::sgt: return CC::G;
+                case ir::ICmpCC::sge: return CC::GE;
+                case ir::ICmpCC::ult: return CC::B;
+                case ir::ICmpCC::ule: return CC::BE;
+                case ir::ICmpCC::ugt: return CC::A;
+                case ir::ICmpCC::uge: return CC::AE;
+            }
         }
     };
 } // namespace xiao::x86_64
