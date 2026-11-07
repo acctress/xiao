@@ -7,8 +7,8 @@ namespace xiao::codegen
 {
     enum class RelocKind : uint8_t
     {
-        X86CallPCRel14, //! call rel32
-        Abs8            //! mov r64, imm64
+        X86CallPCRel4, //! call rel32
+        Abs8           //! mov r64, imm64
     };
 
     struct Reloc
