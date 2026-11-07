@@ -112,9 +112,23 @@ namespace xiao::x86_64 {
         }
     };
 
+    [[nodiscard]] inline MachineEnv host_machine_env() noexcept
+    {
+#if defined(_WIN64)
+        return win64_env();
+#else
+        return sysv_env();
+#endif
+    }
+
     [[nodiscard]] inline const X86ABISpec& host_abi() noexcept {
         static constexpr X86ABISpec k_spec;
         return k_spec;
+    }
+
+    [[nodiscard]] inline const ABISpec& host_abi_spec() noexcept
+    {
+        return host_abi();
     }
 
 }

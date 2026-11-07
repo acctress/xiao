@@ -97,7 +97,7 @@ namespace xiao::codegen {
 
         [[nodiscard]] static constexpr Reg invalid() noexcept { return Reg{}; }
 
-        [[nodiscard]] constexpr bool is_physical() const noexcept { return (bits >> 1) < (pinned_count / 2); }
+        [[nodiscard]] constexpr bool is_physical() const noexcept { return (bits >> 1) < pinned_count; }
 
         [[nodiscard]] constexpr bool is_virtual()  const noexcept { return !is_physical(); }
 
@@ -107,7 +107,7 @@ namespace xiao::codegen {
 
         [[nodiscard]] constexpr PReg as_preg() const noexcept {
             assert(is_physical());
-            return PReg::make(static_cast<uint8_t>(bits >> 1), static_cast<RegClass>(bits & 1));
+            return PReg::make(static_cast<uint8_t>((bits >> 1) & PReg::max_hw_enc), static_cast<RegClass>(bits & 1));
         }
 
         [[nodiscard]] constexpr RegClass rc()    const noexcept { return static_cast<RegClass>(bits & 1); }

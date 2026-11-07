@@ -34,7 +34,7 @@ namespace xiao::codegen
     {
     public:
         //! @brief Collect all register operands into `ops`
-        void get_operands( std::vector< MachOperand > &ops )
+        void get_operands( std::vector< MachOperand >& ops )
         { self( ).get_operands( ops ); }
 
         //! @brief How this instruction ends its block.
@@ -69,25 +69,29 @@ namespace xiao::codegen
 
         //! @brief Emit this instruction into `buf`
         template < typename State, typename Info >
-        void emit( std::vector< uint8_t > &buf, const Info &info, State &state ) const = delete;
+        void emit( std::vector< uint8_t >& buf, const Info& info, State& state ) const = delete;
 
         //! @brief Return a formatted, readable representation of this instruction
         template < typename State >
-        [[nodiscard]] std::string fmt( State &state ) const = delete;
+        [[nodiscard]] std::string fmt( State& state ) const = delete;
 
     private:
-        [[nodiscard]] Derived &self( ) noexcept
-        { return static_cast< Derived & >( *this ); }
+        [[nodiscard]] Derived& self( ) noexcept
+        { return static_cast< Derived& >( *this ); }
 
-        [[nodiscard]] const Derived &self( ) const noexcept
-        { return static_cast< const Derived & >( *this ); }
+        [[nodiscard]] const Derived& self( ) const noexcept
+        { return static_cast< const Derived& >( *this ); }
     };
 
-    template <typename T>
-    concept MachInstC = requires(T inst, std::vector<MachOperand>& ops)
-    {
+    template < typename T >
+    concept MachInstC = requires ( T inst, std::vector< MachOperand >& ops ) {
         inst.get_operands( ops );
-        { inst.is_term( )       } -> std::same_as<MachTerminator>;
-        { inst.is_mem_access( ) } -> std::same_as<bool>;
+        { inst.is_term( ) } -> std::same_as< MachTerminator >;
+        { inst.is_mem_access( ) } -> std::same_as< bool >;
+    };
+
+    template < typename T >
+    concept LabelUseC = requires ( T use, uint32_t from, uint32_t to ) {
+        { T::encode( use, from, to ) } -> std::same_as< int32_t >;
     };
 } // namespace xiao::codegen

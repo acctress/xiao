@@ -23,7 +23,7 @@ AlignConsecutiveMacros:
 AlignEscapedNewlines: Left
 AlignOperands: AlignAfterOperator
 AllowAllArgumentsOnNextLine: false
-AllowAllParametersOfDeclarationOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: true
 AllowShortBlocksOnASingleLine: Always
 AllowShortCaseLabelsOnASingleLine: true
 AllowShortEnumsOnASingleLine: true

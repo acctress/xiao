@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <optional>
 #include <xiao/codegen/reg.hh>
 
 namespace xiao::codegen {
@@ -82,7 +83,7 @@ namespace xiao::codegen {
         }
 
         //! @brief Returns the fixed PReg if this is a fixed constrained operand.
-        [[nodiscard]] constexpr std::optional<PReg> fixed_preg() const noexcept {
+        [[nodiscard]] constexpr std::optional< PReg > fixed_preg() const noexcept {
             if (!is_fixed()) return std::nullopt;
             PReg r;
             r.bits = static_cast<uint8_t>((bits & preg_mask) >> preg_shift);
