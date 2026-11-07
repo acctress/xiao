@@ -1,9 +1,12 @@
 #pragma once
 
-#include "machinst.hh"
-
-#include <vector>
+#include <xiao/codegen/machinst.hh>
+#include <xiao/codegen/compiled.hh>
+#include <xiao/codegen/reloc.hh>
+#include <cstring>
+#include <cassert>
 #include <cstdint>
+#include <vector>
 #include <span>
 
 namespace xiao::codegen
@@ -66,10 +69,7 @@ namespace xiao::codegen
 
         //! @brief Patches a previousl emitted 32-bit slot with a new value
         constexpr void patch_i32( const std::size_t offset, const int32_t value ) noexcept
-        {
-            auto* t = reinterpret_cast< uint32_t* >( m_bytes.data( ) + offset );
-            *t      = static_cast< uint32_t >( value );
-        }
+        { std::memcpy( m_bytes.data( ) + offset, &value, sizeof value ); }
 
         //! @brief Get a view of the emitted bytes
         [[nodiscard]] constexpr std::span< const uint8_t > data( ) const noexcept
@@ -102,14 +102,24 @@ namespace xiao::codegen
             m_fixups.push_back( { off, label, kind } );
         }
 
+        //! @brief Record a relocation for the field that starts at the current offset
+        void add_reloc( const RelocKind kind, const ir::ExternalName target, const int64_t addend )
+        { m_relocs.push_back( { static_cast< uint32_t >( current_offset( ) ), kind, target, addend } ); }
+
+        [[nodiscard]] CompiledCode finish( ) &&
+        {
+            resolve_labels( );
+            return CompiledCode { .code = std::move( m_bytes ), .relocs = std::move( m_relocs ) };
+        }
+
         void resolve_labels( )
         {
             for ( const auto& [ offset, label, kind ] : m_fixups )
             {
-                assert( m_label_offsets[ label ] != ~0u && "xiao::codegen::MachBuffer: unbound label at resolve time");
+                assert( m_label_offsets[ label ] != ~0u && "xiao::codegen::MachBuffer: unbound label at resolve time" );
 
                 const auto target = m_label_offsets[ label ];
-                const auto enc = LabelUse::encode( kind, offset, target );
+                const auto enc    = LabelUse::encode( kind, offset, target );
                 patch_i32( offset, enc );
             }
 
@@ -120,6 +130,7 @@ namespace xiao::codegen
         std::vector< uint8_t >    m_bytes { };
         std::vector< LabelFixup > m_fixups { };
         std::vector< uint32_t >   m_label_offsets { };
+        std::vector< Reloc >      m_relocs { };
     };
 
 } // namespace xiao::codegen

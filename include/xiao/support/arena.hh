@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <string_view>
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
@@ -11,6 +12,7 @@
 #include <memory>
 #include <span>
 #include <vector>
+#include <bit>
 
 namespace xiao::support
 {

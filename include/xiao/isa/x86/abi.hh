@@ -1,5 +1,8 @@
 #pragma once
 
+#include "machenv.hh"
+#include "xiao/codegen/machenv.hh"
+
 #include <xiao/codegen/abi.hh>
 #include <xiao/isa/x86/reg.hh>
 #include <utility>

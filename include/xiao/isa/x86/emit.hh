@@ -10,7 +10,7 @@ namespace xiao::x86_64
 {
     inline void emit( const VCode< X86Inst >& vcode, const regalloc::Allocations& allocs, MachBuffer< LabelUse >& buf )
     {
-        for ( uint32_t i { 0 }; i < vcode.blocks.size( ); ++i ) buf.new_label( );
+        for ( uint32_t i { 0 }; i < vcode.blocks.size( ); ++i ) ( void ) buf.new_label( );
 
         for ( uint32_t bi { 0 }; bi < vcode.blocks.size( ); ++bi )
         {

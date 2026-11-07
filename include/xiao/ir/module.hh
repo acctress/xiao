@@ -22,7 +22,8 @@ namespace xiao::ir
         IRModule( const IRModule& )             = delete;
         IRModule& operator= ( const IRModule& ) = delete;
 
-        [[nodiscard]] FunctionRef declare( const std::string_view name, const Type ret, const std::span< const Type > params = { } )
+        [[nodiscard]] FunctionRef declare( const std::string_view name, const Type ret, const std::span< const Type > params = { },
+                                           const codegen::CallConv cc = codegen::host_call_conv( ) )
         {
             auto*      fn        = m_arena.alloc< IRFunction >( );
             const auto id        = static_cast< uint32_t >( m_functions.size( ) );
@@ -31,23 +32,15 @@ namespace xiao::ir
             fn->name             = intern( name ).first;
             fn->sig.ret          = ret;
             fn->sig.params_count = static_cast< uint16_t >( params.size( ) );
+            fn->sig.cc           = cc;
             m_functions.push_back( fn );
             return FunctionRef { id };
         }
 
         [[nodiscard]] FunctionRef declare( const std::string_view name, const Type ret,
-                                           const std::initializer_list< const Type > params = { } )
-        {
-            auto*      fn        = m_arena.alloc< IRFunction >( );
-            const auto id        = static_cast< uint32_t >( m_functions.size( ) );
-            fn->arena            = &m_arena;
-            fn->self             = FunctionRef { id };
-            fn->name             = intern( name ).first;
-            fn->sig.ret          = ret;
-            fn->sig.params_count = static_cast< uint16_t >( params.size( ) );
-            m_functions.push_back( fn );
-            return FunctionRef { id };
-        }
+                                           const std::initializer_list< const Type > params = { },
+                                           const codegen::CallConv                   cc     = codegen::host_call_conv( ) )
+        { return declare( name, ret, std::span { params.begin( ), params.size( ) }, cc ); }
 
         //! @brief Intern a string; returns a StringRef + view pair.
         [[nodiscard]] std::pair< StringRef, std::string_view > intern( const std::string_view sv )
@@ -110,7 +103,7 @@ namespace xiao::ir
                         const auto& [ op, cc, result, ops_offset, ops_count, imm ] { fn->insts[ b.insts_offset + ii ] };
                         std::format_to( out, "    " );
 
-                        switch (  op )
+                        switch ( op )
                         {
                             case IROp::iconst:
                                 std::format_to( out, "v{} = iconst {} #{}\n", result.id, fn->values[ result.id ].type, imm );
@@ -119,12 +112,12 @@ namespace xiao::ir
                             case IROp::isub:
                             case IROp::imul:
                             case IROp::idiv:
-                                std::format_to( out, "v{} = {} v{}, v{}\n", result.id,  op, fn->operands[ ops_offset ].id,
+                                std::format_to( out, "v{} = {} v{}, v{}\n", result.id, op, fn->operands[ ops_offset ].id,
                                                 fn->operands[ ops_offset + 1 ].id );
                                 break;
                             case IROp::icmp:
-                                std::format_to( out, "v{} = icmp {} v{}, v{}\n", result.id, cc,
-                                                fn->operands[ ops_offset ].id, fn->operands[ ops_offset + 1 ].id );
+                                std::format_to( out, "v{} = icmp {} v{}, v{}\n", result.id, cc, fn->operands[ ops_offset ].id,
+                                                fn->operands[ ops_offset + 1 ].id );
                                 break;
                             case IROp::br:
                             {

@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "xiao/codegen/call_conv.hh"
+
 #include <xiao/codegen/machenv.hh>
 #include <xiao/isa/x86/reg.hh>
 
@@ -51,5 +53,15 @@ namespace xiao::x86_64
             .non_preferred = {k_win64_non_preferred_int, std::span< const PReg > { }},
             .scratch       = {                      R10,                        XMM4},
         };
+    }
+
+    [[nodiscard]] inline codegen::MachineEnv env_for( const codegen::CallConv cc ) noexcept
+    {
+        switch ( cc )
+        {
+            case codegen::CallConv::SystemV:         return sysv_env( );
+            case codegen::CallConv::WindowsFastcall: return win64_env( );
+        }
+        std::unreachable( );
     }
 } // namespace xiao::x86_64
