@@ -154,6 +154,18 @@ namespace xiao::ir
         [[nodiscard]] ValueRef call( const FuncRef callee, const std::span< const ValueRef > args )
         { return emit( IROp::call, m_ext_funcs[ callee.id ].ret, args, callee.id ); }
 
+        [[nodiscard]] ValueRef load( const Type ty, const ValueRef addr, const int32_t offset = 0 )
+        {
+            const ValueRef ops[] = { addr };
+            return emit( IROp::load, ty, ops, static_cast< uint64_t >( static_cast< int64_t >( offset ) ) );
+        }
+
+        void store( const ValueRef value, const ValueRef addr, const int32_t offset = 0 )
+        {
+            const ValueRef ops[] = { value, addr };
+            emit( IROp::store, Type::unit, ops, static_cast< uint64_t >( static_cast< int64_t >( offset ) ) );
+        }
+
         void finalise( )
         {
             auto& arena = *m_fn.arena;

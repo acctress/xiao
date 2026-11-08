@@ -20,7 +20,9 @@ namespace xiao::ir
         br,
         brif,
         ret,
-        call
+        call,
+        store,
+        load,
     };
 
     //! @brief Condition kinds for icmp.
@@ -50,6 +52,10 @@ namespace xiao::ir
         uint16_t ops_count { };
         uint64_t imm { };
     };
+
+    //! @brief Read the offset out of `inst.imm`
+    [[nodiscard]] constexpr int32_t mem_offset( const IRInst& inst ) noexcept
+    { return static_cast< int32_t >( static_cast< int64_t >( inst.imm ) ); }
 } // namespace xiao::ir
 
 template <>
@@ -73,6 +79,8 @@ struct std::formatter< xiao::ir::IROp >
             case brif: return std::format_to( ctx.out( ), "brif" );
             case ret: return std::format_to( ctx.out( ), "ret" );
             case call: return std::format_to( ctx.out( ), "call" );
+            case store: return std::format_to( ctx.out( ), "store" );
+            case load: return std::format_to( ctx.out( ), "load" );
         }
     }
 };

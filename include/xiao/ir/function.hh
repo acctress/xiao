@@ -12,6 +12,7 @@
 #include <xiao/ir/types.hh>
 #include <xiao/ir/refs.hh>
 #include <span>
+#include <variant>
 
 namespace xiao::ir
 {
@@ -52,4 +53,26 @@ namespace xiao::ir
         std::span< ExtFunc >  ext_funcs { };
         std::span< Type >     ext_param_types { };
     };
+
+    struct BranchArgs
+    {
+        std::span< const ValueRef > then_args { };
+        std::span< const ValueRef > else_args { };
+    };
+
+    [[nodiscard]] inline BranchArgs branch_args( const IRFunction& fn, const IRBlock& block, const IRInst& term )
+    {
+        const auto ops = fn.operands.subspan( term.ops_offset, term.ops_count );
+        switch ( term.op )
+        {
+            case IROp::br: return { .then_args = ops, .else_args = { } };
+            case IROp::brif:
+            {
+                const auto& then_b = fn.blocks[ fn.succs[ block.succs_offset ].id ];
+                const auto  rest   = ops.subspan( 1 );
+                return { .then_args = rest.first( then_b.params_count ), .else_args = rest.subspan( then_b.params_count ) };
+            }
+            default: return { };
+        }
+    }
 } // namespace xiao::ir

@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <format>
+#include <string>
 #include <unordered_map>
 #include <xiao/support/arena.hh>
 #include <xiao/ir/function.hh>
@@ -25,13 +27,13 @@ namespace xiao::ir
         [[nodiscard]] FunctionRef declare( const std::string_view name, const Type ret, const std::span< const Type > params = { },
                                            const codegen::CallConv cc = codegen::host_call_conv( ) )
         {
-            auto*      fn        = m_arena.alloc< IRFunction >( );
-            const auto id        = static_cast< uint32_t >( m_functions.size( ) );
-            fn->arena            = &m_arena;
-            fn->self             = FunctionRef { id };
-            fn->name             = intern( name ).first;
-            fn->sig.ret          = ret;
-            fn->sig.cc           = cc;
+            auto*      fn = m_arena.alloc< IRFunction >( );
+            const auto id = static_cast< uint32_t >( m_functions.size( ) );
+            fn->arena     = &m_arena;
+            fn->self      = FunctionRef { id };
+            fn->name      = intern( name ).first;
+            fn->sig.ret   = ret;
+            fn->sig.cc    = cc;
             if ( !params.empty( ) )
             {
                 fn->sig.params = m_arena.alloc_array_uninit< Type >( params.size( ) );
@@ -98,6 +100,13 @@ namespace xiao::ir
                     std::format_to( out, ") -> {}\n", e.ret );
                 }
 
+                const auto target = [ & ]( const uint32_t id, const std::span< const ValueRef > args )
+                {
+                    std::format_to( out, "b{}(", id );
+                    for ( auto ai { 0uz }; ai < args.size( ); ++ai ) std::format_to( out, "{}v{}", ai ? ", " : "", args[ ai ].id );
+                    std::format_to( out, ")" );
+                };
+
                 for ( auto bi { 0uz }; bi < fn->blocks.size( ); ++bi )
                 {
                     const auto& b { fn->blocks[ bi ] };
@@ -134,16 +143,20 @@ namespace xiao::ir
                                 break;
                             case IROp::br:
                             {
-                                const auto target = fn->succs[ b.succs_offset ].id;
-                                std::format_to( out, "br b{}\n", target );
+                                const auto [ then_args, else_args ] = branch_args( *fn, b, fn->insts[ b.insts_offset + ii ] );
+                                std::format_to( out, "br " );
+                                target( fn->succs[ b.succs_offset ].id,  then_args );
+                                std::format_to( out, "\n" );
                                 break;
                             }
                             case IROp::brif:
                             {
-                                const auto cond       = fn->operands[ ops_offset ].id;
-                                const auto then_block = fn->succs[ b.succs_offset ].id;
-                                const auto else_block = fn->succs[ b.succs_offset + 1 ].id;
-                                std::format_to( out, "brif v{}, b{}, b{}\n", cond, then_block, else_block );
+                                const auto [ then_args, else_args ] = branch_args( *fn, b, fn->insts[ b.insts_offset + ii ] );
+                                std::format_to( out, "brif v{}, ", fn->operands[ ops_offset ].id );
+                                target( fn->succs[ b.succs_offset ].id, then_args );
+                                std::format_to( out, ", " );
+                                target( fn->succs[ b.succs_offset + 1 ].id, else_args );
+                                std::format_to( out, "\n" );
                                 break;
                             }
                             case IROp::ret:
@@ -158,6 +171,20 @@ namespace xiao::ir
                                 for ( uint16_t oi = 0; oi < ops_count; ++oi )
                                     std::format_to( out, "{}v{}", oi ? ", " : "", fn->operands[ ops_offset + oi ].id );
                                 std::format_to( out, ")\n" );
+                                break;
+                            }
+                            case IROp::load:
+                            {
+                                const auto off = mem_offset( fn->insts[ b.insts_offset + ii ] );
+                                std::format_to( out, "v{} = load.{} v{}{}\n", result.id, fn->values[ result.id ].type, fn->operands[ ops_offset ].id,
+                                                off ? std::format( "{:+}", off ) : std::string { } );
+                                break;
+                            }
+                            case IROp::store:
+                            {
+                                const auto off = mem_offset( fn->insts[ b.insts_offset + ii ] );
+                                std::format_to( out, "store v{}, v{}{}\n", fn->operands[ ops_offset ].id, fn->operands[ ops_offset + 1 ].id,
+                                                off ? std::format( "{:+}", off ) : std::string { } );
                                 break;
                             }
                         }

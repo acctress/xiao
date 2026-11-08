@@ -95,27 +95,9 @@ namespace xiao::x86_64
                     const auto base  = next( );
                     const auto index = inst.mem.index.valid( ) ? next( ) : PReg::invalid( );
 
-                    emit_rex( buf, true, dst, base );
+                    emit_rex_mem( buf, true, dst, base, index );
                     buf.emit_u8( 0x8B );
-
-                    if ( index.valid( ) )
-                    {
-                        buf.emit_u8( modrm( 0b10, dst.hw( ), 0b100 ) );
-                        buf.emit_u8(
-                            static_cast< uint8_t >( ( inst.mem.scale << 6 ) | ( ( index.hw( ) & 7 ) << 3 ) | ( base.hw( ) & 7 ) ) );
-                        buf.emit_i32( inst.mem.disp );
-                    }
-                    else if ( inst.mem.disp == 0 && ( base.hw( ) & 7 ) != 5 ) { buf.emit_u8( modrm( 0b00, dst.hw( ), base.hw( ) ) ); }
-                    else if ( inst.mem.disp >= -128 && inst.mem.disp <= 127 )
-                    {
-                        buf.emit_u8( modrm( 0b01, dst.hw( ), base.hw( ) ) );
-                        buf.emit_u8( static_cast< uint8_t >( inst.mem.disp ) );
-                    }
-                    else
-                    {
-                        buf.emit_u8( modrm( 0b10, dst.hw( ), base.hw( ) ) );
-                        buf.emit_i32( inst.mem.disp );
-                    }
+                    emit_mem_operand( buf, dst.hw( ), base, index, inst.mem.scale, inst.mem.disp );
                 }
                 else if constexpr ( std::is_same_v< T, inst::MovStore > )
                 {
@@ -123,27 +105,9 @@ namespace xiao::x86_64
                     const auto index = inst.mem.index.valid( ) ? next( ) : PReg::invalid( );
                     const auto src   = next( );
 
-                    emit_rex( buf, true, src, base );
+                    emit_rex_mem( buf, true, src, base, index );
                     buf.emit_u8( 0x89 );
-
-                    if ( index.valid( ) )
-                    {
-                        buf.emit_u8( modrm( 0b10, src.hw( ), 0b100 ) );
-                        buf.emit_u8(
-                            static_cast< uint8_t >( ( inst.mem.scale << 6 ) | ( ( index.hw( ) & 7 ) << 3 ) | ( base.hw( ) & 7 ) ) );
-                        buf.emit_i32( inst.mem.disp );
-                    }
-                    else if ( inst.mem.disp == 0 && ( base.hw( ) & 7 ) != 5 ) { buf.emit_u8( modrm( 0b00, src.hw( ), base.hw( ) ) ); }
-                    else if ( inst.mem.disp >= -128 && inst.mem.disp <= 127 )
-                    {
-                        buf.emit_u8( modrm( 0b01, src.hw( ), base.hw( ) ) );
-                        buf.emit_u8( static_cast< uint8_t >( inst.mem.disp ) );
-                    }
-                    else
-                    {
-                        buf.emit_u8( modrm( 0b10, src.hw( ), base.hw( ) ) );
-                        buf.emit_i32( inst.mem.disp );
-                    }
+                    emit_mem_operand( buf, src.hw( ), base, index, inst.mem.scale, inst.mem.disp );
                 }
                 else if constexpr ( std::is_same_v< T, inst::Movzx > )
                 {

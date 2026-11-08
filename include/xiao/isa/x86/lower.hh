@@ -12,7 +12,9 @@
 #include <xiao/codegen/machenv.hh>
 #include <xiao/codegen/vcode.hh>
 
+#include <algorithm>
 #include <cassert>
+#include <span>
 #include <vector>
 
 namespace xiao::x86_64
@@ -28,6 +30,8 @@ namespace xiao::x86_64
             m_vreg_c    = Reg::pinned_count;
             m_cur_block = 0;
             m_value_regs.clear( );
+            m_term_succs.clear( );
+            m_pending_edges.clear( );
             m_builder = codegen::VCodeBuilder< X86Inst > { };
 
             std::vector< ir::Type > ret_tys;
@@ -51,6 +55,17 @@ namespace xiao::x86_64
 
             visit_function( fn );
 
+            for ( const auto& edge : m_pending_edges )
+            {
+                m_builder.begin_block( edge.block );
+                lower_block_args( edge.args, *edge.target );
+                m_builder.push( inst::Jmp { .target = edge.target_id } );
+
+                m_term_succs.clear( );
+                m_term_succs.push_back( edge.target_id );
+                m_builder.end_block( m_term_succs );
+            }
+
             m_fn = nullptr;
             return std::move( m_builder ).finalise( );
         }
@@ -61,17 +76,15 @@ namespace xiao::x86_64
 
         void on_block( ir::IRFunction& fn, ir::IRBlock& b )
         {
+            m_term_succs.clear( );
+
             const bool is_ent = m_cur_block == 0;
             m_builder.begin_block( m_block_map[ m_cur_block++ ] );
             if ( is_ent ) lower_params( fn, b );
         }
 
         void on_block_end( ir::IRFunction& fn, ir::IRBlock& block )
-        {
-            std::vector< BlockId > succs;
-            for ( auto i { 0u }; i < block.succs_count; ++i ) succs.push_back( m_block_map[ fn.succs[ block.succs_offset + i ].id ] );
-            m_builder.end_block( succs );
-        }
+        { m_builder.end_block( m_term_succs ); }
 
         void on_inst( ir::IRFunction&, ir::IRBlock& block, ir::IRInst& inst )
         {
@@ -88,19 +101,31 @@ namespace xiao::x86_64
                 case brif: lower_brif( block, inst ); break;
                 case idiv: lower_idiv( inst ); break;
                 case call: lower_call( inst ); break;
+                case load: lower_load( inst ); break;
+                case store: lower_store( inst ); break;
             }
         }
 
     private:
-        ir::IRFunction*         m_fn { nullptr };
-        const MachineEnv&       m_env;
-        const ABISpec&          m_abi;
-        ABISig                  m_sig { };
-        VCodeBuilder< X86Inst > m_builder { };
-        std::vector< VReg >     m_value_regs { };
-        std::vector< BlockId >  m_block_map { };
-        uint32_t                m_vreg_c { };
-        uint32_t                m_cur_block { };
+        struct PendingEdge
+        {
+            BlockId                         block { };
+            std::span< const ir::ValueRef > args { };
+            const ir::IRBlock*              target { };
+            BlockId                         target_id { };
+        };
+
+        ir::IRFunction*            m_fn { nullptr };
+        const MachineEnv&          m_env;
+        const ABISpec&             m_abi;
+        ABISig                     m_sig { };
+        VCodeBuilder< X86Inst >    m_builder { };
+        std::vector< VReg >        m_value_regs { };
+        std::vector< BlockId >     m_block_map { };
+        std::vector< BlockId >     m_term_succs { };
+        std::vector< PendingEdge > m_pending_edges { };
+        uint32_t                   m_vreg_c { };
+        uint32_t                   m_cur_block { };
 
         [[nodiscard]] VReg alloc_vreg( const ir::Type type ) noexcept
         {
@@ -161,7 +186,7 @@ namespace xiao::x86_64
                 const auto ret_preg = m_sig.rets[ 0 ].reg( );
 
                 m_builder.push( inst::Mov {
-                    .dst = codegen::Reg::from_preg( ret_preg ),
+                    .dst = Reg::from_preg( ret_preg ),
                     .src = src,
                 } );
             }
@@ -183,23 +208,57 @@ namespace xiao::x86_64
 
         void lower_br( ir::IRBlock& block, const ir::IRInst& inst )
         {
-            const auto succ = m_fn->succs[ block.succs_offset ];
-            const auto ref  = m_block_map[ succ.id ];
+            const auto [ id ]  = m_fn->succs[ block.succs_offset ];
+            const auto& target = m_fn->blocks[ id ];
+            const auto  ref    = m_block_map[ id ];
+
+            lower_block_args( ir::branch_args( *m_fn, block, inst ).then_args, target );
             m_builder.push( inst::Jmp { .target = ref } );
+            m_term_succs.push_back( ref );
         }
 
         void lower_brif( ir::IRBlock& block, const ir::IRInst& inst )
         {
-            const auto [ a_id ] = m_fn->succs[ block.succs_offset ];
-            const auto [ b_id ] = m_fn->succs[ block.succs_offset + 1 ];
-            const auto cond     = reg_for( m_fn->operands[ inst.ops_offset ] );
+            const auto [ a_id ]                 = m_fn->succs[ block.succs_offset ];
+            const auto [ b_id ]                 = m_fn->succs[ block.succs_offset + 1 ];
+            const auto& then_b                  = m_fn->blocks[ a_id ];
+            const auto& else_b                  = m_fn->blocks[ b_id ];
+            const auto [ then_args, else_args ] = ir::branch_args( *m_fn, block, inst );
+            const auto cond                     = reg_for( m_fn->operands[ inst.ops_offset ] );
 
             const auto then_id = m_block_map[ a_id ];
             const auto else_id = m_block_map[ b_id ];
 
+            auto jcc_target = then_id;
+            if ( !then_args.empty( ) )
+            {
+                jcc_target = m_builder.start_block( );
+                m_pending_edges.push_back( { .block = jcc_target, .args = then_args, .target = &then_b, .target_id = then_id } );
+            }
+
             m_builder.push( inst::Alu { .op = AluOp::Test, .dst = cond, .src = cond } );
-            m_builder.push( inst::Jcc { .cc = CC::NE, .target = then_id } );
+            m_builder.push( inst::Jcc { .cc = CC::NE, .target = jcc_target } );
+            lower_block_args( else_args, else_b );
             m_builder.push( inst::Jmp { .target = else_id } );
+
+            m_term_succs.push_back( jcc_target );
+            m_term_succs.push_back( else_id );
+        }
+
+        void lower_load( const ir::IRInst& inst )
+        {
+            m_builder.push( inst::MovLoad {
+                .dst = reg_for( inst.result ),
+                .mem = { .base = reg_for( m_fn->operands[ inst.ops_offset ] ), .disp = ir::mem_offset( inst ) },
+            } );
+        }
+
+        void lower_store( const ir::IRInst& inst )
+        {
+            m_builder.push( inst::MovStore {
+                .mem = { .base = reg_for( m_fn->operands[ inst.ops_offset + 1 ] ), .disp = ir::mem_offset( inst ) },
+                .src = reg_for( m_fn->operands[ inst.ops_offset ] ),
+            } );
         }
 
         void lower_idiv( const ir::IRInst& inst )
@@ -217,15 +276,64 @@ namespace xiao::x86_64
             m_builder.push( inst::Mov { .dst = res, .src = rax } );
         }
 
+        void lower_block_args( const std::span< const ir::ValueRef > args, const ir::IRBlock& target )
+        {
+            assert( args.size( ) == target.params_count );
+
+            struct Copy
+            {
+                VReg     dst { };
+                VReg     src { };
+                ir::Type ty { };
+            };
+
+            std::vector< Copy > copies;
+            copies.reserve( args.size( ) );
+            for ( uint16_t i { 0 }; i < target.params_count; ++i )
+            {
+                const auto dst = vreg_for( m_fn->block_params[ target.params_offset + i ] );
+                if ( const auto src = vreg_for( args[ i ] ); dst != src )
+                    copies.push_back( { .dst = dst, .src = src, .ty = m_fn->values[ args[ i ].id ].type } );
+            }
+
+            const auto overlaps = std::ranges::any_of( copies,
+                                                       [ & ]( const Copy& c )
+                                                       {
+                                                           return std::ranges::any_of( copies,
+                                                                                       [ & ]( const Copy& d )
+                                                                                       {
+                                                                                           return c.src == d.dst;
+                                                                                       } );
+                                                       } );
+
+            if ( !overlaps )
+            {
+                for ( const auto& c : copies )
+                    m_builder.push( inst::Mov { .dst = Reg::from_vreg( c.dst ), .src = Reg::from_vreg( c.src ) } );
+                return;
+            }
+
+            std::vector< VReg > temps;
+            temps.reserve( copies.size( ) );
+            for ( const auto& c : copies )
+            {
+                temps.push_back( alloc_vreg( c.ty ) );
+                m_builder.push( inst::Mov { .dst = Reg::from_vreg( temps.back( ) ), .src = Reg::from_vreg( c.src ) } );
+            }
+
+            for ( std::size_t i { 0 }; i < copies.size( ); ++i )
+                m_builder.push( inst::Mov { .dst = Reg::from_vreg( copies[ i ].dst ), .src = Reg::from_vreg( temps[ i ] ) } );
+        }
+
         void lower_call( const ir::IRInst& inst )
         {
-            const auto& ext    = m_fn->ext_funcs[ inst.imm ];
-            const auto  params = m_fn->ext_param_types.subspan( ext.params_offset, ext.params_count );
+            const auto& [ name, ret, params_offset, params_count, cc, colocated ] = m_fn->ext_funcs[ inst.imm ];
+            const auto params = m_fn->ext_param_types.subspan( params_offset, params_count );
 
             std::vector< ir::Type > rets;
-            if ( ext.ret != ir::Type::unit ) rets.push_back( ext.ret );
+            if ( ret != ir::Type::unit ) rets.push_back( ret );
 
-            const auto csig = m_abi.compute( ext.cc, params, rets );
+            const auto csig = m_abi.compute( cc, params, rets );
 
             std::vector< PReg > args;
             args.reserve( inst.ops_count );
@@ -233,16 +341,17 @@ namespace xiao::x86_64
             {
                 assert( csig.params[ i ].is_reg( ) && "[xiao::lower::lower_call] stack passed args not supported YET" );
                 args.push_back( csig.params[ i ].reg( ) );
-                m_builder.push( inst::Mov { .dst = Reg::from_preg( args.back( ) ), .src = reg_for( m_fn->operands[ inst.ops_offset + i ] ) } );
+                m_builder.push(
+                    inst::Mov { .dst = Reg::from_preg( args.back( ) ), .src = reg_for( m_fn->operands[ inst.ops_offset + i ] ) } );
             }
 
             const auto ret_preg = rets.empty( ) ? PReg::invalid( ) : csig.rets[ 0 ].reg( );
 
-            if ( ext.colocated ) m_builder.push( inst::Call { .name = ext.name, .args = std::move( args ), .ret = ret_preg } );
+            if ( colocated ) m_builder.push( inst::Call { .name = name, .args = std::move( args ), .ret = ret_preg } );
             else
             {
                 const auto target = Reg::from_vreg( alloc_vreg( ir::Type::i64 ) );
-                m_builder.push( inst::LoadExtName { .dst = target, .name = ext.name } );
+                m_builder.push( inst::LoadExtName { .dst = target, .name = name } );
                 m_builder.push( inst::CallInd { .target = target, .args = std::move( args ), .ret = ret_preg } );
             }
 
