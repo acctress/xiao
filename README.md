@@ -72,6 +72,12 @@ The architecture is modelled on [Cranelift](https://cranelift.dev), and the libr
 - Disassembles compiled code to Intel syntax using [Zydis](https://github.com/zyantific/zydis),
   annotated with relocations
 
+**xiao-object**
+- Ahead of time compilation to COFF object files that link with `lld-link` and `link.exe`
+- Functions and data placed in `.text`, `.rdata`, `.data` and `.bss`, with symbols for each
+  declaration and relocations resolved by the linker
+- A readable dump of an object's sections, symbols, relocations and contents
+
 ## Example
 
 The following compiles `calc(x, y) = sqr_func(x + y) - x * y` with `xiao-jit`, where `sqr_func` is
@@ -163,8 +169,12 @@ Data in the same module is addressed with a RIP-relative `lea`. Writable data (`
 `get_finalised_data`. A `DataDescription` can also hold the addresses of functions and other data
 objects, which are filled in when the module is finalised.
 
-A larger example using every supported feature can be found in [`source/entry.cc`](source/entry.cc).
-Run it with `ir`, `asm` or `all` to print the IR and machine code of every function.
+### Ahead of time compilation
+
+`xiao-object` implements the same `Module` interface but writes an object file instead of loading
+the code. [`source/entry.cc`](source/entry.cc) uses it to build a hello world program: it builds
+`main` in the IR, calls `puts` with a string held in a data object, writes `hello.obj`, prints its
+sections, symbols, relocations and machine code, then links it with `clang` and runs it.
 
 ## Architecture
 
@@ -188,8 +198,8 @@ cmake --build build
 
 The executable is written to `bin/exe/`. xiao is developed and tested with Clang on Windows.
 
-By default the example also prints the generated machine code using `xiao-disasm`, which downloads
-Zydis at configure time. Pass `-DXIAO_DISASM=OFF` to build without it. The xiao library itself has
+The example links its object file with `clang`, which must be on the `PATH`. By default it also
+prints the generated machine code using `xiao-disasm`, which downloads Zydis at configure time. Pass `-DXIAO_DISASM=OFF` to build without it. The xiao library itself has
 no dependencies.
 
 ## Project layout
@@ -202,6 +212,7 @@ no dependencies.
 | `include/xiao/regalloc` | Liveness, live ranges, coalescing, the backtracking allocator, move resolution and the checker |
 | `include/xiao/module` | Function and data declarations, `DataDescription`, linkage and the `Module` interface |
 | `include/xiao-jit` | JIT module, builder, and code and data memory |
+| `include/xiao-object` | Object module, object file model, COFF writer and dumper |
 | `include/xiao-disasm` | Optional disassembler for compiled code, built on Zydis |
 
 ## Status
@@ -212,7 +223,7 @@ xiao is in early development. The following are not yet supported:
 - Floating point types.
 - Arguments passed on the stack.
 - Indirect calls through function pointers.
-- Ahead of time compilation and object file output.
+- ELF and Mach-O object files.
 - Thread-local data and unwind information.
 
 ## Acknowledgements

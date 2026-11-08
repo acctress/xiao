@@ -156,10 +156,10 @@ namespace xiao::jit
 
         [[nodiscard]] const void* lookup_symbol( const std::string_view name ) const
         {
-            if ( const auto it = m_builder.m_symbols.find( name ); it != m_builder.m_symbols.end( ) ) return it->second;
+            if ( const auto iter = m_builder.m_symbols.find( name ); iter != m_builder.m_symbols.end( ) ) return iter->second;
 
-            for ( auto it = m_builder.m_lookup_fns.rbegin( ); it != m_builder.m_lookup_fns.rend( ); ++it )
-                if ( const auto p = ( *it )( name ) ) return p;
+            for ( auto iter = m_builder.m_lookup_fns.rbegin( ); iter != m_builder.m_lookup_fns.rend( ); ++iter )
+                if ( const auto p = ( *iter )( name ) ) return p;
 
             return nullptr;
         }

@@ -141,12 +141,12 @@ namespace xiao::regalloc
             {
                 for ( const auto& s : range.segments )
                 {
-                    const auto it = std::ranges::lower_bound( entries, s.from, { },
-                                                              []( const Entry& e )
-                                                              {
-                                                                  return e.seg.from;
-                                                              } );
-                    entries.insert( it, Entry { s, owner } );
+                    const auto iter = std::ranges::lower_bound( entries, s.from, { },
+                                                                []( const Entry& e )
+                                                                {
+                                                                    return e.seg.from;
+                                                                } );
+                    entries.insert( iter, Entry { s, owner } );
                 }
             }
 
@@ -349,7 +349,7 @@ namespace xiao::regalloc
 
                 for ( const auto& [ from, to ] : busy )
                 {
-                    consider( cursor,  from );
+                    consider( cursor, from );
                     cursor = std::max( cursor, to );
                 }
                 consider( cursor, end );

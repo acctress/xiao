@@ -37,9 +37,16 @@ namespace xiao::x86_64
 
         const auto used = [ & ]( const PReg pr )
         {
-            const auto holds = [ & ]( const regalloc::Allocation& a ) { return a.is_reg( ) && a.preg == pr; };
+            const auto holds = [ & ]( const regalloc::Allocation& a )
+            {
+                return a.is_reg( ) && a.preg == pr;
+            };
             return std::ranges::any_of( allocs.ops, holds )
-                || std::ranges::any_of( allocs.edits, [ & ]( const regalloc::Edit& e ) { return holds( e.from ) || holds( e.to ); } );
+                || std::ranges::any_of( allocs.edits,
+                                        [ & ]( const regalloc::Edit& e )
+                                        {
+                                            return holds( e.from ) || holds( e.to );
+                                        } );
         };
 
         for ( const auto pr : env.non_preferred[ 0 ] )
@@ -114,11 +121,13 @@ namespace xiao::x86_64
             auto                          end = e;
             for ( ; end != edits.end( ) && end->prio == e->prio; ++end )
             {
-                assert( ( !end->from.is_reg( ) || end->from.preg.rc( ) == RegClass::Int ) && ( !end->to.is_reg( ) || end->to.preg.rc( ) == RegClass::Int )
+                assert( ( !end->from.is_reg( ) || end->from.preg.rc( ) == RegClass::Int )
+                        && ( !end->to.is_reg( ) || end->to.preg.rc( ) == RegClass::Int )
                         && "[xiao::x86_64::emit_edits] float moves not supported YET" );
                 group.push_back( { end->from, end->to } );
             }
-            for ( const auto& m : regalloc::sequence_parallel_moves( std::move( group ), regalloc::Allocation { .preg = frame.scratch[ 0 ] } ) )
+            for ( const auto& m :
+                  regalloc::sequence_parallel_moves( std::move( group ), regalloc::Allocation { .preg = frame.scratch[ 0 ] } ) )
                 emit_move( buf, frame, m );
             e = end;
         }
@@ -156,10 +165,10 @@ namespace xiao::x86_64
     {
         if ( frame.stack_adjust ) emit_rsp_adjust( buf, 0, frame.stack_adjust );
 
-        for ( auto it = frame.saved.rbegin( ); it != frame.saved.rend( ); ++it )
+        for ( auto iter = frame.saved.rbegin( ); iter != frame.saved.rend( ); ++iter )
         {
-            if ( it->hw( ) >= 8 ) buf.emit_u8( 0x41 );
-            buf.emit_u8( static_cast< uint8_t >( 0x58 + ( it->hw( ) & 7 ) ) );
+            if ( iter->hw( ) >= 8 ) buf.emit_u8( 0x41 );
+            buf.emit_u8( static_cast< uint8_t >( 0x58 + ( iter->hw( ) & 7 ) ) );
         }
     }
 } // namespace xiao::x86_64

@@ -198,10 +198,10 @@ namespace xiao::module
 
         [[nodiscard]] std::expected< DataId, ModuleError > declare_data( std::string_view name, Linkage linkage, bool writable );
 
-        [[nodiscard]] const FunctionDecl& get( FuncId id ) const
+        [[nodiscard]] const FunctionDecl& get( const FuncId id ) const
         { return m_funcs[ id.id ]; }
 
-        [[nodiscard]] const DataDecl& get( DataId id ) const
+        [[nodiscard]] const DataDecl& get( const DataId id ) const
         { return m_data[ id.id ]; }
 
         [[nodiscard]] std::optional< FuncOrDataId > get_name( std::string_view name ) const;
@@ -231,7 +231,8 @@ namespace xiao::module
         [[nodiscard]] virtual std::expected< FuncId, ModuleError > declare_function( std::string_view name, Linkage linkage,
                                                                                      const Signature& sig ) = 0;
 
-        [[nodiscard]] virtual std::expected< DataId, ModuleError > declare_data( std::string_view name, Linkage linkage, bool writable ) = 0;
+        [[nodiscard]] virtual std::expected< DataId, ModuleError > declare_data( std::string_view name, Linkage linkage, bool writable )
+            = 0;
 
         [[nodiscard]] virtual std::expected< void, ModuleError > define_function( FuncId id, codegen::Context& ctx ) = 0;
 
@@ -267,9 +268,9 @@ namespace xiao::module
     inline std::expected< FuncId, ModuleError > ModuleDeclarations::declare_function( const std::string_view name, const Linkage linkage,
                                                                                       const Signature& sig )
     {
-        if ( const auto it = m_names.find( name ); it != m_names.end( ) )
+        if ( const auto iter = m_names.find( name ); iter != m_names.end( ) )
         {
-            const auto* id = std::get_if< FuncId >( &it->second );
+            const auto* id = std::get_if< FuncId >( &iter->second );
             if ( !id ) return std::unexpected( ModuleError::IncompatibleDeclaration );
 
             auto& decl = m_funcs[ id->id ];
@@ -290,9 +291,9 @@ namespace xiao::module
     inline std::expected< DataId, ModuleError > ModuleDeclarations::declare_data( const std::string_view name, const Linkage linkage,
                                                                                   const bool writable )
     {
-        if ( const auto it = m_names.find( name ); it != m_names.end( ) )
+        if ( const auto iter = m_names.find( name ); iter != m_names.end( ) )
         {
-            const auto* id = std::get_if< DataId >( &it->second );
+            const auto* id = std::get_if< DataId >( &iter->second );
             if ( !id ) return std::unexpected( ModuleError::IncompatibleDeclaration );
 
             auto&      decl   = m_data[ id->id ];
@@ -311,7 +312,7 @@ namespace xiao::module
 
     inline std::optional< FuncOrDataId > ModuleDeclarations::get_name( const std::string_view name ) const
     {
-        if ( const auto it = m_names.find( name ); it != m_names.end( ) ) return it->second;
+        if ( const auto iter = m_names.find( name ); iter != m_names.end( ) ) return iter->second;
         return std::nullopt;
     }
 
@@ -325,8 +326,11 @@ namespace xiao::module
     inline ir::GlobalValueRef Module::declare_data_in_func( const DataId id, ir::IRBuilder& builder ) const
     {
         const auto& decl = declarations( ).get( id );
-        return builder.create_global_value(
-            ir::GlobalValueData { .name = ir::ExternalName { ir::extns::data, id.id }, .offset = 0, .colocated = decl.linkage != Linkage::Import } );
+        return builder.create_global_value( ir::GlobalValueData {
+            .name      = ir::ExternalName { ir::extns::data, id.id },
+            .offset    = 0,
+            .colocated = decl.linkage != Linkage::Import
+        } );
     }
 
     inline ir::FuncRef Module::declare_func_in_data( const FuncId id, DataDescription& data ) const

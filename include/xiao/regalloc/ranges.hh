@@ -53,9 +53,9 @@ namespace xiao::regalloc
 
         void add( Segment seg )
         {
-            auto it = std::ranges::lower_bound( segments, seg.from, { }, &Segment::to );
+            auto iter = std::ranges::lower_bound( segments, seg.from, { }, &Segment::to );
 
-            auto last = it;
+            auto last = iter;
             while ( last != segments.end( ) && last->from <= seg.to )
             {
                 seg.from = std::min( seg.from, last->from );
@@ -63,14 +63,14 @@ namespace xiao::regalloc
                 ++last;
             }
 
-            it = segments.erase( it, last );
-            segments.insert( it, seg );
+            iter = segments.erase( iter, last );
+            segments.insert( iter, seg );
         }
 
         [[nodiscard]] bool covers( const ProgPoint p ) const noexcept
         {
-            const auto it = std::ranges::upper_bound( segments, p, { }, &Segment::from );
-            return it != segments.begin( ) && std::prev( it )->to > p;
+            const auto iter = std::ranges::upper_bound( segments, p, { }, &Segment::from );
+            return iter != segments.begin( ) && std::prev( iter )->to > p;
         }
 
         void start_at( const ProgPoint p )

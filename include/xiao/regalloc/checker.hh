@@ -54,7 +54,7 @@ namespace xiao::regalloc
                         ++group_end;
                     }
                     std::size_t k { 0 };
-                    for ( auto it = e; it != group_end; ++it ) st[ index( it->to ) ] = values[ k++ ];
+                    for ( auto iter = e; iter != group_end; ++iter ) st[ index( iter->to ) ] = values[ k++ ];
                     e = group_end;
                 }
 
