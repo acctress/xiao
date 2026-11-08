@@ -13,6 +13,7 @@
   <img src="https://img.shields.io/badge/language-C%2B%2B23-blue" alt="C++23">
   <img src="https://img.shields.io/badge/target-x86--64-lightgrey" alt="x86-64">
   <img src="https://img.shields.io/github/last-commit/acctress/xiao" alt="Last commit">
+  <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/acctress/xiao/cxx/.github/badges/loc.json" alt="Lines of code">
 </p>
 
 ## Overview
