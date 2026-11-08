@@ -21,8 +21,6 @@ namespace xiao::x86_64
     inline constexpr PReg k_sysv_preferred_float[]
         = { XMM0, XMM1, XMM2, XMM3, XMM4, XMM5, XMM6, XMM7, XMM8, XMM9, XMM10, XMM11, XMM12, XMM13, XMM14, XMM15 };
 
-    inline constexpr PReg k_sysv_non_preferred_float[] = { };
-
     //! win64
 
     inline constexpr PReg k_win64_preferred_int[] = { RAX, RCX, RDX, R8, R9, R10, R11 };

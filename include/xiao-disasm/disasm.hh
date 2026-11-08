@@ -19,6 +19,7 @@ namespace xiao::disasm
         switch ( kind )
         {
             case codegen::RelocKind::X86CallPCRel4: return "x86_call_pcrel4";
+            case codegen::RelocKind::X86PCRel4: return "x86_pcrel4";
             case codegen::RelocKind::Abs8: return "abs8";
         }
         return "<?>";

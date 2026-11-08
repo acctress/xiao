@@ -67,13 +67,127 @@ namespace xiao::ir
                 case IROp::call: verify_call( fn, inst ); break;
                 case IROp::load: verify_load( fn, inst ); break;
                 case IROp::store: verify_store( fn, inst ); break;
+                case IROp::iconst:
+                    if ( const auto ty = fn.values[ inst.result.id ].type; !is_int( ty ) )
+                        errs.push_back( { std::format( "iconst: type {} is not an integer type", ty ) } );
+                    break;
+                case IROp::iadd:
+                case IROp::isub:
+                case IROp::imul:
+                case IROp::band:
+                case IROp::bor:
+                case IROp::bxor: verify_binary( fn, inst, false ); break;
+                case IROp::idiv:
+                case IROp::udiv:
+                case IROp::srem:
+                case IROp::urem:
+                case IROp::icmp: verify_binary( fn, inst, true ); break;
+                case IROp::ishl:
+                case IROp::ushr:
+                case IROp::sshr: verify_shift( fn, inst ); break;
+                case IROp::bnot:
+                case IROp::ineg: verify_unary( fn, inst ); break;
+                case IROp::uextend:
+                case IROp::sextend:
+                case IROp::ireduce: verify_convert( fn, inst ); break;
+                case IROp::select: verify_select( fn, inst ); break;
+                case IROp::symbol_value: verify_symbol_value( fn, inst ); break;
                 default: break;
             }
         }
 
     private:
-        [[nodiscard]] static bool is_64bit_scalar( const Type ty ) noexcept
-        { return ty == Type::i64 || ty == Type::ptr; }
+        [[nodiscard]] static Type operand_type( const IRFunction& fn, const IRInst& inst, const uint16_t i )
+        { return fn.values[ fn.operands[ inst.ops_offset + i ].id ].type; }
+
+        [[nodiscard]] bool expect_operands( const IRInst& inst, const uint16_t n )
+        {
+            if ( inst.ops_count == n ) return true;
+            errs.push_back( { std::format( "{}: {} operands, expected {}", inst.op, inst.ops_count, n ) } );
+            return false;
+        }
+
+        void verify_binary( const IRFunction& fn, const IRInst& inst, const bool needs_64bit )
+        {
+            if ( !expect_operands( inst, 2 ) ) return;
+
+            const auto a = operand_type( fn, inst, 0 );
+            const auto b = operand_type( fn, inst, 1 );
+
+            if ( !is_int( a ) || !is_int( b ) )
+            {
+                errs.push_back( { std::format( "{}: operands are {} and {}, expected integers", inst.op, a, b ) } );
+                return;
+            }
+
+            if ( a != b && !( a == Type::ptr && b == Type::i64 ) )
+                errs.push_back( { std::format( "{}: operand types {} and {} don't match", inst.op, a, b ) } );
+
+            if ( needs_64bit && ( bit_width( a ) != 64 || bit_width( b ) != 64 ) )
+                errs.push_back( { std::format( "{}: operands are {} and {}, extend narrow values to i64 first", inst.op, a, b ) } );
+        }
+
+        void verify_shift( const IRFunction& fn, const IRInst& inst )
+        {
+            if ( !expect_operands( inst, 2 ) ) return;
+
+            const auto value = operand_type( fn, inst, 0 );
+            const auto count = operand_type( fn, inst, 1 );
+
+            if ( !is_int( value ) || !is_int( count ) )
+                errs.push_back( { std::format( "{}: operands are {} and {}, expected integers", inst.op, value, count ) } );
+            else if ( inst.op != IROp::ishl && bit_width( value ) != 64 )
+                errs.push_back( { std::format( "{}: value is {}, extend narrow values to i64 first", inst.op, value ) } );
+        }
+
+        void verify_unary( const IRFunction& fn, const IRInst& inst )
+        {
+            if ( !expect_operands( inst, 1 ) ) return;
+
+            if ( const auto a = operand_type( fn, inst, 0 ); !is_int( a ) )
+                errs.push_back( { std::format( "{}: operand is {}, expected an integer", inst.op, a ) } );
+        }
+
+        void verify_convert( const IRFunction& fn, const IRInst& inst )
+        {
+            if ( !expect_operands( inst, 1 ) ) return;
+
+            const auto from = operand_type( fn, inst, 0 );
+            const auto to   = fn.values[ inst.result.id ].type;
+
+            if ( !is_int( from ) || !is_int( to ) )
+            {
+                errs.push_back( { std::format( "{}: {} to {}, expected integers", inst.op, from, to ) } );
+                return;
+            }
+
+            const bool widening = inst.op != IROp::ireduce;
+            if ( widening ? bit_width( to ) <= bit_width( from ) : bit_width( to ) >= bit_width( from ) )
+                errs.push_back( { std::format( "{}.{}: from {} is not {}", inst.op, to, from, widening ? "narrower" : "wider" ) } );
+        }
+
+        void verify_select( const IRFunction& fn, const IRInst& inst )
+        {
+            if ( !expect_operands( inst, 3 ) ) return;
+
+            const auto c = operand_type( fn, inst, 0 );
+            const auto a = operand_type( fn, inst, 1 );
+            const auto b = operand_type( fn, inst, 2 );
+
+            if ( !is_int( c ) ) errs.push_back( { std::format( "select: condition is {}, expected an integer", c ) } );
+            if ( a != b ) errs.push_back( { std::format( "select: values are {} and {}, expected the same type", a, b ) } );
+        }
+
+        void verify_symbol_value( const IRFunction& fn, const IRInst& inst )
+        {
+            if ( !expect_operands( inst, 0 ) ) return;
+
+            if ( inst.imm >= fn.global_values.size( ) )
+                errs.push_back( { std::format( "symbol_value: gv{} but only {} global values", inst.imm, fn.global_values.size( ) ) } );
+
+            if ( const auto ty = fn.values[ inst.result.id ].type; ty != Type::ptr )
+                errs.push_back( { std::format( "symbol_value.{}: result must be ptr", ty ) } );
+        }
 
         void verify_load( const IRFunction& fn, const IRInst& inst )
         {
@@ -86,8 +200,8 @@ namespace xiao::ir
             if ( const auto addr = fn.values[ fn.operands[ inst.ops_offset ].id ].type; addr != Type::ptr )
                 errs.push_back( { std::format( "load: address is {}, expected ptr", addr ) } );
 
-            if ( const auto ty = fn.values[ inst.result.id ].type; !is_64bit_scalar( ty ) )
-                errs.push_back( { std::format( "load.{}: only 64-bit loads supported YET", ty ) } );
+            if ( const auto ty = fn.values[ inst.result.id ].type; !is_int( ty ) )
+                errs.push_back( { std::format( "load.{}: only integer loads supported YET", ty ) } );
         }
 
         void verify_store( const IRFunction& fn, const IRInst& inst )
@@ -101,8 +215,8 @@ namespace xiao::ir
             if ( const auto addr = fn.values[ fn.operands[ inst.ops_offset + 1 ].id ].type; addr != Type::ptr )
                 errs.push_back( { std::format( "store: address is {}, expected ptr", addr ) } );
 
-            if ( const auto ty = fn.values[ fn.operands[ inst.ops_offset ].id ].type; !is_64bit_scalar( ty ) )
-                errs.push_back( { std::format( "store.{}: only 64-bit stores supported YET", ty ) } );
+            if ( const auto ty = fn.values[ fn.operands[ inst.ops_offset ].id ].type; !is_int( ty ) )
+                errs.push_back( { std::format( "store.{}: only integer stores supported YET", ty ) } );
         }
 
         void verify_call( const IRFunction& fn, const IRInst& inst )

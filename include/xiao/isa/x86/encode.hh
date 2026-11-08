@@ -10,24 +10,49 @@ namespace xiao::x86_64
     [[nodiscard]] constexpr uint8_t modrm( const uint8_t mod, const uint8_t reg, const uint8_t rm ) noexcept
     { return static_cast< uint8_t >( ( mod << 6 ) | ( ( reg & 7 ) << 3 ) | ( rm & 7 ) ); }
 
-    inline void emit_rex( MachBuffer< LabelUse >& buf, const bool w64, const PReg reg, const PReg rm ) noexcept
+    [[nodiscard]] constexpr bool needs_rex_for_byte( const PReg r ) noexcept
+    { return r.valid( ) && r.hw( ) >= 4 && r.hw( ) <= 7; }
+
+    inline void emit_rex( MachBuffer< LabelUse >& buf, const bool w64, const PReg reg, const PReg rm, const bool byte_op = false ) noexcept
     {
         uint8_t rex { 0x40 };
         if ( w64 ) rex |= 0x08;
         if ( reg.valid( ) && reg.hw( ) >= 8 ) rex |= 0x04;
         if ( rm.valid( ) && rm.hw( ) >= 8 ) rex |= 0x01;
-        if ( rex != 0x40 ) buf.emit_u8( rex );
+        if ( rex != 0x40 || ( byte_op && ( needs_rex_for_byte( reg ) || needs_rex_for_byte( rm ) ) ) ) buf.emit_u8( rex );
     }
 
-    inline void emit_rex_mem( MachBuffer< LabelUse >& buf, const bool w64, const PReg reg, const PReg base, const PReg index ) noexcept
+    inline void emit_rex_mem( MachBuffer< LabelUse >& buf, const bool w64, const PReg reg, const PReg base, const PReg index,
+                              const bool byte_op = false ) noexcept
     {
         uint8_t rex { 0x40 };
         if ( w64 ) rex |= 0x08;
         if ( reg.valid( ) && reg.hw( ) >= 8 ) rex |= 0x04;
         if ( index.valid( ) && index.hw( ) >= 8 ) rex |= 0x02;
         if ( base.valid( ) && base.hw( ) >= 8 ) rex |= 0x01;
-        if ( rex != 0x40 ) buf.emit_u8( rex );
+        if ( rex != 0x40 || ( byte_op && needs_rex_for_byte( reg ) ) ) buf.emit_u8( rex );
     }
+
+    [[nodiscard]] constexpr uint8_t cc_nibble( const CC cc ) noexcept
+    {
+        switch ( cc )
+        {
+            case CC::B: return 0x2;
+            case CC::AE: return 0x3;
+            case CC::E: return 0x4;
+            case CC::NE: return 0x5;
+            case CC::BE: return 0x6;
+            case CC::A: return 0x7;
+            case CC::L: return 0xC;
+            case CC::GE: return 0xD;
+            case CC::LE: return 0xE;
+            case CC::G: return 0xF;
+        }
+        return 0x4;
+    }
+
+    [[nodiscard]] constexpr bool fits_i8( const int64_t v ) noexcept
+    { return v >= INT8_MIN && v <= INT8_MAX; }
 
     inline void emit_mem_operand( MachBuffer< LabelUse >& buf, const uint8_t reg_field, const PReg base, const PReg index,
                                   const uint8_t scale_log2, const int32_t disp ) noexcept

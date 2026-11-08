@@ -34,28 +34,39 @@ The architecture is modelled on [Cranelift](https://cranelift.dev), and the libr
 **Intermediate representation**
 - SSA form with block parameters
 - Builder API, verifier and text printer
-- Integer arithmetic: `iconst`, `iadd`, `isub`, `imul`, `idiv`
-- Comparisons: `icmp` with all signed and unsigned conditions
+- Integer types `i8`, `i16`, `i32`, `i64` and `ptr`
+- Arithmetic: `iconst`, `iadd`, `isub`, `imul`, `ineg`, `idiv`, `udiv`, `srem`, `urem`
+- Bitwise and shifts: `band`, `bor`, `bxor`, `bnot`, `ishl`, `ushr`, `sshr`
+- Conversions: `uextend`, `sextend`, `ireduce`
+- Comparisons and selection: `icmp` with all signed and unsigned conditions, `select`
 - Control flow: `br`, `brif` and `ret` with block arguments, supporting loops and merges
-- Memory: `load` and `store` through pointers with a constant offset
+- Memory: 8, 16, 32 and 64-bit `load` and `store` through pointers with a constant offset
 - Calls to functions in the same module or to external symbols
+- Global values and `symbol_value` for the address of a data object, with an optional offset
 
 **x86-64 backend**
-- Lowering to machine instructions on virtual registers
-- Linear scan register allocation with fixed register constraints, using callee saved registers for
-  values that live across calls and spilling to stack slots under register pressure
+- Lowering to machine instructions on virtual registers, with constants folded into immediates
+- Backtracking register allocation in the style of LLVM's greedy allocator and regalloc2: live
+  ranges with holes, copy coalescing into bundles, fixed register hints, exact call clobbers,
+  eviction by spill weight, live range splitting with parallel move resolution, and a symbolic
+  checker in debug builds
 - Prologue and epilogue generation with stack alignment and Win64 shadow space
 - Windows x64 and System V calling conventions
-- Relocations for calls
+- Relocations for calls and data: RIP-relative `lea` for data in the module, absolute addresses for
+  imported data
 
 **Module layer**
-- Named function declarations with `Import`, `Local` and `Export` linkage
+- Named function and data declarations with `Import`, `Local` and `Export` linkage
+- Data objects described by `DataDescription`: byte contents or zero fill, alignment, and pointers
+  to functions or other data written in at link time
 - A `Module` interface implemented by output modules
 
 **xiao-jit**
 - Declare, define, finalise and call functions at runtime
 - Host symbol registration, with fallback lookup in the executable and the C runtime
 - Code memory that is writable until finalisation and executable afterwards
+- Read-only data protected at finalisation, writable data that stays writable
+- Code and data allocated from one reserved address range, so RIP-relative references always fit
 
 **xiao-disasm** (optional)
 - Disassembles compiled code to Intel syntax using [Zydis](https://github.com/zyantific/zydis),
@@ -127,7 +138,33 @@ b0(v0: i64, v1: i64):
 }
 ```
 
+### Data and strings
+
+Strings and other constant or global data live in data objects, as in Cranelift. A data object is
+declared and defined on the module, and a function reads its address with `symbol_value`:
+
+```cpp
+const auto hello_id = *jit.declare_data( "hello", module::Linkage::Local, false );
+
+module::DataDescription desc;
+desc.define( std::string_view { "hello, world" } );
+if ( !jit.define_data( hello_id, desc ) ) return 1;
+
+ir::IRBuilder b { *irm.get( fn_ref ) };
+const auto    hello = jit.declare_data_in_func( hello_id, b );
+b.switch_to_block( b.add_block( { } ) );
+
+const auto text  = b.symbol_value( Type::ptr, hello );
+const auto first = b.uextend( Type::i64, b.load( Type::i8, text ) );
+```
+
+Data in the same module is addressed with a RIP-relative `lea`. Writable data (`declare_data` with
+`writable = true`) can be read and written by both compiled code and the host through
+`get_finalised_data`. A `DataDescription` can also hold the addresses of functions and other data
+objects, which are filled in when the module is finalised.
+
 A larger example using every supported feature can be found in [`source/entry.cc`](source/entry.cc).
+Run it with `ir`, `asm` or `all` to print the IR and machine code of every function.
 
 ## Architecture
 
@@ -135,8 +172,8 @@ A larger example using every supported feature can be found in [`source/entry.cc
 2. `Context::compile` lowers each function to target instructions on virtual registers.
 3. The register allocator assigns physical registers.
 4. Emission produces `CompiledCode`: the machine code and its relocations.
-5. An output module consumes the compiled code. `xiao-jit` places it in executable memory and
-   resolves its relocations.
+5. An output module consumes the compiled code and the module's data objects. `xiao-jit` places
+   them in memory, resolves their relocations and protects them.
 
 ## Building
 
@@ -162,9 +199,9 @@ no dependencies.
 | `include/xiao/ir` | IR definitions, builder, verifier and printer |
 | `include/xiao/codegen` | Target independent code generation: VCode, machine buffer, relocations, `Context`, `TargetIsa` |
 | `include/xiao/isa/x86` | x86-64 instructions, lowering, encoding, frames and calling conventions |
-| `include/xiao/regalloc` | Liveness analysis, live intervals and linear scan allocation |
-| `include/xiao/module` | Function declarations, linkage and the `Module` interface |
-| `include/xiao-jit` | JIT module, builder and executable memory |
+| `include/xiao/regalloc` | Liveness, live ranges, coalescing, the backtracking allocator, move resolution and the checker |
+| `include/xiao/module` | Function and data declarations, `DataDescription`, linkage and the `Module` interface |
+| `include/xiao-jit` | JIT module, builder, and code and data memory |
 | `include/xiao-disasm` | Optional disassembler for compiled code, built on Zydis |
 
 ## Status
@@ -172,10 +209,11 @@ no dependencies.
 xiao is in early development. The following are not yet supported:
 
 - Targets other than x86-64. Windows x64 is tested; System V is implemented but untested.
-- Floating point types, and loads and stores narrower than 64 bits.
+- Floating point types.
 - Arguments passed on the stack.
+- Indirect calls through function pointers.
 - Ahead of time compilation and object file output.
-- Global data, data objects and unwind information.
+- Thread-local data and unwind information.
 
 ## Acknowledgements
 

@@ -8,8 +8,10 @@
 #include <xiao/codegen/operand.hh>
 #include <xiao/ir/types.hh>
 
+#include <concepts>
 #include <cstdint>
 #include <optional>
+#include <span>
 #include <string>
 #include <utility>
 #include <vector>
@@ -89,6 +91,8 @@ namespace xiao::codegen
         { inst.is_term( ) } -> std::same_as< MachTerminator >;
         { inst.is_mem_access( ) } -> std::same_as< bool >;
         { inst.is_call( ) } -> std::same_as< bool >;
+        { inst.as_move( ) } -> std::same_as< std::optional< std::pair< Reg, Reg > > >;
+        { inst.clobbers( ) } -> std::convertible_to< std::span< const PReg > >;
     };
 
     template < typename T >

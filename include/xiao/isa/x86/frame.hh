@@ -13,6 +13,7 @@
 #include <array>
 #include <cassert>
 #include <cstdint>
+#include <span>
 #include <vector>
 
 namespace xiao::x86_64
@@ -36,11 +37,9 @@ namespace xiao::x86_64
 
         const auto used = [ & ]( const PReg pr )
         {
-            return std::ranges::any_of( allocs.ops,
-                                        [ & ]( const regalloc::Allocation& op )
-                                        {
-                                            return !op.is_spill( ) && op.preg == pr;
-                                        } );
+            const auto holds = [ & ]( const regalloc::Allocation& a ) { return a.is_reg( ) && a.preg == pr; };
+            return std::ranges::any_of( allocs.ops, holds )
+                || std::ranges::any_of( allocs.edits, [ & ]( const regalloc::Edit& e ) { return holds( e.from ) || holds( e.to ); } );
         };
 
         for ( const auto pr : env.non_preferred[ 0 ] )
@@ -86,6 +85,43 @@ namespace xiao::x86_64
         emit_rex_mem( buf, true, src, RSP, PReg::invalid( ) );
         buf.emit_u8( 0x89 );
         emit_mem_operand( buf, src.hw( ), RSP, PReg::invalid( ), 0, offset );
+    }
+
+    inline void emit_move( MachBuffer< LabelUse >& buf, const FrameLayout& frame, const regalloc::Move& m )
+    {
+        if ( m.from.is_reg( ) && m.to.is_reg( ) )
+        {
+            emit_rex( buf, true, m.from.preg, m.to.preg );
+            buf.emit_u8( 0x89 );
+            buf.emit_u8( modrm( 0b11, m.from.preg.hw( ), m.to.preg.hw( ) ) );
+        }
+        else if ( m.from.is_reg( ) )
+            emit_spill_store( buf, frame.spill_offset( m.to.slot ), m.from.preg );
+        else if ( m.to.is_reg( ) )
+            emit_spill_load( buf, m.to.preg, frame.spill_offset( m.from.slot ) );
+        else
+        {
+            emit_spill_load( buf, frame.scratch[ 1 ], frame.spill_offset( m.from.slot ) );
+            emit_spill_store( buf, frame.spill_offset( m.to.slot ), frame.scratch[ 1 ] );
+        }
+    }
+
+    inline void emit_edits( MachBuffer< LabelUse >& buf, const FrameLayout& frame, const std::span< const regalloc::Edit > edits )
+    {
+        for ( auto e = edits.begin( ); e != edits.end( ); )
+        {
+            std::vector< regalloc::Move > group;
+            auto                          end = e;
+            for ( ; end != edits.end( ) && end->prio == e->prio; ++end )
+            {
+                assert( ( !end->from.is_reg( ) || end->from.preg.rc( ) == RegClass::Int ) && ( !end->to.is_reg( ) || end->to.preg.rc( ) == RegClass::Int )
+                        && "[xiao::x86_64::emit_edits] float moves not supported YET" );
+                group.push_back( { end->from, end->to } );
+            }
+            for ( const auto& m : regalloc::sequence_parallel_moves( std::move( group ), regalloc::Allocation { .preg = frame.scratch[ 0 ] } ) )
+                emit_move( buf, frame, m );
+            e = end;
+        }
     }
 
     inline void emit_rsp_adjust( MachBuffer< LabelUse >& buf, const uint8_t ext, const uint32_t n )

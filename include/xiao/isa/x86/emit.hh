@@ -8,6 +8,7 @@
 #include <array>
 #include <cassert>
 #include <cstdint>
+#include <span>
 #include <vector>
 
 namespace xiao::x86_64
@@ -29,6 +30,7 @@ namespace xiao::x86_64
         emit_prologue( buf, frame );
 
         std::vector< PReg > pregs;
+        auto                edit = allocs.edits.begin( );
 
         for ( uint32_t bi { 0 }; bi < vcode.blocks.size( ); ++bi )
         {
@@ -40,9 +42,21 @@ namespace xiao::x86_64
                 const auto i_idx        = block.insts_offset + ii;
                 const auto [ off, cnt ] = vcode.operand_ranges[ i_idx ];
 
+                const auto edits_end = std::find_if( edit, allocs.edits.end( ),
+                                                     [ & ]( const regalloc::Edit& e ) { return e.point != regalloc::before( i_idx ); } );
+                emit_edits( buf, frame, std::span< const regalloc::Edit > { edit, edits_end } );
+                edit = edits_end;
+
                 if ( const auto* jmp = std::get_if< inst::Jmp >( &vcode.insts[ i_idx ].inner );
                      jmp && ii + 1 == block.insts_count && jmp->target.id == bi + 1 )
                     continue;
+
+                if ( vcode.insts[ i_idx ].as_move( ) && cnt == 2 )
+                {
+                    const auto& d = allocs.ops[ off ];
+                    const auto& s = allocs.ops[ off + 1 ];
+                    if ( d.is_spill( ) ? s.is_spill( ) && d.slot == s.slot : !s.is_spill( ) && d.preg == s.preg ) continue;
+                }
 
                 pregs.clear( );
                 std::array< Spilled, 2 > spills { };

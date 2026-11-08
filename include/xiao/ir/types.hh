@@ -21,6 +21,25 @@ namespace xiao::ir
         ptr,
         unit
     };
+
+    [[nodiscard]] constexpr bool is_int( const Type t ) noexcept
+    { return t == Type::i8 || t == Type::i16 || t == Type::i32 || t == Type::i64 || t == Type::ptr; }
+
+    [[nodiscard]] constexpr uint8_t bit_width( const Type t ) noexcept
+    {
+        switch ( t )
+        {
+            case Type::i8: return 8;
+            case Type::i16: return 16;
+            case Type::i32: return 32;
+            case Type::f32: return 32;
+            case Type::i64:
+            case Type::f64:
+            case Type::ptr: return 64;
+            case Type::unit: return 0;
+        }
+        return 0;
+    }
 } // namespace xiao::ir
 
 //! @brief std::formatter specialisation for ir::Type for formatting.

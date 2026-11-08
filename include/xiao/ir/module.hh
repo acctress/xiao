@@ -100,6 +100,13 @@ namespace xiao::ir
                     std::format_to( out, ") -> {}\n", e.ret );
                 }
 
+                for ( auto gi { 0uz }; gi < fn->global_values.size( ); ++gi )
+                {
+                    const auto& g = fn->global_values[ gi ];
+                    std::format_to( out, "    gv{} = symbol {}u{}:{}{}\n", gi, g.colocated ? "colocated " : "", g.name.ns, g.name.index,
+                                    g.offset ? std::format( "{:+}", g.offset ) : std::string { } );
+                }
+
                 const auto target = [ & ]( const uint32_t id, const std::span< const ValueRef > args )
                 {
                     std::format_to( out, "b{}(", id );
@@ -128,14 +135,40 @@ namespace xiao::ir
                         switch ( op )
                         {
                             case IROp::iconst:
-                                std::format_to( out, "v{} = iconst {} #{}\n", result.id, fn->values[ result.id ].type, imm );
+                                std::format_to( out, "v{} = iconst {} #{}\n", result.id, fn->values[ result.id ].type, static_cast< int64_t >( imm ) );
                                 break;
                             case IROp::iadd:
                             case IROp::isub:
                             case IROp::imul:
                             case IROp::idiv:
+                            case IROp::udiv:
+                            case IROp::srem:
+                            case IROp::urem:
+                            case IROp::band:
+                            case IROp::bor:
+                            case IROp::bxor:
+                            case IROp::ishl:
+                            case IROp::ushr:
+                            case IROp::sshr:
                                 std::format_to( out, "v{} = {} v{}, v{}\n", result.id, op, fn->operands[ ops_offset ].id,
                                                 fn->operands[ ops_offset + 1 ].id );
+                                break;
+                            case IROp::bnot:
+                            case IROp::ineg:
+                                std::format_to( out, "v{} = {} v{}\n", result.id, op, fn->operands[ ops_offset ].id );
+                                break;
+                            case IROp::uextend:
+                            case IROp::sextend:
+                            case IROp::ireduce:
+                                std::format_to( out, "v{} = {}.{} v{}\n", result.id, op, fn->values[ result.id ].type,
+                                                fn->operands[ ops_offset ].id );
+                                break;
+                            case IROp::symbol_value:
+                                std::format_to( out, "v{} = symbol_value.{} gv{}\n", result.id, fn->values[ result.id ].type, imm );
+                                break;
+                            case IROp::select:
+                                std::format_to( out, "v{} = select v{}, v{}, v{}\n", result.id, fn->operands[ ops_offset ].id,
+                                                fn->operands[ ops_offset + 1 ].id, fn->operands[ ops_offset + 2 ].id );
                                 break;
                             case IROp::icmp:
                                 std::format_to( out, "v{} = icmp {} v{}, v{}\n", result.id, cc, fn->operands[ ops_offset ].id,

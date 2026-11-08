@@ -23,6 +23,22 @@ namespace xiao::ir
         call,
         store,
         load,
+        band,
+        bor,
+        bxor,
+        bnot,
+        ineg,
+        ishl,
+        ushr,
+        sshr,
+        udiv,
+        srem,
+        urem,
+        select,
+        uextend,
+        sextend,
+        ireduce,
+        symbol_value,
     };
 
     //! @brief Condition kinds for icmp.
@@ -81,7 +97,24 @@ struct std::formatter< xiao::ir::IROp >
             case call: return std::format_to( ctx.out( ), "call" );
             case store: return std::format_to( ctx.out( ), "store" );
             case load: return std::format_to( ctx.out( ), "load" );
+            case band: return std::format_to( ctx.out( ), "band" );
+            case bor: return std::format_to( ctx.out( ), "bor" );
+            case bxor: return std::format_to( ctx.out( ), "bxor" );
+            case bnot: return std::format_to( ctx.out( ), "bnot" );
+            case ineg: return std::format_to( ctx.out( ), "ineg" );
+            case ishl: return std::format_to( ctx.out( ), "ishl" );
+            case ushr: return std::format_to( ctx.out( ), "ushr" );
+            case sshr: return std::format_to( ctx.out( ), "sshr" );
+            case udiv: return std::format_to( ctx.out( ), "udiv" );
+            case srem: return std::format_to( ctx.out( ), "srem" );
+            case urem: return std::format_to( ctx.out( ), "urem" );
+            case select: return std::format_to( ctx.out( ), "select" );
+            case uextend: return std::format_to( ctx.out( ), "uextend" );
+            case sextend: return std::format_to( ctx.out( ), "sextend" );
+            case ireduce: return std::format_to( ctx.out( ), "ireduce" );
+            case symbol_value: return std::format_to( ctx.out( ), "symbol_value" );
         }
+        return ctx.out( );
     }
 };
 

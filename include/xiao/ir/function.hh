@@ -36,6 +36,13 @@ namespace xiao::ir
         bool              colocated { };
     };
 
+    struct GlobalValueData
+    {
+        ExternalName name { };
+        int64_t      offset { };
+        bool         colocated { };
+    };
+
     //! @brief Owns flat pools for one IR function,
     //! @note All are views into the owning IRModule's arena
     struct IRFunction
@@ -52,6 +59,7 @@ namespace xiao::ir
         std::span< ValueRef > block_params { };
         std::span< ExtFunc >  ext_funcs { };
         std::span< Type >     ext_param_types { };
+        std::span< GlobalValueData > global_values { };
     };
 
     struct BranchArgs

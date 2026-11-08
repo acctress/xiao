@@ -69,6 +69,25 @@ namespace xiao::x86_64
         Test
     };
 
+    enum class UnaryOp : uint8_t
+    {
+        Not,
+        Neg
+    };
+
+    enum class ShiftOp : uint8_t
+    {
+        Shl,
+        Shr,
+        Sar
+    };
+
+    enum class RelocDistance : uint8_t
+    {
+        Near,
+        Far,
+    };
+
     enum class OperandSize : uint8_t
     {
         S8,
@@ -108,7 +127,53 @@ namespace xiao::x86_64
             AluOp   op { };
             Reg     dst { };
             int32_t imm { };
+
+            void get_operands( std::vector< MachOperand >& ops ) const
+            {
+                if ( op == AluOp::Cmp || op == AluOp::Test ) { USE( dst ) }
+                else
+                {
+                    USEDEF( dst )
+                }
+            }
+        };
+
+        struct Unary
+        {
+            UnaryOp op { };
+            Reg     dst { };
             XIAO_OPERANDS( USEDEF( dst ) )
+        };
+
+        struct Shift
+        {
+            ShiftOp op { };
+            Reg     dst { };
+            Reg     count { };
+            XIAO_OPERANDS( USEDEF( dst ) USE( count ) )
+        };
+
+        struct ShiftImm
+        {
+            ShiftOp op { };
+            Reg     dst { };
+            uint8_t imm { };
+            XIAO_OPERANDS( USEDEF( dst ) )
+        };
+
+        struct TestReg
+        {
+            Reg         reg { };
+            OperandSize size { OperandSize::S64 };
+            XIAO_OPERANDS( USE( reg ) )
+        };
+
+        struct CMov
+        {
+            CC  cc { };
+            Reg dst { };
+            Reg src { };
+            XIAO_OPERANDS( USEDEF( dst ) USE( src ) )
         };
 
         struct Mov
@@ -129,6 +194,7 @@ namespace xiao::x86_64
         {
             Reg         dst { };
             AddressMode mem { };
+            OperandSize size { OperandSize::S64 };
             XIAO_OPERANDS( DEF( dst ) USE( mem.base ) USE( mem.index ) )
         };
 
@@ -136,6 +202,7 @@ namespace xiao::x86_64
         {
             AddressMode mem { };
             Reg         src { };
+            OperandSize size { OperandSize::S64 };
             XIAO_OPERANDS( USE( mem.base ) USE( mem.index ) USE( src ) )
         };
 
@@ -165,7 +232,9 @@ namespace xiao::x86_64
         struct Div
         {
             Reg src { };
-            XIAO_OPERANDS( USE( src ) )
+            Reg rax { };
+            Reg rdx { };
+            XIAO_OPERANDS( USE( src ) FIXED_USEDEF( rax, RAX ) FIXED_USEDEF( rdx, RDX ) )
         };
 
         struct Idiv
@@ -220,6 +289,7 @@ namespace xiao::x86_64
             ir::ExternalName    name { };
             std::vector< PReg > args { };
             PReg                ret { };
+            std::vector< PReg > clobbers { };
 
             void get_operands( std::vector< MachOperand >& ops ) const
             {
@@ -232,6 +302,8 @@ namespace xiao::x86_64
         {
             Reg              dst { };
             ir::ExternalName name { };
+            int64_t          offset { };
+            RelocDistance    distance { RelocDistance::Far };
             XIAO_OPERANDS( DEF( dst ) )
         };
 
@@ -240,6 +312,7 @@ namespace xiao::x86_64
             Reg                 target { };
             std::vector< PReg > args { };
             PReg                ret { };
+            std::vector< PReg > clobbers { };
 
             void get_operands( std::vector< MachOperand >& ops ) const
             {
@@ -297,6 +370,27 @@ namespace xiao::x86_64
         return "<?>";
     }
 
+    [[nodiscard]] constexpr std::string_view to_string( const UnaryOp op ) noexcept
+    {
+        switch ( op )
+        {
+            case UnaryOp::Not: return "not";
+            case UnaryOp::Neg: return "neg";
+        }
+        return "<?>";
+    }
+
+    [[nodiscard]] constexpr std::string_view to_string( const ShiftOp op ) noexcept
+    {
+        switch ( op )
+        {
+            case ShiftOp::Shl: return "shl";
+            case ShiftOp::Shr: return "shr";
+            case ShiftOp::Sar: return "sar";
+        }
+        return "<?>";
+    }
+
     [[nodiscard]] constexpr std::string_view to_string( const OperandSize size ) noexcept
     {
         switch ( size )
@@ -329,10 +423,10 @@ namespace xiao::x86_64
 
     struct X86Inst : MachInst< X86Inst, LabelUse >
     {
-        using Inst = std::variant< inst::Alu, inst::AluImm, inst::Mov, inst::MovImm, inst::MovLoad, inst::MovStore, inst::Movzx,
-                                   inst::Movsx, inst::Cdq, inst::Div, inst::Idiv, inst::Push, inst::Pop, inst::LeaFrame, inst::SetCC,
-                                   inst::Jmp, inst::Jcc, inst::Call, inst::LoadExtName, inst::CallInd, inst::Ret,
-                                   inst::DummyUse >;
+        using Inst = std::variant< inst::Alu, inst::AluImm, inst::Unary, inst::Shift, inst::ShiftImm, inst::TestReg, inst::CMov, inst::Mov,
+                                   inst::MovImm, inst::MovLoad, inst::MovStore, inst::Movzx, inst::Movsx, inst::Cdq, inst::Div, inst::Idiv,
+                                   inst::Push, inst::Pop, inst::LeaFrame, inst::SetCC, inst::Jmp, inst::Jcc, inst::Call, inst::LoadExtName,
+                                   inst::CallInd, inst::Ret, inst::DummyUse >;
 
         Inst inner;
 
@@ -369,6 +463,13 @@ namespace xiao::x86_64
             return std::nullopt;
         }
 
+        [[nodiscard]] std::span< const PReg > clobbers( ) const noexcept
+        {
+            if ( const auto* call = std::get_if< inst::Call >( &inner ) ) return call->clobbers;
+            if ( const auto* call = std::get_if< inst::CallInd >( &inner ) ) return call->clobbers;
+            return { };
+        }
+
         [[nodiscard]] bool is_mem_access( ) const noexcept
         { return std::holds_alternative< inst::MovLoad >( inner ) || std::holds_alternative< inst::MovStore >( inner ); }
 
@@ -402,11 +503,21 @@ namespace xiao::x86_64
                         if ( inst.dst.valid( ) ) inst.dst = next( );
                         if ( inst.src.valid( ) ) inst.src = next( );
                     }
-                    else if constexpr ( std::is_same_v< T, inst::AluImm > )
+                    else if constexpr ( std::is_same_v< T, inst::AluImm > || std::is_same_v< T, inst::Unary >
+                                        || std::is_same_v< T, inst::ShiftImm > )
                     {
                         if ( inst.dst.valid( ) ) inst.dst = next( );
                     }
-                    else if constexpr ( std::is_same_v< T, inst::Mov > )
+                    else if constexpr ( std::is_same_v< T, inst::Shift > )
+                    {
+                        if ( inst.dst.valid( ) ) inst.dst = next( );
+                        if ( inst.count.valid( ) ) inst.count = next( );
+                    }
+                    else if constexpr ( std::is_same_v< T, inst::TestReg > )
+                    {
+                        if ( inst.reg.valid( ) ) inst.reg = next( );
+                    }
+                    else if constexpr ( std::is_same_v< T, inst::Mov > || std::is_same_v< T, inst::CMov > )
                     {
                         if ( inst.dst.valid( ) ) inst.dst = next( );
                         if ( inst.src.valid( ) ) inst.src = next( );
@@ -442,11 +553,7 @@ namespace xiao::x86_64
                         if ( inst.rax.valid( ) ) inst.rax = next( );
                         if ( inst.rdx.valid( ) ) inst.rdx = next( );
                     }
-                    else if constexpr ( std::is_same_v< T, inst::Div > )
-                    {
-                        if ( inst.src.valid( ) ) inst.src = next( );
-                    }
-                    else if constexpr ( std::is_same_v< T, inst::Idiv > )
+                    else if constexpr ( std::is_same_v< T, inst::Div > || std::is_same_v< T, inst::Idiv > )
                     {
                         if ( inst.src.valid( ) ) inst.src = next( );
                         if ( inst.rax.valid( ) ) inst.rax = next( );
@@ -514,23 +621,43 @@ namespace xiao::x86_64
                     {
                         return std::format( "{} {}, {}", x86_64::to_string( i.op ), i.dst, i.imm );
                     }
+                    else if constexpr ( std::is_same_v< T, inst::Unary > )
+                    {
+                        return std::format( "{} {}", x86_64::to_string( i.op ), i.dst );
+                    }
+                    else if constexpr ( std::is_same_v< T, inst::Shift > )
+                    {
+                        return std::format( "{} {}, {}", x86_64::to_string( i.op ), i.dst, i.count );
+                    }
+                    else if constexpr ( std::is_same_v< T, inst::ShiftImm > )
+                    {
+                        return std::format( "{} {}, {}", x86_64::to_string( i.op ), i.dst, i.imm );
+                    }
+                    else if constexpr ( std::is_same_v< T, inst::TestReg > )
+                    {
+                        return std::format( "test.{} {}, {}", x86_64::to_string( i.size ), i.reg, i.reg );
+                    }
+                    else if constexpr ( std::is_same_v< T, inst::CMov > )
+                    {
+                        return std::format( "cmov{} {}, {}", x86_64::to_string( i.cc ), i.dst, i.src );
+                    }
                     else if constexpr ( std::is_same_v< T, inst::Mov > ) { return std::format( "mov {}, {}", i.dst, i.src ); }
                     else if constexpr ( std::is_same_v< T, inst::MovImm > ) { return std::format( "mov {}, {}", i.dst, i.imm ); }
                     else if constexpr ( std::is_same_v< T, inst::MovLoad > )
                     {
-                        return std::format( "mov {}, {}", i.dst, address( i.mem ) );
+                        return std::format( "mov.{} {}, {}", x86_64::to_string( i.size ), i.dst, address( i.mem ) );
                     }
                     else if constexpr ( std::is_same_v< T, inst::MovStore > )
                     {
-                        return std::format( "mov {}, {}", address( i.mem ), i.src );
+                        return std::format( "mov.{} {}, {}", x86_64::to_string( i.size ), address( i.mem ), i.src );
                     }
                     else if constexpr ( std::is_same_v< T, inst::Movzx > )
                     {
-                        return std::format( "movzx.{}, {}, {}", x86_64::to_string( i.size ), i.dst, i.src );
+                        return std::format( "movzx.{} {}, {}", x86_64::to_string( i.size ), i.dst, i.src );
                     }
                     else if constexpr ( std::is_same_v< T, inst::Movsx > )
                     {
-                        return std::format( "movsx.{}, {}, {}", x86_64::to_string( i.size ), i.dst, i.src );
+                        return std::format( "movsx.{} {}, {}", x86_64::to_string( i.size ), i.dst, i.src );
                     }
                     else if constexpr ( std::is_same_v< T, inst::Cdq > ) { return "cdq"; }
                     else if constexpr ( std::is_same_v< T, inst::Div > ) { return std::format( "div {}", i.src ); }
@@ -553,7 +680,9 @@ namespace xiao::x86_64
                     else if constexpr ( std::is_same_v< T, inst::Call > ) { return std::format( "call u{}:{}", i.name.ns, i.name.index ); }
                     else if constexpr ( std::is_same_v< T, inst::LoadExtName > )
                     {
-                        return std::format( "mov {}, u{}:{}", i.dst, i.name.ns, i.name.index );
+                        const auto off = i.offset ? std::format( "{:+}", i.offset ) : std::string { };
+                        if ( i.distance == RelocDistance::Near ) return std::format( "lea {}, [rip+u{}:{}{}]", i.dst, i.name.ns, i.name.index, off );
+                        return std::format( "mov {}, u{}:{}{}", i.dst, i.name.ns, i.name.index, off );
                     }
                     else if constexpr ( std::is_same_v< T, inst::CallInd > ) { return std::format( "call *{}", i.target ); }
                     else if constexpr ( std::is_same_v< T, inst::Ret > ) { return "ret"; }

@@ -99,6 +99,15 @@ namespace xiao::ir
                                                const codegen::CallConv cc, const bool colocated )
         { return import_function( name, std::span { params.begin( ), params.size( ) }, ret, cc, colocated ); }
 
+        [[nodiscard]] GlobalValueRef create_global_value( const GlobalValueData& data )
+        {
+            m_global_values.push_back( data );
+            return GlobalValueRef { static_cast< uint32_t >( m_global_values.size( ) - 1 ) };
+        }
+
+        [[nodiscard]] ValueRef symbol_value( const Type ty, const GlobalValueRef gv )
+        { return emit( IROp::symbol_value, ty, { }, gv.id ); }
+
         [[nodiscard]] ValueRef block_param( const BlockRef block, const uint16_t n ) const
         { return m_block_params[ m_block_param_offsets[ block.id ] + n ]; }
 
@@ -129,6 +138,54 @@ namespace xiao::ir
 
         [[nodiscard]] ValueRef idiv( const ValueRef a, const ValueRef b )
         { return emit_binop( IROp::idiv, a, b ); }
+
+        [[nodiscard]] ValueRef udiv( const ValueRef a, const ValueRef b )
+        { return emit_binop( IROp::udiv, a, b ); }
+
+        [[nodiscard]] ValueRef srem( const ValueRef a, const ValueRef b )
+        { return emit_binop( IROp::srem, a, b ); }
+
+        [[nodiscard]] ValueRef urem( const ValueRef a, const ValueRef b )
+        { return emit_binop( IROp::urem, a, b ); }
+
+        [[nodiscard]] ValueRef band( const ValueRef a, const ValueRef b )
+        { return emit_binop( IROp::band, a, b ); }
+
+        [[nodiscard]] ValueRef bor( const ValueRef a, const ValueRef b )
+        { return emit_binop( IROp::bor, a, b ); }
+
+        [[nodiscard]] ValueRef bxor( const ValueRef a, const ValueRef b )
+        { return emit_binop( IROp::bxor, a, b ); }
+
+        [[nodiscard]] ValueRef ishl( const ValueRef a, const ValueRef b )
+        { return emit_binop( IROp::ishl, a, b ); }
+
+        [[nodiscard]] ValueRef ushr( const ValueRef a, const ValueRef b )
+        { return emit_binop( IROp::ushr, a, b ); }
+
+        [[nodiscard]] ValueRef sshr( const ValueRef a, const ValueRef b )
+        { return emit_binop( IROp::sshr, a, b ); }
+
+        [[nodiscard]] ValueRef bnot( const ValueRef a )
+        { return emit_unary( IROp::bnot, m_values[ a.id ].type, a ); }
+
+        [[nodiscard]] ValueRef ineg( const ValueRef a )
+        { return emit_unary( IROp::ineg, m_values[ a.id ].type, a ); }
+
+        [[nodiscard]] ValueRef uextend( const Type ty, const ValueRef a )
+        { return emit_unary( IROp::uextend, ty, a ); }
+
+        [[nodiscard]] ValueRef sextend( const Type ty, const ValueRef a )
+        { return emit_unary( IROp::sextend, ty, a ); }
+
+        [[nodiscard]] ValueRef ireduce( const Type ty, const ValueRef a )
+        { return emit_unary( IROp::ireduce, ty, a ); }
+
+        [[nodiscard]] ValueRef select( const ValueRef cond, const ValueRef a, const ValueRef b )
+        {
+            const ValueRef ops[] = { cond, a, b };
+            return emit( IROp::select, m_values[ a.id ].type, ops );
+        }
 
         [[nodiscard]] ValueRef icmp( const ICmpCC cc, const ValueRef a, const ValueRef b )
         {
@@ -185,6 +242,7 @@ namespace xiao::ir
             m_fn.block_params    = copy_to_arena< ValueRef >( arena, m_block_params );
             m_fn.ext_funcs       = copy_to_arena< ExtFunc >( arena, m_ext_funcs );
             m_fn.ext_param_types = copy_to_arena< Type >( arena, m_ext_param_types );
+            m_fn.global_values   = copy_to_arena< GlobalValueData >( arena, m_global_values );
         }
 
     private:
@@ -202,6 +260,7 @@ namespace xiao::ir
         std::vector< uint32_t > m_block_inst_ends;
         std::vector< ExtFunc >  m_ext_funcs;
         std::vector< Type >     m_ext_param_types;
+        std::vector< GlobalValueData > m_global_values;
 
         [[nodiscard]] ValueRef push_value( const Type ty, const InstRef inst )
         {
@@ -232,6 +291,12 @@ namespace xiao::ir
         {
             const ValueRef ops[] = { a, b };
             return emit( op, m_values[ a.id ].type, ops );
+        }
+
+        [[nodiscard]] ValueRef emit_unary( const IROp op, const Type ty, const ValueRef a )
+        {
+            const ValueRef ops[] = { a };
+            return emit( op, ty, ops );
         }
 
         void emit_terminator( const IROp op, const BlockRef primary, const BlockRef secondary, const ValueRef cond,
