@@ -32,9 +32,33 @@ namespace xiao::x86_64
                 else if constexpr ( std::is_same_v< T, inst::MovImm > )
                 {
                     const auto dst = next( );
-                    emit_rex( buf, true, PReg::invalid( ), dst );
-                    buf.emit_u8( static_cast< uint8_t >( 0xB8 + ( dst.hw( ) & 7 ) ) );
-                    buf.emit_u64( static_cast< uint64_t >( inst.imm ) );
+                    const auto imm = inst.imm;
+
+                    if ( imm == 0 )
+                    {
+                        emit_rex( buf, false, dst, dst );
+                        buf.emit_u8( 0x31 );
+                        buf.emit_u8( modrm( 0b11, dst.hw( ), dst.hw( ) ) );
+                    }
+                    else if ( imm > 0 && imm <= INT64_C( 0xFFFFFFFF ) )
+                    {
+                        emit_rex( buf, false, PReg::invalid( ), dst );
+                        buf.emit_u8( static_cast< uint8_t >( 0xB8 + ( dst.hw( ) & 7 ) ) );
+                        buf.emit_u32( static_cast< uint32_t >( imm ) );
+                    }
+                    else if ( imm >= INT32_MIN && imm < 0 )
+                    {
+                        emit_rex( buf, true, PReg::invalid( ), dst );
+                        buf.emit_u8( 0xC7 );
+                        buf.emit_u8( modrm( 0b11, 0, dst.hw( ) ) );
+                        buf.emit_i32( static_cast< int32_t >( imm ) );
+                    }
+                    else
+                    {
+                        emit_rex( buf, true, PReg::invalid( ), dst );
+                        buf.emit_u8( static_cast< uint8_t >( 0xB8 + ( dst.hw( ) & 7 ) ) );
+                        buf.emit_u64( static_cast< uint64_t >( imm ) );
+                    }
                 }
                 else if constexpr ( std::is_same_v< T, inst::Alu > )
                 {

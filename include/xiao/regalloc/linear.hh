@@ -89,9 +89,6 @@ namespace xiao::regalloc
             auto&      p       = pool( iv.cls );
             const bool crosses = crosses_call( iv );
 
-            assert( ( !crosses || !callee_saved[ static_cast< uint8_t >( iv.cls ) ].empty( ) )
-                    && "[regalloc::LinearScan::pick] value live across a call needs a callee-saved reg, and spilling is not implemented" );
-
             for ( auto it = p.rbegin( ); it != p.rend( ); ++it )
             {
                 if ( crosses && !is_callee_saved( *it ) ) continue;
@@ -103,6 +100,36 @@ namespace xiao::regalloc
             }
 
             return std::nullopt;
+        }
+
+        void spill_or_evict( const LiveInterval& interval )
+        {
+            const bool crosses = crosses_call( interval );
+
+            const auto usable = [ & ]( const Active& a )
+            {
+                if ( a.fixed || a.preg.rc( ) != interval.cls ) return false;
+                if ( crosses && !is_callee_saved( a.preg ) ) return false;
+                return !blocked_by_fixed( a.preg, interval.start( ), interval.end( ) );
+            };
+
+            auto victim = active.end( );
+            for ( auto it = active.begin( ); it != active.end( ); ++it )
+                if ( usable( *it ) && ( victim == active.end( ) || it->end > victim->end ) ) victim = it;
+
+            if ( victim == active.end( ) || victim->end <= interval.end( ) )
+            {
+                spilled.push_back( interval.vreg );
+                return;
+            }
+
+            const auto pr = victim->preg;
+            spilled.push_back( victim->vreg );
+            assignments.erase( victim->vreg );
+            active.erase( victim );
+
+            assignments.emplace( interval.vreg, pr );
+            active.push_back( { interval.vreg, pr, interval.end( ), false } );
         }
 
         [[nodiscard]] std::pair< std::unordered_map< uint32_t, codegen::PReg >, std::vector< uint32_t > > run( )
@@ -154,7 +181,8 @@ namespace xiao::regalloc
                         }
                         assert( victim != active.end( ) && "[regalloc::LinearScan::run] fixed reg not free and not held by active vreg" );
 
-                        if ( victim->end > interval.start( ) + 1 ) { spilled.push_back( victim->vreg ); }
+                        spilled.push_back( victim->vreg );
+                        assignments.erase( victim->vreg );
                         active.erase( victim );
                     }
 
@@ -168,29 +196,7 @@ namespace xiao::regalloc
                     active.push_back( { interval.vreg, *pr, interval.end( ), false } );
                 }
                 else
-                {
-                    auto victim = std::ranges::max_element( active,
-                                                            [ & ]( const Active& a, const Active& b )
-                                                            {
-                                                                if ( a.fixed || a.preg.rc( ) != interval.cls ) return true;
-                                                                if ( b.fixed || b.preg.rc( ) != interval.cls ) return false;
-                                                                return a.end < b.end;
-                                                            } );
-
-                    if ( victim == active.end( ) || victim->fixed || victim->preg.rc( ) != interval.cls )
-                    {
-                        spilled.push_back( interval.vreg );
-                    }
-                    else if ( interval.end( ) > victim->end ) { spilled.push_back( interval.vreg ); }
-                    else
-                    {
-                        const auto pr = victim->preg;
-                        spilled.push_back( victim->vreg );
-                        active.erase( victim );
-                        assignments.emplace( interval.vreg, pr );
-                        active.push_back( { interval.vreg, pr, interval.end( ), false } );
-                    }
-                }
+                    spill_or_evict( interval );
             }
 
             return { std::move( assignments ), std::move( spilled ) };

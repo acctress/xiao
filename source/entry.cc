@@ -4,6 +4,10 @@
 #include <xiao/ir/module.hh>
 #include <xiao/ir/verifier.hh>
 
+#ifdef XIAO_HAS_ZYDIS
+#include <xiao-disasm/disasm.hh>
+#endif
+
 #include <cstdint>
 #include <iterator>
 #include <print>
@@ -90,6 +94,10 @@ int main( )
         std::println( "[error] jit failed" );
         return 1;
     }
+
+#ifdef XIAO_HAS_ZYDIS
+    std::println( "~~ x86-64 ~~\n{}", disasm::dump( *ctx.compiled( ) ) );
+#endif
 
     auto* const process = jit.get_finalised_function< int64_t( int64_t*, int64_t ) >( process_id );
 

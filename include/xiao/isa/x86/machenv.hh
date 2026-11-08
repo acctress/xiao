@@ -33,6 +33,12 @@ namespace xiao::x86_64
 
     inline constexpr PReg k_win64_non_preferred_float[] = { XMM6, XMM7, XMM8, XMM9, XMM10, XMM11, XMM12, XMM13, XMM14, XMM15 };
 
+    inline constexpr PReg k_int_scratch[] = { R10, R11 };
+
+    inline constexpr PReg k_sysv_float_scratch[] = { XMM14 };
+
+    inline constexpr PReg k_win64_float_scratch[] = { XMM4 };
+
     //! MachineEnv factories
 
     //! @brief Construct a MachineEnv for System V AMD64 ABI
@@ -41,7 +47,7 @@ namespace xiao::x86_64
         return {
             .preferred     = {    k_sysv_preferred_int,      k_sysv_preferred_float},
             .non_preferred = {k_sysv_non_preferred_int, std::span< const PReg > { }},
-            .scratch       = {                     R10,                       XMM14},
+            .scratch       = {           k_int_scratch,        k_sysv_float_scratch},
         };
     }
 
@@ -51,7 +57,7 @@ namespace xiao::x86_64
         return {
             .preferred     = {    k_win64_preferred_int,     k_win64_preferred_float},
             .non_preferred = {k_win64_non_preferred_int, std::span< const PReg > { }},
-            .scratch       = {                      R10,                        XMM4},
+            .scratch       = {            k_int_scratch,       k_win64_float_scratch},
         };
     }
 
@@ -59,7 +65,7 @@ namespace xiao::x86_64
     {
         switch ( cc )
         {
-            case codegen::CallConv::SystemV:         return sysv_env( );
+            case codegen::CallConv::SystemV: return sysv_env( );
             case codegen::CallConv::WindowsFastcall: return win64_env( );
         }
         std::unreachable( );

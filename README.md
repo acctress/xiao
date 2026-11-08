@@ -43,7 +43,7 @@ The architecture is modelled on [Cranelift](https://cranelift.dev), and the libr
 **x86-64 backend**
 - Lowering to machine instructions on virtual registers
 - Linear scan register allocation with fixed register constraints, using callee saved registers for
-  values that live across calls
+  values that live across calls and spilling to stack slots under register pressure
 - Prologue and epilogue generation with stack alignment and Win64 shadow space
 - Windows x64 and System V calling conventions
 - Relocations for calls
@@ -56,6 +56,10 @@ The architecture is modelled on [Cranelift](https://cranelift.dev), and the libr
 - Declare, define, finalise and call functions at runtime
 - Host symbol registration, with fallback lookup in the executable and the C runtime
 - Code memory that is writable until finalisation and executable afterwards
+
+**xiao-disasm** (optional)
+- Disassembles compiled code to Intel syntax using [Zydis](https://github.com/zyantific/zydis),
+  annotated with relocations
 
 ## Example
 
@@ -147,6 +151,10 @@ cmake --build build
 
 The executable is written to `bin/exe/`. xiao is developed and tested with Clang on Windows.
 
+By default the example also prints the generated machine code using `xiao-disasm`, which downloads
+Zydis at configure time. Pass `-DXIAO_DISASM=OFF` to build without it. The xiao library itself has
+no dependencies.
+
 ## Project layout
 
 | Path | Contents |
@@ -157,6 +165,7 @@ The executable is written to `bin/exe/`. xiao is developed and tested with Clang
 | `include/xiao/regalloc` | Liveness analysis, live intervals and linear scan allocation |
 | `include/xiao/module` | Function declarations, linkage and the `Module` interface |
 | `include/xiao-jit` | JIT module, builder and executable memory |
+| `include/xiao-disasm` | Optional disassembler for compiled code, built on Zydis |
 
 ## Status
 
@@ -164,8 +173,6 @@ xiao is in early development. The following are not yet supported:
 
 - Targets other than x86-64. Windows x64 is tested; System V is implemented but untested.
 - Floating point types, and loads and stores narrower than 64 bits.
-- Register spilling. Functions that need more registers than the target provides are not yet
-  handled correctly.
 - Arguments passed on the stack.
 - Ahead of time compilation and object file output.
 - Global data, data objects and unwind information.
