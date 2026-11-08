@@ -80,6 +80,25 @@ namespace xiao::ir
             return BlockRef { block_id };
         }
 
+        [[nodiscard]] FuncRef import_function( const ExternalName name, const std::span< const Type > params, const Type ret,
+                                               const codegen::CallConv cc, const bool colocated )
+        {
+            const auto id = static_cast< uint32_t >( m_ext_funcs.size( ) );
+            m_ext_funcs.push_back( ExtFunc { .name          = name,
+                                             .ret           = ret,
+                                             .params_offset = static_cast< uint32_t >( m_ext_param_types.size( ) ),
+                                             .params_count  = static_cast< uint16_t >( params.size( ) ),
+                                             .cc            = cc,
+                                             .colocated     = colocated } );
+
+            m_ext_param_types.insert( m_ext_param_types.end( ), params.begin( ), params.end( ) );
+            return FuncRef { id };
+        }
+
+        [[nodiscard]] FuncRef import_function( const ExternalName name, const std::initializer_list< const Type > params, const Type ret,
+                                               const codegen::CallConv cc, const bool colocated )
+        { return import_function( name, std::span { params.begin( ), params.size( ) }, ret, cc, colocated ); }
+
         [[nodiscard]] ValueRef block_param( const BlockRef block, const uint16_t n ) const
         { return m_block_params[ m_block_param_offsets[ block.id ] + n ]; }
 
@@ -122,9 +141,7 @@ namespace xiao::ir
 
         void brif( const ValueRef cond, const BlockRef then_block, const std::span< const ValueRef > then_args, const BlockRef else_block,
                    const std::span< const ValueRef > else_args )
-        {
-            emit_terminator( IROp::brif, then_block, else_block, cond, then_args, else_args );
-        }
+        { emit_terminator( IROp::brif, then_block, else_block, cond, then_args, else_args ); }
 
         void ret( const ValueRef val = ValueRef { ~0u } )
         {
@@ -134,8 +151,8 @@ namespace xiao::ir
             m_block_inst_ends[ m_cur.id ] = static_cast< uint32_t >( m_insts.size( ) );
         }
 
-        [[nodiscard]] ValueRef call( const FunctionRef callee, const std::span< const ValueRef > args, const Type ret_ty )
-        { return emit( IROp::call, ret_ty, args, callee.id ); }
+        [[nodiscard]] ValueRef call( const FuncRef callee, const std::span< const ValueRef > args )
+        { return emit( IROp::call, m_ext_funcs[ callee.id ].ret, args, callee.id ); }
 
         void finalise( )
         {
@@ -148,12 +165,14 @@ namespace xiao::ir
                 m_blocks[ i ].insts_count  = static_cast< uint16_t >( end - start );
             }
 
-            m_fn.blocks       = copy_to_arena< IRBlock >( arena, m_blocks );
-            m_fn.insts        = copy_to_arena< IRInst >( arena, m_insts );
-            m_fn.operands     = copy_to_arena< ValueRef >( arena, m_operands );
-            m_fn.succs        = copy_to_arena< BlockRef >( arena, m_succs );
-            m_fn.values       = copy_to_arena< Value >( arena, m_values );
-            m_fn.block_params = copy_to_arena< ValueRef >( arena, m_block_params );
+            m_fn.blocks          = copy_to_arena< IRBlock >( arena, m_blocks );
+            m_fn.insts           = copy_to_arena< IRInst >( arena, m_insts );
+            m_fn.operands        = copy_to_arena< ValueRef >( arena, m_operands );
+            m_fn.succs           = copy_to_arena< BlockRef >( arena, m_succs );
+            m_fn.values          = copy_to_arena< Value >( arena, m_values );
+            m_fn.block_params    = copy_to_arena< ValueRef >( arena, m_block_params );
+            m_fn.ext_funcs       = copy_to_arena< ExtFunc >( arena, m_ext_funcs );
+            m_fn.ext_param_types = copy_to_arena< Type >( arena, m_ext_param_types );
         }
 
     private:
@@ -169,6 +188,8 @@ namespace xiao::ir
         std::vector< uint32_t > m_block_inst_starts;
         std::vector< uint32_t > m_block_param_offsets;
         std::vector< uint32_t > m_block_inst_ends;
+        std::vector< ExtFunc >  m_ext_funcs;
+        std::vector< Type >     m_ext_param_types;
 
         [[nodiscard]] ValueRef push_value( const Type ty, const InstRef inst )
         {
@@ -177,8 +198,7 @@ namespace xiao::ir
             return ValueRef { id };
         }
 
-        ValueRef emit( const IROp op, const Type ty, const std::span< const ValueRef > ops, const uint64_t imm = 0,
-                                     const ICmpCC cc = { } )
+        ValueRef emit( const IROp op, const Type ty, const std::span< const ValueRef > ops, const uint64_t imm = 0, const ICmpCC cc = { } )
         {
             const auto inst_id = static_cast< uint32_t >( m_insts.size( ) );
             const auto vref    = push_value( ty, InstRef { inst_id } );

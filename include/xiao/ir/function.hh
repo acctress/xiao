@@ -6,6 +6,7 @@
 
 #include <xiao/codegen/call_conv.hh>
 #include <xiao/support/arena.hh>
+#include <xiao/ir/extname.hh>
 #include <xiao/ir/block.hh>
 #include <xiao/ir/inst.hh>
 #include <xiao/ir/types.hh>
@@ -19,9 +20,19 @@ namespace xiao::ir
     struct IRSig
     {
         Type              ret { };
+        std::span< Type > params { };
+        codegen::CallConv cc { codegen::host_call_conv( ) };
+    };
+
+    //! @brief A function this function calls
+    struct ExtFunc
+    {
+        ExternalName      name { };
+        Type              ret { };
         uint32_t          params_offset { };
         uint16_t          params_count { };
-        codegen::CallConv cc { codegen::host_call_conv( ) };
+        codegen::CallConv cc { };
+        bool              colocated { };
     };
 
     //! @brief Owns flat pools for one IR function,
@@ -38,5 +49,7 @@ namespace xiao::ir
         std::span< BlockRef > succs { };
         std::span< Value >    values { };
         std::span< ValueRef > block_params { };
+        std::span< ExtFunc >  ext_funcs { };
+        std::span< Type >     ext_param_types { };
     };
 } // namespace xiao::ir

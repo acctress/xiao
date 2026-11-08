@@ -88,6 +88,7 @@ namespace xiao::codegen
         inst.get_operands( ops );
         { inst.is_term( ) } -> std::same_as< MachTerminator >;
         { inst.is_mem_access( ) } -> std::same_as< bool >;
+        { inst.is_call( ) } -> std::same_as< bool >;
     };
 
     template < typename T >

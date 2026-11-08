@@ -33,7 +33,12 @@ namespace xiao::regalloc
         // excl( ints_pool, env.scratch[ 0 ] );
         // excl( floats_pool, env.scratch[ 1 ] );
 
-        LinearScan scan { std::move( intervals.intervals ), std::move( ints_pool ), std::move( floats_pool ) };
+        std::array< std::vector< codegen::PReg >, 2 > callee_saved;
+        for ( std::size_t cls = 0; cls < 2; ++cls )
+            callee_saved[ cls ].assign( env.non_preferred[ cls ].begin( ), env.non_preferred[ cls ].end( ) );
+
+        LinearScan scan { intervals.intervals, std::move( ints_pool ), std::move( floats_pool ), intervals.call_points,
+                          std::move( callee_saved ) };
 
         auto [ assignments, spilled ] = std::move( scan ).run( );
 

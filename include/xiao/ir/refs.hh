@@ -17,6 +17,7 @@ namespace xiao::ir {
     using StringRef     = Ref<struct StringTag>;
     using FunctionRef   = Ref<struct FunctionTag>;
     using ImmRef        = Ref<struct ImmTag>;
+    using FuncRef       = Ref<struct FuncRefTag>; //! Different to `FunctionRef`, this is an index into `IRFunction::ext_funcs`
 }
 
 

@@ -3,6 +3,9 @@
 #include <xiao/regalloc/interval.hh>
 #include <xiao/codegen/reg.hh>
 #include <algorithm>
+#include <array>
+#include <cassert>
+#include <optional>
 #include <print>
 #include <unordered_map>
 #include <vector>
@@ -26,12 +29,22 @@ namespace xiao::regalloc
         std::unordered_map< uint32_t, codegen::PReg > assignments;
         std::vector< uint32_t >                       spilled;
 
-        LinearScan( std::vector< LiveInterval > intervals, std::vector< codegen::PReg > ints_pool,
-                    std::vector< codegen::PReg > floats_pool ) :
+        std::vector< Point >                          call_points;
+        std::array< std::vector< codegen::PReg >, 2 > callee_saved;
+
+        std::unordered_map< uint8_t, std::vector< std::pair< Point, Point > > > fixed_ranges;
+
+        LinearScan( std::vector< LiveInterval > intervals, std::vector< codegen::PReg > ints_pool, std::vector< codegen::PReg > floats_pool,
+                    std::vector< Point > call_points, std::array< std::vector< codegen::PReg >, 2 > callee_saved ) :
             intervals { std::move( intervals ) },
             ints_pool { std::move( ints_pool ) },
-            floats_pool { std::move( floats_pool ) }
+            floats_pool { std::move( floats_pool ) },
+            call_points { std::move( call_points ) },
+            callee_saved { std::move( callee_saved ) }
         {
+            for ( const auto& iv : this->intervals )
+                if ( iv.fixed )
+                    for ( const auto& r : iv.ranges ) fixed_ranges[ iv.fixed->index( ) ].push_back( r );
         }
 
         [[nodiscard]] std::vector< codegen::PReg >& pool( const codegen::RegClass cls )
@@ -39,6 +52,58 @@ namespace xiao::regalloc
 
         [[nodiscard]] static constexpr bool same_pr( const codegen::PReg& a, const codegen::PReg& b )
         { return a.index( ) == b.index( ) && a.rc( ) == b.rc( ); }
+
+        [[nodiscard]] bool crosses_call( const LiveInterval& iv ) const
+        {
+            const auto s = iv.start( ), e = iv.end( );
+            return std::ranges::any_of( call_points,
+                                        [ & ]( const Point p )
+                                        {
+                                            return s < p && e > p + 1;
+                                        } );
+        }
+
+        [[nodiscard]] bool is_callee_saved( const codegen::PReg pr ) const
+        {
+            const auto& cs = callee_saved[ static_cast< uint8_t >( pr.rc( ) ) ];
+            return std::ranges::any_of( cs,
+                                        [ & ]( const codegen::PReg c )
+                                        {
+                                            return same_pr( c, pr );
+                                        } );
+        }
+
+        [[nodiscard]] bool blocked_by_fixed( const codegen::PReg pr, const Point s, const Point e ) const
+        {
+            const auto it = fixed_ranges.find( pr.index( ) );
+            if ( it == fixed_ranges.end( ) ) return false;
+            return std::ranges::any_of( it->second,
+                                        [ & ]( const auto& r )
+                                        {
+                                            return r.first < e && r.second > s;
+                                        } );
+        }
+
+        [[nodiscard]] std::optional< codegen::PReg > pick( const LiveInterval& iv )
+        {
+            auto&      p       = pool( iv.cls );
+            const bool crosses = crosses_call( iv );
+
+            assert( ( !crosses || !callee_saved[ static_cast< uint8_t >( iv.cls ) ].empty( ) )
+                    && "[regalloc::LinearScan::pick] value live across a call needs a callee-saved reg, and spilling is not implemented" );
+
+            for ( auto it = p.rbegin( ); it != p.rend( ); ++it )
+            {
+                if ( crosses && !is_callee_saved( *it ) ) continue;
+                if ( blocked_by_fixed( *it, iv.start( ), iv.end( ) ) ) continue;
+
+                const auto pr = *it;
+                p.erase( std::next( it ).base( ) );
+                return pr;
+            }
+
+            return std::nullopt;
+        }
 
         [[nodiscard]] std::pair< std::unordered_map< uint32_t, codegen::PReg >, std::vector< uint32_t > > run( )
         {
@@ -97,14 +162,10 @@ namespace xiao::regalloc
                     continue;
                 }
 
-                auto& p = pool( interval.cls );
-                if ( !p.empty( ) )
+                if ( const auto pr = pick( interval ) )
                 {
-                    const auto pr = p.back( );
-                    p.pop_back( );
-
-                    assignments.emplace( interval.vreg, pr );
-                    active.push_back( { interval.vreg, pr, interval.end( ), false } );
+                    assignments.emplace( interval.vreg, *pr );
+                    active.push_back( { interval.vreg, *pr, interval.end( ), false } );
                 }
                 else
                 {

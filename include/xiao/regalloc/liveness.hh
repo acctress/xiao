@@ -40,7 +40,7 @@ namespace xiao::regalloc
                         const auto& op = vc.operands[ o ];
                         const auto  vr = op.vreg( );
 
-                        if ( !vr.valid( ) || vr.index( ) < codegen::Reg::pinned_count ) continue; // pinned: covered by fixed intervals
+                        if ( !vr.valid( ) || vr.index( ) < codegen::Reg::pinned_count ) continue;
 
                         const bool is_use = op.kind( ) == codegen::OperandKind::Use || op.kind( ) == codegen::OperandKind::UseDef;
                         const bool is_def = op.kind( ) == codegen::OperandKind::Def || op.kind( ) == codegen::OperandKind::UseDef;

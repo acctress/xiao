@@ -16,6 +16,6 @@ namespace xiao::ir
         uint32_t ns { };
         uint32_t index { };
 
-        friend constexpr bool operator==(const ExternalName&, const ExternalName&) = default;
+        friend constexpr bool operator== ( const ExternalName&, const ExternalName& ) = default;
     };
 } // namespace xiao::ir

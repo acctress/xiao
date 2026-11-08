@@ -7,6 +7,7 @@
 #include <xiao/codegen/reg.hh>
 #include <xiao/isa/x86/fmt.hh>
 #include <xiao/ir/types.hh>
+#include <xiao/ir/extname.hh>
 
 #include <cstdint>
 #include <optional>
@@ -19,7 +20,6 @@
     void get_operands( std::vector< MachOperand >& ops ) const \
     { __VA_ARGS__ }
 
-//! A pinned physical Reg becomes a fixed operand so the allocator puts it in that register.
 #define XIAO_OPERAND( reg, kind, pos )                                                                                  \
     if ( ( reg ).valid( ) )                                                                                             \
         ops.push_back( ( reg ).is_physical( ) ? MachOperand::fixed( ( reg ).as_vreg( ), kind, pos, ( reg ).as_preg( ) ) \
@@ -217,8 +217,36 @@ namespace xiao::x86_64
 
         struct Call
         {
-            uint32_t func_id { };
-            XIAO_OPERANDS( )
+            ir::ExternalName    name { };
+            std::vector< PReg > args { };
+            PReg                ret { };
+
+            void get_operands( std::vector< MachOperand >& ops ) const
+            {
+                for ( const auto arg : args ) { FIXED_USE( Reg::from_preg( arg ), arg ) }
+                if ( ret.valid( ) ) { FIXED_DEF( Reg::from_preg( ret ), ret ) }
+            }
+        };
+
+        struct LoadExtName
+        {
+            Reg              dst { };
+            ir::ExternalName name { };
+            XIAO_OPERANDS( DEF( dst ) )
+        };
+
+        struct CallInd
+        {
+            Reg                 target { };
+            std::vector< PReg > args { };
+            PReg                ret { };
+
+            void get_operands( std::vector< MachOperand >& ops ) const
+            {
+                USE( target )
+                for ( const auto arg : args ) { FIXED_USE( Reg::from_preg( arg ), arg ) }
+                if ( ret.valid( ) ) { FIXED_DEF( Reg::from_preg( ret ), ret ) }
+            }
         };
 
         struct Ret
@@ -237,8 +265,7 @@ namespace xiao::x86_64
     {
         enum class Kind : uint8_t
         {
-            JmpRel32,
-            PCRel32
+            JmpRel32
         } kind;
 
         explicit constexpr LabelUse( const Kind k ) : kind { k } { }
@@ -247,8 +274,7 @@ namespace xiao::x86_64
         {
             switch ( use.kind )
             {
-                case Kind::JmpRel32:
-                case Kind::PCRel32: return static_cast< int32_t >( to ) - static_cast< int32_t >( from + 4 );
+                case Kind::JmpRel32: return static_cast< int32_t >( to ) - static_cast< int32_t >( from + 4 );
             }
 
             std::unreachable( );
@@ -305,7 +331,8 @@ namespace xiao::x86_64
     {
         using Inst = std::variant< inst::Alu, inst::AluImm, inst::Mov, inst::MovImm, inst::MovLoad, inst::MovStore, inst::Movzx,
                                    inst::Movsx, inst::Cdq, inst::Div, inst::Idiv, inst::Push, inst::Pop, inst::LeaFrame, inst::SetCC,
-                                   inst::Jmp, inst::Jcc, inst::Call, inst::Ret, inst::DummyUse >;
+                                   inst::Jmp, inst::Jcc, inst::Call, inst::LoadExtName, inst::CallInd, inst::Ret,
+                                   inst::DummyUse >;
 
         Inst inner;
 
@@ -332,6 +359,9 @@ namespace xiao::x86_64
             if ( std::holds_alternative< inst::Jcc >( inner ) ) return MachTerminator::CondBranch;
             return MachTerminator::None;
         }
+
+        [[nodiscard]] bool is_call( ) const noexcept
+        { return std::holds_alternative< inst::Call >( inner ) || std::holds_alternative< inst::CallInd >( inner ); }
 
         [[nodiscard]] std::optional< std::pair< Reg, Reg > > as_move( ) const noexcept
         {
@@ -520,7 +550,12 @@ namespace xiao::x86_64
                     {
                         return std::format( "j{} .L{}", x86_64::to_string( i.cc ), i.target.id );
                     }
-                    else if constexpr ( std::is_same_v< T, inst::Call > ) { return std::format( "call .Lfunc{}", i.func_id ); }
+                    else if constexpr ( std::is_same_v< T, inst::Call > ) { return std::format( "call u{}:{}", i.name.ns, i.name.index ); }
+                    else if constexpr ( std::is_same_v< T, inst::LoadExtName > )
+                    {
+                        return std::format( "mov {}, u{}:{}", i.dst, i.name.ns, i.name.index );
+                    }
+                    else if constexpr ( std::is_same_v< T, inst::CallInd > ) { return std::format( "call *{}", i.target ); }
                     else if constexpr ( std::is_same_v< T, inst::Ret > ) { return "ret"; }
                     else if constexpr ( std::is_same_v< T, inst::DummyUse > ) { return std::format( "# keep-alive {}", i.reg ); }
                 },

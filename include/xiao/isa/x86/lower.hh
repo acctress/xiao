@@ -30,15 +30,10 @@ namespace xiao::x86_64
             m_value_regs.clear( );
             m_builder = codegen::VCodeBuilder< X86Inst > { };
 
-            std::vector< ir::Type > param_tys;
             std::vector< ir::Type > ret_tys;
-
-            param_tys.reserve( fn.sig.params_count );
-            for ( uint16_t i = 0; i < fn.sig.params_count; ++i ) param_tys.push_back( fn.values[ i ].type );
-
             if ( fn.sig.ret != ir::Type::unit ) ret_tys.push_back( fn.sig.ret );
 
-            m_sig = m_abi.compute( fn.sig.cc, param_tys, ret_tys );
+            m_sig = m_abi.compute( fn.sig.cc, fn.sig.params, ret_tys );
 
             m_value_regs.resize( fn.values.size( ) );
             for ( auto i { 0u }; i < fn.values.size( ); ++i ) m_value_regs[ i ] = alloc_vreg( fn.values[ i ].type );
@@ -126,7 +121,7 @@ namespace xiao::x86_64
 
         void lower_params( const ir::IRFunction& fn, const ir::IRBlock& entry )
         {
-            assert( entry.params_count == fn.sig.params_count && "[xiao::lower::lower_params] entry block params must match the sig" );
+            assert( entry.params_count == fn.sig.params.size( ) && "[xiao::lower::lower_params] entry block params must match the sig" );
 
             for ( uint16_t i { 0 }; i < entry.params_count; ++i )
             {
@@ -222,7 +217,37 @@ namespace xiao::x86_64
             m_builder.push( inst::Mov { .dst = res, .src = rax } );
         }
 
-        void lower_call( const ir::IRInst& inst ) { }
+        void lower_call( const ir::IRInst& inst )
+        {
+            const auto& ext    = m_fn->ext_funcs[ inst.imm ];
+            const auto  params = m_fn->ext_param_types.subspan( ext.params_offset, ext.params_count );
+
+            std::vector< ir::Type > rets;
+            if ( ext.ret != ir::Type::unit ) rets.push_back( ext.ret );
+
+            const auto csig = m_abi.compute( ext.cc, params, rets );
+
+            std::vector< PReg > args;
+            args.reserve( inst.ops_count );
+            for ( uint16_t i = 0; i < inst.ops_count; ++i )
+            {
+                assert( csig.params[ i ].is_reg( ) && "[xiao::lower::lower_call] stack passed args not supported YET" );
+                args.push_back( csig.params[ i ].reg( ) );
+                m_builder.push( inst::Mov { .dst = Reg::from_preg( args.back( ) ), .src = reg_for( m_fn->operands[ inst.ops_offset + i ] ) } );
+            }
+
+            const auto ret_preg = rets.empty( ) ? PReg::invalid( ) : csig.rets[ 0 ].reg( );
+
+            if ( ext.colocated ) m_builder.push( inst::Call { .name = ext.name, .args = std::move( args ), .ret = ret_preg } );
+            else
+            {
+                const auto target = Reg::from_vreg( alloc_vreg( ir::Type::i64 ) );
+                m_builder.push( inst::LoadExtName { .dst = target, .name = ext.name } );
+                m_builder.push( inst::CallInd { .target = target, .args = std::move( args ), .ret = ret_preg } );
+            }
+
+            if ( ret_preg.valid( ) ) m_builder.push( inst::Mov { .dst = reg_for( inst.result ), .src = Reg::from_preg( ret_preg ) } );
+        }
 
         [[nodiscard]] static constexpr CC icmp_cc( const ir::ICmpCC cc ) noexcept
         {

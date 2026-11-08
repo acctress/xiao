@@ -31,8 +31,12 @@ namespace xiao::ir
             fn->self             = FunctionRef { id };
             fn->name             = intern( name ).first;
             fn->sig.ret          = ret;
-            fn->sig.params_count = static_cast< uint16_t >( params.size( ) );
             fn->sig.cc           = cc;
+            if ( !params.empty( ) )
+            {
+                fn->sig.params = m_arena.alloc_array_uninit< Type >( params.size( ) );
+                std::ranges::copy( params, fn->sig.params.begin( ) );
+            }
             m_functions.push_back( fn );
             return FunctionRef { id };
         }
@@ -77,13 +81,22 @@ namespace xiao::ir
             for ( const auto* fn : m_functions )
             {
                 std::format_to( out, "fn {}(", string( fn->name ) );
-                for ( auto i { 0u }; i < fn->sig.params_count; ++i )
+                for ( auto i { 0uz }; i < fn->sig.params.size( ); ++i )
                 {
                     if ( i ) std::format_to( out, ", " );
-                    std::format_to( out, "v{}: {}", i, fn->values[ i ].type );
+                    std::format_to( out, "v{}: {}", i, fn->sig.params[ i ] );
                 }
 
                 std::format_to( out, ") -> {} {{\n", fn->sig.ret );
+
+                for ( auto ei { 0uz }; ei < fn->ext_funcs.size( ); ++ei )
+                {
+                    const auto& e = fn->ext_funcs[ ei ];
+                    std::format_to( out, "    fn{} = {}u{}:{}(", ei, e.colocated ? "colocated " : "", e.name.ns, e.name.index );
+                    for ( auto pi { 0u }; pi < e.params_count; ++pi )
+                        std::format_to( out, "{}{}", pi ? ", " : "", fn->ext_param_types[ e.params_offset + pi ] );
+                    std::format_to( out, ") -> {}\n", e.ret );
+                }
 
                 for ( auto bi { 0uz }; bi < fn->blocks.size( ); ++bi )
                 {
@@ -139,11 +152,14 @@ namespace xiao::ir
                                     std::format_to( out, "ret\n" );
                                 break;
                             case IROp::call:
-                                std::format_to( out, "v{} = call .func{}", result.id, imm );
+                            {
+                                if ( fn->ext_funcs[ imm ].ret != Type::unit ) std::format_to( out, "v{} = ", result.id );
+                                std::format_to( out, "call fn{}(", imm );
                                 for ( uint16_t oi = 0; oi < ops_count; ++oi )
-                                    std::format_to( out, " v{}", fn->operands[ ops_offset + oi ].id );
-                                std::format_to( out, "\n" );
+                                    std::format_to( out, "{}v{}", oi ? ", " : "", fn->operands[ ops_offset + oi ].id );
+                                std::format_to( out, ")\n" );
                                 break;
+                            }
                         }
                     }
                 }

@@ -276,9 +276,30 @@ namespace xiao::x86_64
                 }
                 else if constexpr ( std::is_same_v< T, inst::Call > )
                 {
-                    //! call rel32
+                    for ( std::size_t a = 0; a < inst.args.size( ); ++a ) ( void ) next( );
+                    if ( inst.ret.valid( ) ) ( void ) next( );
+
                     buf.emit_u8( 0xE8 );
-                    buf.emit_label_ref( inst.func_id, LabelUse { LabelUse::Kind::PCRel32 } );
+                    buf.add_reloc( codegen::RelocKind::X86CallPCRel4, inst.name, -4 );
+                    buf.emit_u32( 0 );
+                }
+                else if constexpr ( std::is_same_v< T, inst::LoadExtName > )
+                {
+                    const auto dst = next( );
+                    emit_rex( buf, true, PReg::invalid( ), dst );
+                    buf.emit_u8( static_cast< uint8_t >( 0xB8 + ( dst.hw( ) & 7 ) ) );
+                    buf.add_reloc( codegen::RelocKind::Abs8, inst.name, 0 );
+                    buf.emit_u64( 0 );
+                }
+                else if constexpr ( std::is_same_v< T, inst::CallInd > )
+                {
+                    const auto target = next( );
+                    for ( std::size_t a = 0; a < inst.args.size( ); ++a ) ( void ) next( );
+                    if ( inst.ret.valid( ) ) ( void ) next( );
+
+                    if ( target.hw( ) >= 8 ) buf.emit_u8( 0x41 );
+                    buf.emit_u8( 0xFF );
+                    buf.emit_u8( modrm( 0b11, 2, target.hw( ) ) );
                 }
                 else if constexpr ( std::is_same_v< T, inst::Ret > ) { buf.emit_u8( 0xC3 ); }
                 else if constexpr ( std::is_same_v< T, inst::DummyUse > ) { }

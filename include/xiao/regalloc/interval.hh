@@ -37,6 +37,7 @@ namespace xiao::regalloc
     struct LiveIntervals
     {
         std::vector< LiveInterval > intervals;
+        std::vector< Point >        call_points;
 
         [[nodiscard]] static constexpr bool same_pr( const codegen::PReg& a, const codegen::PReg& b ) noexcept
         { return a.index( ) == b.index( ) && a.rc( ) == b.rc( ); }
@@ -108,9 +109,9 @@ namespace xiao::regalloc
                 for ( const auto& vr : touched | std::views::keys )
                 {
                     const Point s = live_in.contains( vr ) ? block.insts_offset : first_def.at( vr );
-                    const Point e = live_out.contains( vr )   ? block.insts_offset + block.insts_count
+                    const Point e = live_out.contains( vr ) ? block.insts_offset + block.insts_count
                                   : last_use.contains( vr ) ? last_use.at( vr ) + 1
-                                                            : first_def.at( vr ) + 1; // dead def
+                                                            : first_def.at( vr ) + 1;
                     ranges[ vr ].emplace_back( s, e );
                 }
 
@@ -141,7 +142,11 @@ namespace xiao::regalloc
             intervals.insert( intervals.end( ), std::make_move_iterator( fixed_intervals.begin( ) ),
                               std::make_move_iterator( fixed_intervals.end( ) ) );
 
-            return LiveIntervals { std::move( intervals ) };
+            std::vector< Point > call_points;
+            for ( Point i { 0 }; i < vc.insts.size( ); ++i )
+                if ( vc.insts[ i ].is_call( ) ) call_points.push_back( i );
+
+            return LiveIntervals { std::move( intervals ), std::move( call_points ) };
         }
     };
 } // namespace xiao::regalloc
