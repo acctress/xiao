@@ -1,0 +1,20 @@
+[package]
+name = "rasi"
+version = "0.1.0"
+edition = "2024"
+
+[workspace]
+members = [
+    "lib/rasi-ir",
+    "lib/rasi-x86-64-asm",
+    "lib/rasi-x86-64",
+    "lib/rasi-codegen",
+    ".", "lib/rasi-regalloc", "lib/rasi-jit",
+]
+resolver = "3"
+
+[dependencies]
+rasi-ir = { path = "lib/rasi-ir" }
+rasi-codegen = { path = "lib/rasi-codegen" }
+rasi-jit = { path = "lib/rasi-jit" }
+rasi-x86-64 = { path = "lib/rasi-x86-64" }

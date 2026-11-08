@@ -1,0 +1,8 @@
+[package]
+name = "rasi-x86-64-asm"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+rasi-codegen = { path = "../rasi-codegen" }
+iced-x86 = { version = "1", default-features = false, features = ["std", "decoder", "intel"] }

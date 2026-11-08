@@ -1,0 +1,10 @@
+[package]
+name = "rasi-x86-64"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+rasi-codegen = { path = "../rasi-codegen" }
+rasi-x86-64-asm = { path = "../rasi-x86-64-asm" }
+rasi-ir = { path = "../rasi-ir" }
+rasi-regalloc = { path = "../rasi-regalloc" }
