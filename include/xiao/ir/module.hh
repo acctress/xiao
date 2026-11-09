@@ -100,6 +100,15 @@ namespace xiao::ir
                     std::format_to( out, ") -> {}\n", e.ret );
                 }
 
+                for ( auto si { 0uz }; si < fn->signatures.size( ); ++si )
+                {
+                    const auto& sg = fn->signatures[ si ];
+                    std::format_to( out, "    sig{} = (", si );
+                    for ( auto pi { 0u }; pi < sg.params_count; ++pi )
+                        std::format_to( out, "{}{}", pi ? ", " : "", fn->ext_param_types[ sg.params_offset + pi ] );
+                    std::format_to( out, ") -> {}\n", sg.ret );
+                }
+
                 for ( auto gi { 0uz }; gi < fn->global_values.size( ); ++gi )
                 {
                     const auto& g = fn->global_values[ gi ];
@@ -135,7 +144,8 @@ namespace xiao::ir
                         switch ( op )
                         {
                             case IROp::iconst:
-                                std::format_to( out, "v{} = iconst {} #{}\n", result.id, fn->values[ result.id ].type, static_cast< int64_t >( imm ) );
+                                std::format_to( out, "v{} = iconst {} #{}\n", result.id, fn->values[ result.id ].type,
+                                                static_cast< int64_t >( imm ) );
                                 break;
                             case IROp::iadd:
                             case IROp::isub:
@@ -154,15 +164,25 @@ namespace xiao::ir
                                                 fn->operands[ ops_offset + 1 ].id );
                                 break;
                             case IROp::bnot:
-                            case IROp::ineg:
-                                std::format_to( out, "v{} = {} v{}\n", result.id, op, fn->operands[ ops_offset ].id );
-                                break;
+                            case IROp::ineg: std::format_to( out, "v{} = {} v{}\n", result.id, op, fn->operands[ ops_offset ].id ); break;
                             case IROp::uextend:
                             case IROp::sextend:
                             case IROp::ireduce:
                                 std::format_to( out, "v{} = {}.{} v{}\n", result.id, op, fn->values[ result.id ].type,
                                                 fn->operands[ ops_offset ].id );
                                 break;
+                            case IROp::func_addr:
+                                std::format_to( out, "v{} = func_addr.{} fn{}\n", result.id, fn->values[ result.id ].type, imm );
+                                break;
+                            case IROp::call_indirect:
+                            {
+                                if ( fn->signatures[ imm ].ret != Type::unit ) std::format_to( out, "v{} = ", result.id );
+                                std::format_to( out, "call_indirect sig{}, v{}(", imm, fn->operands[ ops_offset ].id );
+                                for ( uint16_t oi = 1; oi < ops_count; ++oi )
+                                    std::format_to( out, "{}v{}", oi > 1 ? ", " : "", fn->operands[ ops_offset + oi ].id );
+                                std::format_to( out, ")\n" );
+                                break;
+                            }
                             case IROp::symbol_value:
                                 std::format_to( out, "v{} = symbol_value.{} gv{}\n", result.id, fn->values[ result.id ].type, imm );
                                 break;
@@ -178,7 +198,7 @@ namespace xiao::ir
                             {
                                 const auto [ then_args, else_args ] = branch_args( *fn, b, fn->insts[ b.insts_offset + ii ] );
                                 std::format_to( out, "br " );
-                                target( fn->succs[ b.succs_offset ].id,  then_args );
+                                target( fn->succs[ b.succs_offset ].id, then_args );
                                 std::format_to( out, "\n" );
                                 break;
                             }
@@ -209,8 +229,8 @@ namespace xiao::ir
                             case IROp::load:
                             {
                                 const auto off = mem_offset( fn->insts[ b.insts_offset + ii ] );
-                                std::format_to( out, "v{} = load.{} v{}{}\n", result.id, fn->values[ result.id ].type, fn->operands[ ops_offset ].id,
-                                                off ? std::format( "{:+}", off ) : std::string { } );
+                                std::format_to( out, "v{} = load.{} v{}{}\n", result.id, fn->values[ result.id ].type,
+                                                fn->operands[ ops_offset ].id, off ? std::format( "{:+}", off ) : std::string { } );
                                 break;
                             }
                             case IROp::store:

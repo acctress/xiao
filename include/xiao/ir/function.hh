@@ -36,6 +36,14 @@ namespace xiao::ir
         bool              colocated { };
     };
 
+    struct ExtSig
+    {
+        Type              ret { };
+        uint32_t          params_offset { };
+        uint16_t          params_count { };
+        codegen::CallConv cc { };
+    };
+
     struct GlobalValueData
     {
         ExternalName name { };
@@ -47,19 +55,20 @@ namespace xiao::ir
     //! @note All are views into the owning IRModule's arena
     struct IRFunction
     {
-        support::Arena*       arena { };
-        StringRef             name { };
-        IRSig                 sig { };
-        FunctionRef           self { };
-        std::span< IRBlock >  blocks { };
-        std::span< IRInst >   insts { };
-        std::span< ValueRef > operands { };
-        std::span< BlockRef > succs { };
-        std::span< Value >    values { };
-        std::span< ValueRef > block_params { };
-        std::span< ExtFunc >  ext_funcs { };
-        std::span< Type >     ext_param_types { };
+        support::Arena*              arena { };
+        StringRef                    name { };
+        IRSig                        sig { };
+        FunctionRef                  self { };
+        std::span< IRBlock >         blocks { };
+        std::span< IRInst >          insts { };
+        std::span< ValueRef >        operands { };
+        std::span< BlockRef >        succs { };
+        std::span< Value >           values { };
+        std::span< ValueRef >        block_params { };
+        std::span< ExtFunc >         ext_funcs { };
+        std::span< Type >            ext_param_types { };
         std::span< GlobalValueData > global_values { };
+        std::span< ExtSig >          signatures { };
     };
 
     struct BranchArgs

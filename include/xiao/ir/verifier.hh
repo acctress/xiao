@@ -92,6 +92,8 @@ namespace xiao::ir
                 case IROp::ireduce: verify_convert( fn, inst ); break;
                 case IROp::select: verify_select( fn, inst ); break;
                 case IROp::symbol_value: verify_symbol_value( fn, inst ); break;
+                case IROp::func_addr: verify_func_addr( fn, inst ); break;
+                case IROp::call_indirect: verify_call_indirect( fn, inst ); break;
                 default: break;
             }
         }
@@ -176,6 +178,44 @@ namespace xiao::ir
 
             if ( !is_int( c ) ) errs.push_back( { std::format( "select: condition is {}, expected an integer", c ) } );
             if ( a != b ) errs.push_back( { std::format( "select: values are {} and {}, expected the same type", a, b ) } );
+        }
+
+        void verify_func_addr( const IRFunction& fn, const IRInst& inst )
+        {
+            if ( !expect_operands( inst, 0 ) ) return;
+
+            if ( inst.imm >= fn.ext_funcs.size( ) )
+                errs.push_back( { std::format( "func_addr: fn{} but only {} imports", inst.imm, fn.ext_funcs.size( ) ) } );
+
+            if ( const auto ty = fn.values[ inst.result.id ].type; ty != Type::ptr )
+                errs.push_back( { std::format( "func_addr.{}: result must be ptr", ty ) } );
+        }
+
+        void verify_call_indirect( const IRFunction& fn, const IRInst& inst )
+        {
+            if ( inst.imm >= fn.signatures.size( ) )
+            {
+                errs.push_back( { std::format( "call_indirect through sig{} but only {} signatures", inst.imm, fn.signatures.size( ) ) } );
+                return;
+            }
+
+            const auto& sig = fn.signatures[ inst.imm ];
+            if ( inst.ops_count != sig.params_count + 1 )
+            {
+                errs.push_back(
+                    { std::format( "call_indirect sig{}: {} args, expected {}", inst.imm, inst.ops_count - 1, sig.params_count ) } );
+                return;
+            }
+
+            if ( const auto callee = operand_type( fn, inst, 0 ); callee != Type::ptr )
+                errs.push_back( { std::format( "call_indirect: callee is {}, expected ptr", callee ) } );
+
+            for ( uint16_t i = 0; i < sig.params_count; ++i )
+            {
+                const auto got = operand_type( fn, inst, static_cast< uint16_t >( i + 1 ) );
+                if ( const auto want = fn.ext_param_types[ sig.params_offset + i ]; got != want )
+                    errs.push_back( { std::format( "call_indirect sig{}: arg {} is {}, expected {}", inst.imm, i, got, want ) } );
+            }
         }
 
         void verify_symbol_value( const IRFunction& fn, const IRInst& inst )

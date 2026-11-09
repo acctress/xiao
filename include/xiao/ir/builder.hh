@@ -99,6 +99,29 @@ namespace xiao::ir
                                                const codegen::CallConv cc, const bool colocated )
         { return import_function( name, std::span { params.begin( ), params.size( ) }, ret, cc, colocated ); }
 
+        [[nodiscard]] SigRef import_signature( const std::span< const Type > params, const Type ret, const codegen::CallConv cc )
+        {
+            m_signatures.push_back( ExtSig { .ret           = ret,
+                                             .params_offset = static_cast< uint32_t >( m_ext_param_types.size( ) ),
+                                             .params_count  = static_cast< uint16_t >( params.size( ) ),
+                                             .cc            = cc } );
+            m_ext_param_types.insert( m_ext_param_types.end( ), params.begin( ), params.end( ) );
+            return SigRef { static_cast< uint32_t >( m_signatures.size( ) - 1 ) };
+        }
+
+        [[nodiscard]] SigRef import_signature( const std::initializer_list< const Type > params, const Type ret, const codegen::CallConv cc )
+        { return import_signature( std::span { params.begin( ), params.size( ) }, ret, cc ); }
+
+        [[nodiscard]] ValueRef func_addr( const Type ty, const FuncRef func )
+        { return emit( IROp::func_addr, ty, { }, func.id ); }
+
+        ValueRef call_indirect( const SigRef sig, const ValueRef callee, const std::span< const ValueRef > args )
+        {
+            std::vector< ValueRef > ops { callee };
+            ops.insert( ops.end( ), args.begin( ), args.end( ) );
+            return emit( IROp::call_indirect, m_signatures[ sig.id ].ret, ops, sig.id );
+        }
+
         [[nodiscard]] GlobalValueRef create_global_value( const GlobalValueData& data )
         {
             m_global_values.push_back( data );
@@ -243,6 +266,7 @@ namespace xiao::ir
             m_fn.ext_funcs       = copy_to_arena< ExtFunc >( arena, m_ext_funcs );
             m_fn.ext_param_types = copy_to_arena< Type >( arena, m_ext_param_types );
             m_fn.global_values   = copy_to_arena< GlobalValueData >( arena, m_global_values );
+            m_fn.signatures      = copy_to_arena< ExtSig >( arena, m_signatures );
         }
 
     private:
@@ -261,6 +285,7 @@ namespace xiao::ir
         std::vector< ExtFunc >  m_ext_funcs;
         std::vector< Type >     m_ext_param_types;
         std::vector< GlobalValueData > m_global_values;
+        std::vector< ExtSig >          m_signatures;
 
         [[nodiscard]] ValueRef push_value( const Type ty, const InstRef inst )
         {

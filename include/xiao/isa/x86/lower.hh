@@ -64,6 +64,8 @@ namespace xiao::x86_64
                 for ( uint16_t i { 0 }; i < inst.ops_count; ++i )
                     if ( !fold_operand( inst, i ) ) m_needs_reg[ fn.operands[ inst.ops_offset + i ].id ] = true;
 
+            find_fused_compares( fn );
+
             visit_function( fn );
 
             for ( const auto& edge : m_pending_edges )
@@ -130,6 +132,8 @@ namespace xiao::x86_64
                 case sextend: lower_extend( inst, true ); break;
                 case ireduce: lower_ireduce( inst ); break;
                 case symbol_value: lower_symbol_value( inst ); break;
+                case func_addr: lower_func_addr( inst ); break;
+                case call_indirect: lower_call_indirect( inst ); break;
             }
         }
 
@@ -152,6 +156,7 @@ namespace xiao::x86_64
         std::vector< BlockId >     m_term_succs { };
         std::vector< PendingEdge > m_pending_edges { };
         std::vector< bool >        m_needs_reg { };
+        std::vector< bool >        m_fused { };
         std::vector< uint32_t >    m_pred_count { };
         uint32_t                   m_vreg_c { };
         uint32_t                   m_cur_block { };
@@ -314,22 +319,53 @@ namespace xiao::x86_64
             m_builder.push( inst::Ret { } );
         }
 
+        void find_fused_compares( const ir::IRFunction& fn )
+        {
+            std::vector< uint32_t > uses( fn.values.size( ), 0 );
+            for ( const auto& inst : fn.insts )
+                for ( uint16_t i { 0 }; i < inst.ops_count; ++i ) ++uses[ fn.operands[ inst.ops_offset + i ].id ];
+
+            m_fused.assign( fn.values.size( ), false );
+            for ( const auto& b : fn.blocks )
+            {
+                if ( b.insts_count == 0 ) continue;
+
+                const auto& term = fn.insts[ b.insts_offset + b.insts_count - 1 ];
+                if ( term.op != ir::IROp::brif ) continue;
+
+                const auto cond = fn.operands[ term.ops_offset ];
+                const auto def  = fn.values[ cond.id ].inst.id;
+                if ( def < b.insts_offset || def >= b.insts_offset + b.insts_count ) continue;
+                if ( fn.insts[ def ].op != ir::IROp::icmp || uses[ cond.id ] != 1 ) continue;
+
+                m_fused[ cond.id ] = true;
+            }
+        }
+
+        CC emit_cmp( const ir::IRInst& inst )
+        {
+            if ( const auto imm = fold_operand( inst, 1 ) )
+            {
+                m_builder.push( inst::AluImm { .op = AluOp::Cmp, .dst = reg_for( operand( inst, 0 ) ), .imm = *imm } );
+                return icmp_cc( inst.cc );
+            }
+
+            if ( const auto imm = fold_operand( inst, 0 ) )
+            {
+                m_builder.push( inst::AluImm { .op = AluOp::Cmp, .dst = reg_for( operand( inst, 1 ) ), .imm = *imm } );
+                return icmp_cc( swap_cc( inst.cc ) );
+            }
+
+            m_builder.push( inst::Alu { .op = AluOp::Cmp, .dst = reg_for( operand( inst, 0 ) ), .src = reg_for( operand( inst, 1 ) ) } );
+            return icmp_cc( inst.cc );
+        }
+
         void lower_icmp( const ir::IRInst& inst )
         {
+            if ( m_fused[ inst.result.id ] ) return;
+
             const auto dst = reg_for( inst.result );
-            auto       cc  = icmp_cc( inst.cc );
-
-            if ( const auto imm = fold_operand( inst, 1 ) )
-                m_builder.push( inst::AluImm { .op = AluOp::Cmp, .dst = reg_for( operand( inst, 0 ) ), .imm = *imm } );
-            else if ( const auto imm_l = fold_operand( inst, 0 ) )
-            {
-                cc = icmp_cc( swap_cc( inst.cc ) );
-                m_builder.push( inst::AluImm { .op = AluOp::Cmp, .dst = reg_for( operand( inst, 1 ) ), .imm = *imm_l } );
-            }
-            else
-                m_builder.push(
-                    inst::Alu { .op = AluOp::Cmp, .dst = reg_for( operand( inst, 0 ) ), .src = reg_for( operand( inst, 1 ) ) } );
-
+            const auto cc  = emit_cmp( inst );
             m_builder.push( inst::SetCC { .cc = cc, .dst = dst } );
             m_builder.push( inst::Movzx { .dst = dst, .src = dst, .size = OperandSize::S8 } );
         }
@@ -352,7 +388,7 @@ namespace xiao::x86_64
             const auto& then_b                  = m_fn->blocks[ a_id ];
             const auto& else_b                  = m_fn->blocks[ b_id ];
             const auto [ then_args, else_args ] = ir::branch_args( *m_fn, block, inst );
-            const auto cond                     = reg_for( m_fn->operands[ inst.ops_offset ] );
+            const auto cond                     = m_fn->operands[ inst.ops_offset ];
 
             const auto then_id = m_block_map[ a_id ];
             const auto else_id = m_block_map[ b_id ];
@@ -364,13 +400,26 @@ namespace xiao::x86_64
                 m_pending_edges.push_back( { .block = jcc_target, .args = then_args, .target = &then_b, .target_id = then_id } );
             }
 
-            m_builder.push( inst::TestReg { .reg = cond, .size = size_of( type_of( operand( inst, 0 ) ) ) } );
-            m_builder.push( inst::Jcc { .cc = CC::NE, .target = jcc_target } );
+            auto cc = CC::NE;
+            if ( m_fused[ cond.id ] ) cc = emit_cmp( m_fn->insts[ m_fn->values[ cond.id ].inst.id ] );
+            else
+                m_builder.push( inst::TestReg { .reg = reg_for( cond ), .size = size_of( type_of( cond ) ) } );
+            m_builder.push( inst::Jcc { .cc = cc, .target = jcc_target } );
             lower_block_args( else_args, else_b );
             m_builder.push( inst::Jmp { .target = else_id } );
 
             m_term_succs.push_back( jcc_target );
             m_term_succs.push_back( else_id );
+        }
+
+        void lower_func_addr( const ir::IRInst& inst )
+        {
+            const auto& ext = m_fn->ext_funcs[ inst.imm ];
+            m_builder.push( inst::LoadExtName {
+                .dst      = reg_for( inst.result ),
+                .name     = ext.name,
+                .distance = ext.colocated ? RelocDistance::Near : RelocDistance::Far,
+            } );
         }
 
         void lower_symbol_value( const ir::IRInst& inst )
@@ -520,43 +569,67 @@ namespace xiao::x86_64
                 m_builder.push( inst::Mov { .dst = Reg::from_vreg( copies[ i ].dst ), .src = Reg::from_vreg( temps[ i ] ) } );
         }
 
-        void lower_call( const ir::IRInst& inst )
+        struct CallTarget
         {
-            const auto& [ name, ret, params_offset, params_count, cc, colocated ] = m_fn->ext_funcs[ inst.imm ];
-            const auto params = m_fn->ext_param_types.subspan( params_offset, params_count );
+            std::optional< ir::ExternalName > name { };
+            Reg                               reg { };
+        };
 
+        void emit_call( const ir::IRInst& inst, const std::span< const ir::Type > params, const ir::Type ret, const codegen::CallConv cc,
+                        const uint16_t first_arg, const CallTarget target )
+        {
             std::vector< ir::Type > rets;
             if ( ret != ir::Type::unit ) rets.push_back( ret );
 
             const auto csig = m_abi.compute( cc, params, rets );
 
             std::vector< PReg > args;
-            args.reserve( inst.ops_count );
-            for ( uint16_t i = 0; i < inst.ops_count; ++i )
+            args.reserve( params.size( ) );
+            for ( uint16_t i = 0; i < params.size( ); ++i )
             {
-                assert( csig.params[ i ].is_reg( ) && "[xiao::lower::lower_call] stack passed args not supported YET" );
+                assert( csig.params[ i ].is_reg( ) && "[xiao::lower::emit_call] stack passed args not supported YET" );
                 args.push_back( csig.params[ i ].reg( ) );
-                m_builder.push(
-                    inst::Mov { .dst = Reg::from_preg( args.back( ) ), .src = reg_for( m_fn->operands[ inst.ops_offset + i ] ) } );
+                m_builder.push( inst::Mov { .dst = Reg::from_preg( args.back( ) ),
+                                            .src = reg_for( m_fn->operands[ inst.ops_offset + first_arg + i ] ) } );
             }
 
             const auto ret_preg = rets.empty( ) ? PReg::invalid( ) : csig.rets[ 0 ].reg( );
 
             std::vector< PReg > clobbers;
-            const auto          callee_env = env_for( cc );
-            for ( const auto& cls : callee_env.preferred ) clobbers.insert( clobbers.end( ), cls.begin( ), cls.end( ) );
+            for ( const auto callee_env = env_for( cc ); const auto& cls : callee_env.preferred )
+                clobbers.insert( clobbers.end( ), cls.begin( ), cls.end( ) );
 
-            if ( colocated )
-                m_builder.push( inst::Call { .name = name, .args = std::move( args ), .ret = ret_preg, .clobbers = std::move( clobbers ) } );
-            else
-            {
-                const auto target = Reg::from_vreg( alloc_vreg( ir::Type::i64 ) );
-                m_builder.push( inst::LoadExtName { .dst = target, .name = name } );
+            if ( target.name )
                 m_builder.push(
-                    inst::CallInd { .target = target, .args = std::move( args ), .ret = ret_preg, .clobbers = std::move( clobbers ) } );
-            }
+                    inst::Call { .name = *target.name, .args = std::move( args ), .ret = ret_preg, .clobbers = std::move( clobbers ) } );
+            else
+                m_builder.push(
+                    inst::CallInd { .target = target.reg, .args = std::move( args ), .ret = ret_preg, .clobbers = std::move( clobbers ) } );
 
             if ( ret_preg.valid( ) ) m_builder.push( inst::Mov { .dst = reg_for( inst.result ), .src = Reg::from_preg( ret_preg ) } );
+        }
+
+        void lower_call( const ir::IRInst& inst )
+        {
+            const auto& [ name, ret, params_offset, params_count, cc, colocated ] = m_fn->ext_funcs[ inst.imm ];
+            const auto params = m_fn->ext_param_types.subspan( params_offset, params_count );
+
+            if ( colocated )
+            {
+                emit_call( inst, params, ret, cc, 0, CallTarget { .name = name } );
+                return;
+            }
+
+            const auto target = Reg::from_vreg( alloc_vreg( ir::Type::i64 ) );
+            m_builder.push( inst::LoadExtName { .dst = target, .name = name } );
+            emit_call( inst, params, ret, cc, 0, CallTarget { .reg = target } );
+        }
+
+        void lower_call_indirect( const ir::IRInst& inst )
+        {
+            const auto& sig    = m_fn->signatures[ inst.imm ];
+            const auto  params = m_fn->ext_param_types.subspan( sig.params_offset, sig.params_count );
+            emit_call( inst, params, sig.ret, sig.cc, 1, CallTarget { .reg = reg_for( m_fn->operands[ inst.ops_offset ] ) } );
         }
 
         [[nodiscard]] static constexpr CC icmp_cc( const ir::ICmpCC cc ) noexcept

@@ -42,6 +42,8 @@ The architecture is modelled on [Cranelift](https://cranelift.dev), and the libr
 - Control flow: `br`, `brif` and `ret` with block arguments, supporting loops and merges
 - Memory: 8, 16, 32 and 64-bit `load` and `store` through pointers with a constant offset
 - Calls to functions in the same module or to external symbols
+- Indirect calls: `func_addr` takes the address of a function and `call_indirect` calls through a
+  pointer using a signature imported into the function
 - Global values and `symbol_value` for the address of a data object, with an optional offset
 
 **x86-64 backend**
@@ -222,7 +224,6 @@ xiao is in early development. The following are not yet supported:
 - Targets other than x86-64. Windows x64 is tested; System V is implemented but untested.
 - Floating point types.
 - Arguments passed on the stack.
-- Indirect calls through function pointers.
 - ELF and Mach-O object files.
 - Thread-local data and unwind information.
 

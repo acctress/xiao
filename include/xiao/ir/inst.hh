@@ -39,6 +39,8 @@ namespace xiao::ir
         sextend,
         ireduce,
         symbol_value,
+        func_addr,
+        call_indirect,
     };
 
     //! @brief Condition kinds for icmp.
@@ -113,6 +115,8 @@ struct std::formatter< xiao::ir::IROp >
             case sextend: return std::format_to( ctx.out( ), "sextend" );
             case ireduce: return std::format_to( ctx.out( ), "ireduce" );
             case symbol_value: return std::format_to( ctx.out( ), "symbol_value" );
+            case func_addr: return std::format_to( ctx.out( ), "func_addr" );
+            case call_indirect: return std::format_to( ctx.out( ), "call_indirect" );
         }
         return ctx.out( );
     }
