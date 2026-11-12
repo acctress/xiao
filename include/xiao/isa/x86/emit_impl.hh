@@ -1,0 +1,399 @@
+//!
+//! Created by griffith on 7/11/2026.
+//!
+
+#pragma once
+
+#include <xiao/isa/x86/inst.hh>
+#include <xiao/isa/x86/encode.hh>
+#include <xiao/isa/x86/reg.hh>
+
+namespace xiao::x86_64
+{
+    inline void X86Inst::emit( MachBuffer< LabelUse >& buf, const std::span< const PReg > pregs,
+                               const std::span< const int32_t > slot_offsets ) const
+    {
+        uint32_t i { };
+        auto     next = [ & ]( ) -> PReg
+        {
+            return pregs[ i++ ];
+        };
+
+        std::visit(
+            [ & ]< typename T >( const T& inst )
+            {
+                if constexpr ( std::is_same_v< T, inst::Mov > )
+                {
+                    const auto dst = next( );
+                    const auto src = next( );
+                    emit_rex( buf, true, src, dst );
+                    buf.emit_u8( 0x89 );
+                    buf.emit_u8( modrm( 0b11, src.hw( ), dst.hw( ) ) );
+                }
+                else if constexpr ( std::is_same_v< T, inst::MovImm > )
+                {
+                    const auto dst = next( );
+                    const auto imm = inst.imm;
+
+                    if ( imm == 0 )
+                    {
+                        emit_rex( buf, false, dst, dst );
+                        buf.emit_u8( 0x31 );
+                        buf.emit_u8( modrm( 0b11, dst.hw( ), dst.hw( ) ) );
+                    }
+                    else if ( imm > 0 && imm <= INT64_C( 0xFFFFFFFF ) )
+                    {
+                        emit_rex( buf, false, PReg::invalid( ), dst );
+                        buf.emit_u8( static_cast< uint8_t >( 0xB8 + ( dst.hw( ) & 7 ) ) );
+                        buf.emit_u32( static_cast< uint32_t >( imm ) );
+                    }
+                    else if ( imm >= INT32_MIN && imm < 0 )
+                    {
+                        emit_rex( buf, true, PReg::invalid( ), dst );
+                        buf.emit_u8( 0xC7 );
+                        buf.emit_u8( modrm( 0b11, 0, dst.hw( ) ) );
+                        buf.emit_i32( static_cast< int32_t >( imm ) );
+                    }
+                    else
+                    {
+                        emit_rex( buf, true, PReg::invalid( ), dst );
+                        buf.emit_u8( static_cast< uint8_t >( 0xB8 + ( dst.hw( ) & 7 ) ) );
+                        buf.emit_u64( static_cast< uint64_t >( imm ) );
+                    }
+                }
+                else if constexpr ( std::is_same_v< T, inst::Alu > )
+                {
+                    const auto dst = next( );
+                    const auto src = next( );
+
+                    if ( inst.op == AluOp::Mul )
+                    {
+                        //! imul r64, r/m64 — 0F AF /r, operand order: dst is reg, src is r/m
+                        emit_rex( buf, true, dst, src );
+                        buf.emit_u8( 0x0F );
+                        buf.emit_u8( 0xAF );
+                        buf.emit_u8( modrm( 0b11, dst.hw( ), src.hw( ) ) );
+                    }
+                    else
+                    {
+                        uint8_t opcode { };
+                        switch ( inst.op )
+                        {
+                            case AluOp::Add: opcode = 0x01; break;  //! add r/m64, r64
+                            case AluOp::Sub: opcode = 0x29; break;  //! sub r/m64, r64
+                            case AluOp::And: opcode = 0x21; break;  //! and r/m64, r64
+                            case AluOp::Or: opcode = 0x09; break;   //! or  r/m64, r64
+                            case AluOp::Xor: opcode = 0x31; break;  //! xor r/m64, r64
+                            case AluOp::Cmp: opcode = 0x39; break;  //! cmp r/m64, r64
+                            case AluOp::Test: opcode = 0x85; break; //! test r/m64, r64
+                            default: std::unreachable( );
+                        }
+
+                        emit_rex( buf, true, src, dst );
+                        buf.emit_u8( opcode );
+                        buf.emit_u8( modrm( 0b11, src.hw( ), dst.hw( ) ) );
+                    }
+                }
+                else if constexpr ( std::is_same_v< T, inst::AluImm > )
+                {
+                    const auto dst       = next( );
+                    const bool short_imm = fits_i8( inst.imm );
+
+                    if ( inst.op == AluOp::Mul )
+                    {
+                        emit_rex( buf, true, dst, dst );
+                        buf.emit_u8( short_imm ? 0x6B : 0x69 );
+                        buf.emit_u8( modrm( 0b11, dst.hw( ), dst.hw( ) ) );
+                    }
+                    else if ( inst.op == AluOp::Test )
+                    {
+                        emit_rex( buf, true, PReg::invalid( ), dst );
+                        buf.emit_u8( 0xF7 );
+                        buf.emit_u8( modrm( 0b11, 0, dst.hw( ) ) );
+                        buf.emit_i32( inst.imm );
+                        return;
+                    }
+                    else
+                    {
+                        uint8_t ext { };
+                        switch ( inst.op )
+                        {
+                            case AluOp::Add: ext = 0; break;
+                            case AluOp::Or: ext = 1; break;
+                            case AluOp::And: ext = 4; break;
+                            case AluOp::Sub: ext = 5; break;
+                            case AluOp::Xor: ext = 6; break;
+                            case AluOp::Cmp: ext = 7; break;
+                            default: std::unreachable( );
+                        }
+                        emit_rex( buf, true, PReg::invalid( ), dst );
+                        buf.emit_u8( short_imm ? 0x83 : 0x81 );
+                        buf.emit_u8( modrm( 0b11, ext, dst.hw( ) ) );
+                    }
+
+                    if ( short_imm ) buf.emit_u8( static_cast< uint8_t >( static_cast< int8_t >( inst.imm ) ) );
+                    else
+                        buf.emit_i32( inst.imm );
+                }
+                else if constexpr ( std::is_same_v< T, inst::Unary > )
+                {
+                    const auto dst = next( );
+                    emit_rex( buf, true, PReg::invalid( ), dst );
+                    buf.emit_u8( 0xF7 );
+                    buf.emit_u8( modrm( 0b11, inst.op == UnaryOp::Not ? 2 : 3, dst.hw( ) ) );
+                }
+                else if constexpr ( std::is_same_v< T, inst::Shift > || std::is_same_v< T, inst::ShiftImm > )
+                {
+                    const auto dst = next( );
+                    if constexpr ( std::is_same_v< T, inst::Shift > ) ( void ) next( );
+
+                    uint8_t ext { };
+                    switch ( inst.op )
+                    {
+                        case ShiftOp::Shl: ext = 4; break;
+                        case ShiftOp::Shr: ext = 5; break;
+                        case ShiftOp::Sar: ext = 7; break;
+                        default: break;
+                    }
+
+                    emit_rex( buf, true, PReg::invalid( ), dst );
+                    if constexpr ( std::is_same_v< T, inst::Shift > )
+                    {
+                        buf.emit_u8( 0xD3 );
+                        buf.emit_u8( modrm( 0b11, ext, dst.hw( ) ) );
+                    }
+                    else
+                    {
+                        buf.emit_u8( 0xC1 );
+                        buf.emit_u8( modrm( 0b11, ext, dst.hw( ) ) );
+                        buf.emit_u8( static_cast< uint8_t >( inst.imm & 63 ) );
+                    }
+                }
+                else if constexpr ( std::is_same_v< T, inst::TestReg > )
+                {
+                    const auto r = next( );
+                    switch ( inst.size )
+                    {
+                        case OperandSize::S8:
+                            emit_rex( buf, false, r, r, true );
+                            buf.emit_u8( 0x84 );
+                            break;
+                        case OperandSize::S16:
+                            buf.emit_u8( 0x66 );
+                            emit_rex( buf, false, r, r );
+                            buf.emit_u8( 0x85 );
+                            break;
+                        case OperandSize::S32:
+                            emit_rex( buf, false, r, r );
+                            buf.emit_u8( 0x85 );
+                            break;
+                        case OperandSize::S64:
+                            emit_rex( buf, true, r, r );
+                            buf.emit_u8( 0x85 );
+                            break;
+                        default: break;
+                    }
+                    buf.emit_u8( modrm( 0b11, r.hw( ), r.hw( ) ) );
+                }
+                else if constexpr ( std::is_same_v< T, inst::CMov > )
+                {
+                    const auto dst = next( );
+                    const auto src = next( );
+                    emit_rex( buf, true, dst, src );
+                    buf.emit_u8( 0x0F );
+                    buf.emit_u8( static_cast< uint8_t >( 0x40 | cc_nibble( inst.cc ) ) );
+                    buf.emit_u8( modrm( 0b11, dst.hw( ), src.hw( ) ) );
+                }
+                else if constexpr ( std::is_same_v< T, inst::MovLoad > )
+                {
+                    //! mov dst, [base + index*scale + disp]
+                    const auto dst   = next( );
+                    const auto base  = next( );
+                    const auto index = inst.mem.index.valid( ) ? next( ) : PReg::invalid( );
+
+                    switch ( inst.size )
+                    {
+                        case OperandSize::S8:
+                        case OperandSize::S16:
+                            emit_rex_mem( buf, true, dst, base, index );
+                            buf.emit_u8( 0x0F );
+                            buf.emit_u8( inst.size == OperandSize::S8 ? 0xB6 : 0xB7 );
+                            break;
+                        case OperandSize::S32:
+                            emit_rex_mem( buf, false, dst, base, index );
+                            buf.emit_u8( 0x8B );
+                            break;
+                        case OperandSize::S64:
+                            emit_rex_mem( buf, true, dst, base, index );
+                            buf.emit_u8( 0x8B );
+                            break;
+                        default: break;
+                    }
+                    emit_mem_operand( buf, dst.hw( ), base, index, inst.mem.scale, inst.mem.disp );
+                }
+                else if constexpr ( std::is_same_v< T, inst::MovStore > )
+                {
+                    const auto base  = next( );
+                    const auto index = inst.mem.index.valid( ) ? next( ) : PReg::invalid( );
+                    const auto src   = next( );
+
+                    switch ( inst.size )
+                    {
+                        case OperandSize::S8:
+                            emit_rex_mem( buf, false, src, base, index, true );
+                            buf.emit_u8( 0x88 );
+                            break;
+                        case OperandSize::S16:
+                            buf.emit_u8( 0x66 );
+                            emit_rex_mem( buf, false, src, base, index );
+                            buf.emit_u8( 0x89 );
+                            break;
+                        case OperandSize::S32:
+                            emit_rex_mem( buf, false, src, base, index );
+                            buf.emit_u8( 0x89 );
+                            break;
+                        case OperandSize::S64:
+                            emit_rex_mem( buf, true, src, base, index );
+                            buf.emit_u8( 0x89 );
+                            break;
+                        default: break;
+                    }
+                    emit_mem_operand( buf, src.hw( ), base, index, inst.mem.scale, inst.mem.disp );
+                }
+                else if constexpr ( std::is_same_v< T, inst::Movzx > )
+                {
+                    const auto dst = next( );
+                    const auto src = next( );
+                    if ( inst.size == OperandSize::S32 )
+                    {
+                        emit_rex( buf, false, dst, src );
+                        buf.emit_u8( 0x8B );
+                    }
+                    else
+                    {
+                        emit_rex( buf, true, dst, src );
+                        buf.emit_u8( 0x0F );
+                        switch ( inst.size )
+                        {
+                            case OperandSize::S8: buf.emit_u8( 0xB6 ); break;  //! movzx r64, r/m8
+                            case OperandSize::S16: buf.emit_u8( 0xB7 ); break; //! movzx r64, r/m16
+                            default: std::unreachable( );
+                        }
+                    }
+                    buf.emit_u8( modrm( 0b11, dst.hw( ), src.hw( ) ) );
+                }
+                else if constexpr ( std::is_same_v< T, inst::Movsx > )
+                {
+                    const auto dst = next( );
+                    const auto src = next( );
+                    emit_rex( buf, true, dst, src );
+                    switch ( inst.size )
+                    {
+                        case OperandSize::S8:
+                            buf.emit_u8( 0x0F );
+                            buf.emit_u8( 0xBE );
+                            break;
+                        case OperandSize::S16:
+                            buf.emit_u8( 0x0F );
+                            buf.emit_u8( 0xBF );
+                            break;
+                        case OperandSize::S32: buf.emit_u8( 0x63 ); break;
+                        default: std::unreachable( );
+                    }
+                    buf.emit_u8( modrm( 0b11, dst.hw( ), src.hw( ) ) );
+                }
+                else if constexpr ( std::is_same_v< T, inst::Cdq > )
+                {
+                    ++i;                 //! rax
+                    ++i;                 //! rdx
+                    buf.emit_u8( 0x48 ); //! rex.w
+                    buf.emit_u8( 0x99 ); //! cqo
+                }
+                else if constexpr ( std::is_same_v< T, inst::Div > )
+                {
+                    const auto src = next( );
+                    ( void ) next( );
+                    ( void ) next( );
+                    emit_rex( buf, true, PReg::invalid( ), src );
+                    buf.emit_u8( 0xF7 );
+                    buf.emit_u8( modrm( 0b11, 6, src.hw( ) ) );
+                }
+                else if constexpr ( std::is_same_v< T, inst::Idiv > )
+                {
+                    const auto src = next( );
+                    ++i; //! rax
+                    ++i; //! rdx
+                    emit_rex( buf, true, PReg::invalid( ), src );
+                    buf.emit_u8( 0xF7 );
+                    buf.emit_u8( modrm( 0b11, 7, src.hw( ) ) );
+                }
+                else if constexpr ( std::is_same_v< T, inst::Push > ) { emit_push( buf, next( ) ); }
+                else if constexpr ( std::is_same_v< T, inst::Pop > ) { emit_pop( buf, next( ) ); }
+                else if constexpr ( std::is_same_v< T, inst::StackAddr > )
+                {
+                    assert( inst.slot < slot_offsets.size( ) && "[xiao::x86_64::emit] stack slot without a frame offset" );
+                    const auto dst = next( );
+                    emit_rex_mem( buf, true, dst, RSP, PReg::invalid( ) );
+                    buf.emit_u8( 0x8D );
+                    emit_mem_operand( buf, dst.hw( ), RSP, PReg::invalid( ), 0, slot_offsets[ inst.slot ] + inst.offset );
+                }
+                else if constexpr ( std::is_same_v< T, inst::SetCC > )
+                {
+                    const auto dst = next( );
+                    emit_rex( buf, false, PReg::invalid( ), dst, true );
+                    buf.emit_u8( 0x0F );
+                    buf.emit_u8( static_cast< uint8_t >( 0x90 | cc_nibble( inst.cc ) ) );
+                    buf.emit_u8( modrm( 0b11, 0, dst.hw( ) ) );
+                }
+                else if constexpr ( std::is_same_v< T, inst::Jmp > ) { emit_jmp( buf, inst.target.id ); }
+                else if constexpr ( std::is_same_v< T, inst::Jcc > )
+                {
+                    emit_jcc( buf, cc_nibble( inst.cc ), inst.taken.id);
+                    emit_jmp( buf, inst.not_taken.id );
+                }
+                else if constexpr ( std::is_same_v< T, inst::Call > )
+                {
+                    for ( std::size_t a = 0; a < inst.args.size( ); ++a ) ( void ) next( );
+                    if ( inst.ret.valid( ) ) ( void ) next( );
+
+                    buf.emit_u8( 0xE8 );
+                    buf.add_reloc( codegen::RelocKind::X86CallPCRel4, inst.name, -4 );
+                    buf.emit_u32( 0 );
+                }
+                else if constexpr ( std::is_same_v< T, inst::LoadExtName > )
+                {
+                    const auto dst = next( );
+                    if ( inst.distance == RelocDistance::Near )
+                    {
+                        emit_rex( buf, true, dst, PReg::invalid( ) );
+                        buf.emit_u8( 0x8D );
+                        buf.emit_u8( modrm( 0b00, dst.hw( ), 5 ) );
+                        buf.add_reloc( codegen::RelocKind::X86PCRel4, inst.name, inst.offset - 4 );
+                        buf.emit_u32( 0 );
+                    }
+                    else
+                    {
+                        emit_rex( buf, true, PReg::invalid( ), dst );
+                        buf.emit_u8( static_cast< uint8_t >( 0xB8 + ( dst.hw( ) & 7 ) ) );
+                        buf.add_reloc( codegen::RelocKind::Abs8, inst.name, inst.offset );
+                        buf.emit_u64( 0 );
+                    }
+                }
+                else if constexpr ( std::is_same_v< T, inst::CallInd > )
+                {
+                    const auto target = next( );
+                    for ( std::size_t a = 0; a < inst.args.size( ); ++a ) ( void ) next( );
+                    if ( inst.ret.valid( ) ) ( void ) next( );
+
+                    if ( target.hw( ) >= 8 ) buf.emit_u8( 0x41 );
+                    buf.emit_u8( 0xFF );
+                    buf.emit_u8( modrm( 0b11, 2, target.hw( ) ) );
+                }
+                else if constexpr ( std::is_same_v< T, inst::Ret > ) { buf.emit_u8( 0xC3 ); }
+                else if constexpr ( std::is_same_v< T, inst::DummyUse > ) { }
+            },
+            inner );
+
+        assert( i == pregs.size( ) && "operand count mismatch between get_operands and emit" );
+    }
+} // namespace xiao::x86_64

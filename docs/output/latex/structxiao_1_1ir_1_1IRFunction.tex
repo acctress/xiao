@@ -1,0 +1,112 @@
+\doxysection{xiao::ir::IRFunction Struct Reference}
+\hypertarget{structxiao_1_1ir_1_1IRFunction}{}\label{structxiao_1_1ir_1_1IRFunction}\index{xiao::ir::IRFunction@{xiao::ir::IRFunction}}
+
+
+Owns flat pools for one IR function,.  
+
+
+
+
+{\ttfamily \+\#include $<$function.\+hh$>$}
+
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{classxiao_1_1support_1_1Arena}{support::\+\+Arena}} \texorpdfstring{$\ast$}{*} \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction_a69ec314412548d93dbf28a6b4d5405bb}{arena}} \{\}
+\item 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_a1817af3ff3012e194ba11e4a269b753e}{String\+Ref}} \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction_a95ab95b13fdb5416ff8eb53fff0fae69}{name}} \{\}
+\item 
+\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRSig}{IRSig}} \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction_ab9ff70eb38362a76446ca07e416d490b}{sig}} \{\}
+\item 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_af797d8e76ccbec59a5ae9bd140381361}{Function\+Ref}} \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction_abe534753a25f723e60c666b933fbceee}{self}} \{\}
+\item 
+std::\+span$<$ \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock}{IRBlock}} $>$ \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction_a4a31d9fead66da79f595a7a382daa5a5}{blocks}} \{\}
+\item 
+std::\+span$<$ \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRInst}{IRInst}} $>$ \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction_a9b3350a1b06230af1f6943a3d192966f}{insts}} \{\}
+\item 
+std::\+span$<$ \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} $>$ \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction_ad741be85ae6b8a367e78eeca7fdd41c4}{operands}} \{\}
+\item 
+std::\+span$<$ \doxymbox{\hyperlink{namespacexiao_1_1ir_adce27e1b92f31de91f837887cf466a61}{Block\+Ref}} $>$ \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction_a44763adec20eafd7500147f0d32041cb}{succs}} \{\}
+\item 
+std::\+span$<$ \doxymbox{\hyperlink{structxiao_1_1ir_1_1Value}{Value}} $>$ \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction_aaef33abd003f1e79890ef160797f607d}{values}} \{\}
+\item 
+std::\+span$<$ \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} $>$ \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction_a6977956dbc6f50636d02fc0df799950f}{block\+\_\+params}} \{\}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Owns flat pools for one IR function,. 
+
+\begin{DoxyNote}{Note}
+All are views into the owning \doxylink{classxiao_1_1ir_1_1IRModule}{IRModule}\textquotesingle{}s arena 
+\end{DoxyNote}
+
+
+\label{structxiao_1_1ir_1_1IRFunction_doc-variable-members}
+\Hypertarget{structxiao_1_1ir_1_1IRFunction_doc-variable-members}
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structxiao_1_1ir_1_1IRFunction_a69ec314412548d93dbf28a6b4d5405bb}\index{xiao::ir::IRFunction@{xiao::ir::IRFunction}!arena@{arena}}
+\index{arena@{arena}!xiao::ir::IRFunction@{xiao::ir::IRFunction}}
+\doxysubsubsection{\texorpdfstring{arena}{arena}}
+{\footnotesize\ttfamily \label{structxiao_1_1ir_1_1IRFunction_a69ec314412548d93dbf28a6b4d5405bb} 
+\doxymbox{\hyperlink{classxiao_1_1support_1_1Arena}{support::\+\+Arena}}\texorpdfstring{$\ast$}{*} xiao::\+ir::\+\+IRFunction::\+arena \{\}}
+
+\Hypertarget{structxiao_1_1ir_1_1IRFunction_a6977956dbc6f50636d02fc0df799950f}\index{xiao::ir::IRFunction@{xiao::ir::IRFunction}!block\_params@{block\_params}}
+\index{block\_params@{block\_params}!xiao::ir::IRFunction@{xiao::ir::IRFunction}}
+\doxysubsubsection{\texorpdfstring{block\_params}{block\_params}}
+{\footnotesize\ttfamily \label{structxiao_1_1ir_1_1IRFunction_a6977956dbc6f50636d02fc0df799950f} 
+std::\+span$<$\doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}}$>$ xiao::\+ir::\+\+IRFunction::\+block\+\_\+params \{\}}
+
+\Hypertarget{structxiao_1_1ir_1_1IRFunction_a4a31d9fead66da79f595a7a382daa5a5}\index{xiao::ir::IRFunction@{xiao::ir::IRFunction}!blocks@{blocks}}
+\index{blocks@{blocks}!xiao::ir::IRFunction@{xiao::ir::IRFunction}}
+\doxysubsubsection{\texorpdfstring{blocks}{blocks}}
+{\footnotesize\ttfamily \label{structxiao_1_1ir_1_1IRFunction_a4a31d9fead66da79f595a7a382daa5a5} 
+std::\+span$<$\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock}{IRBlock}}$>$ xiao::\+ir::\+\+IRFunction::\+blocks \{\}}
+
+\Hypertarget{structxiao_1_1ir_1_1IRFunction_a9b3350a1b06230af1f6943a3d192966f}\index{xiao::ir::IRFunction@{xiao::ir::IRFunction}!insts@{insts}}
+\index{insts@{insts}!xiao::ir::IRFunction@{xiao::ir::IRFunction}}
+\doxysubsubsection{\texorpdfstring{insts}{insts}}
+{\footnotesize\ttfamily \label{structxiao_1_1ir_1_1IRFunction_a9b3350a1b06230af1f6943a3d192966f} 
+std::\+span$<$\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRInst}{IRInst}}$>$ xiao::\+ir::\+\+IRFunction::\+insts \{\}}
+
+\Hypertarget{structxiao_1_1ir_1_1IRFunction_a95ab95b13fdb5416ff8eb53fff0fae69}\index{xiao::ir::IRFunction@{xiao::ir::IRFunction}!name@{name}}
+\index{name@{name}!xiao::ir::IRFunction@{xiao::ir::IRFunction}}
+\doxysubsubsection{\texorpdfstring{name}{name}}
+{\footnotesize\ttfamily \label{structxiao_1_1ir_1_1IRFunction_a95ab95b13fdb5416ff8eb53fff0fae69} 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_a1817af3ff3012e194ba11e4a269b753e}{String\+Ref}} xiao::\+ir::\+\+IRFunction::\+name \{\}}
+
+\Hypertarget{structxiao_1_1ir_1_1IRFunction_ad741be85ae6b8a367e78eeca7fdd41c4}\index{xiao::ir::IRFunction@{xiao::ir::IRFunction}!operands@{operands}}
+\index{operands@{operands}!xiao::ir::IRFunction@{xiao::ir::IRFunction}}
+\doxysubsubsection{\texorpdfstring{operands}{operands}}
+{\footnotesize\ttfamily \label{structxiao_1_1ir_1_1IRFunction_ad741be85ae6b8a367e78eeca7fdd41c4} 
+std::\+span$<$\doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}}$>$ xiao::\+ir::\+\+IRFunction::\+operands \{\}}
+
+\Hypertarget{structxiao_1_1ir_1_1IRFunction_abe534753a25f723e60c666b933fbceee}\index{xiao::ir::IRFunction@{xiao::ir::IRFunction}!self@{self}}
+\index{self@{self}!xiao::ir::IRFunction@{xiao::ir::IRFunction}}
+\doxysubsubsection{\texorpdfstring{self}{self}}
+{\footnotesize\ttfamily \label{structxiao_1_1ir_1_1IRFunction_abe534753a25f723e60c666b933fbceee} 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_af797d8e76ccbec59a5ae9bd140381361}{Function\+Ref}} xiao::\+ir::\+\+IRFunction::\+self \{\}}
+
+\Hypertarget{structxiao_1_1ir_1_1IRFunction_ab9ff70eb38362a76446ca07e416d490b}\index{xiao::ir::IRFunction@{xiao::ir::IRFunction}!sig@{sig}}
+\index{sig@{sig}!xiao::ir::IRFunction@{xiao::ir::IRFunction}}
+\doxysubsubsection{\texorpdfstring{sig}{sig}}
+{\footnotesize\ttfamily \label{structxiao_1_1ir_1_1IRFunction_ab9ff70eb38362a76446ca07e416d490b} 
+\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRSig}{IRSig}} xiao::\+ir::\+\+IRFunction::\+sig \{\}}
+
+\Hypertarget{structxiao_1_1ir_1_1IRFunction_a44763adec20eafd7500147f0d32041cb}\index{xiao::ir::IRFunction@{xiao::ir::IRFunction}!succs@{succs}}
+\index{succs@{succs}!xiao::ir::IRFunction@{xiao::ir::IRFunction}}
+\doxysubsubsection{\texorpdfstring{succs}{succs}}
+{\footnotesize\ttfamily \label{structxiao_1_1ir_1_1IRFunction_a44763adec20eafd7500147f0d32041cb} 
+std::\+span$<$\doxymbox{\hyperlink{namespacexiao_1_1ir_adce27e1b92f31de91f837887cf466a61}{Block\+Ref}}$>$ xiao::\+ir::\+\+IRFunction::\+succs \{\}}
+
+\Hypertarget{structxiao_1_1ir_1_1IRFunction_aaef33abd003f1e79890ef160797f607d}\index{xiao::ir::IRFunction@{xiao::ir::IRFunction}!values@{values}}
+\index{values@{values}!xiao::ir::IRFunction@{xiao::ir::IRFunction}}
+\doxysubsubsection{\texorpdfstring{values}{values}}
+{\footnotesize\ttfamily \label{structxiao_1_1ir_1_1IRFunction_aaef33abd003f1e79890ef160797f607d} 
+std::\+span$<$\doxymbox{\hyperlink{structxiao_1_1ir_1_1Value}{Value}}$>$ xiao::\+ir::\+\+IRFunction::\+values \{\}}
+
+
+
+The documentation for this struct was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+include/\+xiao/\+ir/\doxymbox{\hyperlink{function_8hh}{function.\+hh}}\end{DoxyCompactItemize}

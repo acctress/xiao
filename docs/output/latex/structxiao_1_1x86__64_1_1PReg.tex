@@ -1,0 +1,138 @@
+\doxysection{xiao::x86\+\_\+64::PReg Struct Reference}
+\hypertarget{structxiao_1_1x86__64_1_1PReg}{}\label{structxiao_1_1x86__64_1_1PReg}\index{xiao::x86\_64::PReg@{xiao::x86\_64::PReg}}
+
+
+A physical register Hardware encoding and register class packed into a single byte (6 bits, 1 bit). Layout: bit 0 -\/ \doxylink{namespacexiao_1_1codegen_a5bdfce66bc89d50cd7def0cda69899c6}{Reg\+Class} bits 6:1 -\/ hardware encoding bit 7 -\/ reserved.  
+
+
+
+
+{\ttfamily \+\#include $<$reg.\+hh$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+constexpr uint8\+\_\+t \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_a05af42a0ef337341866e5c23f021aa36}{hw}} () const noexcept
+\begin{DoxyCompactList}\small\item\em Hardware encoding index within the register class. \end{DoxyCompactList}\item 
+constexpr \doxymbox{\hyperlink{namespacexiao_1_1codegen_a5bdfce66bc89d50cd7def0cda69899c6}{Reg\+Class}} \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_a41532ce7482d43577b95a4b3c1e92b41}{rc}} () const noexcept
+\begin{DoxyCompactList}\small\item\em Register class of this \doxylink{structxiao_1_1x86__64_1_1PReg}{PReg}. \end{DoxyCompactList}\item 
+constexpr uint8\+\_\+t \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_a3a93e423477c2b05300d9f2d9ba5f482}{index}} () const noexcept
+\begin{DoxyCompactList}\small\item\em Global index across both classes. \end{DoxyCompactList}\item 
+constexpr bool \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_aafcc3d257f62f55d0f5654480d5db825}{valid}} () const noexcept
+\item 
+constexpr bool \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_a31132a458cfa25551a84b13251e313df}{operator==}} (const \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \&) const noexcept=default
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{make}} (const uint8\+\_\+t hw, const \doxymbox{\hyperlink{namespacexiao_1_1codegen_a5bdfce66bc89d50cd7def0cda69899c6}{Reg\+Class}} rc) noexcept
+\item 
+static constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_ad4cb9eba43d2ba3d87271a96166fd88c}{invalid}} () noexcept
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+uint8\+\_\+t \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_a345bceac0c8b123819babc7bbd387f58}{bits}} \{ \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_afde19d842db3824d60d0e7fd640c78ea}{invalid\+\_\+bits}} \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr uint8\+\_\+t \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_a72b0b9a55040e218fed4c7a750992507}{max\+\_\+hw\+\_\+enc}} = 63
+\item 
+static constexpr uint8\+\_\+t \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_afde19d842db3824d60d0e7fd640c78ea}{invalid\+\_\+bits}} = 0x\+FF
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+A physical register Hardware encoding and register class packed into a single byte (6 bits, 1 bit). Layout: bit 0 -\/ \doxylink{namespacexiao_1_1codegen_a5bdfce66bc89d50cd7def0cda69899c6}{Reg\+Class} bits 6:1 -\/ hardware encoding bit 7 -\/ reserved. 
+
+\label{structxiao_1_1x86__64_1_1PReg_doc-func-members}
+\Hypertarget{structxiao_1_1x86__64_1_1PReg_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structxiao_1_1x86__64_1_1PReg_a05af42a0ef337341866e5c23f021aa36}\index{xiao::x86\_64::PReg@{xiao::x86\_64::PReg}!hw@{hw}}
+\index{hw@{hw}!xiao::x86\_64::PReg@{xiao::x86\_64::PReg}}
+\doxysubsubsection{\texorpdfstring{hw()}{hw()}}
+{\footnotesize\ttfamily \label{structxiao_1_1x86__64_1_1PReg_a05af42a0ef337341866e5c23f021aa36} 
+uint8\+\_\+t \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg_a05af42a0ef337341866e5c23f021aa36}{xiao::\+codegen::\+\+PReg::\+hw}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+Hardware encoding index within the register class. 
+
+\Hypertarget{structxiao_1_1x86__64_1_1PReg_a3a93e423477c2b05300d9f2d9ba5f482}\index{xiao::x86\_64::PReg@{xiao::x86\_64::PReg}!index@{index}}
+\index{index@{index}!xiao::x86\_64::PReg@{xiao::x86\_64::PReg}}
+\doxysubsubsection{\texorpdfstring{index()}{index()}}
+{\footnotesize\ttfamily \label{structxiao_1_1x86__64_1_1PReg_a3a93e423477c2b05300d9f2d9ba5f482} 
+uint8\+\_\+t \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg_a3a93e423477c2b05300d9f2d9ba5f482}{xiao::\+codegen::\+\+PReg::\+index}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+Global index across both classes. 
+
+\begin{DoxyNote}{Note}
+Int: 0..63 
+
+Float: 64..127 
+\end{DoxyNote}
+\Hypertarget{structxiao_1_1x86__64_1_1PReg_ad4cb9eba43d2ba3d87271a96166fd88c}\index{xiao::x86\_64::PReg@{xiao::x86\_64::PReg}!invalid@{invalid}}
+\index{invalid@{invalid}!xiao::x86\_64::PReg@{xiao::x86\_64::PReg}}
+\doxysubsubsection{\texorpdfstring{invalid()}{invalid()}}
+{\footnotesize\ttfamily \label{structxiao_1_1x86__64_1_1PReg_ad4cb9eba43d2ba3d87271a96166fd88c} 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg_ad4cb9eba43d2ba3d87271a96166fd88c}{xiao::\+codegen::\+\+PReg::\+invalid}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}, {\ttfamily [nodiscard]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+\Hypertarget{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}\index{xiao::x86\_64::PReg@{xiao::x86\_64::PReg}!make@{make}}
+\index{make@{make}!xiao::x86\_64::PReg@{xiao::x86\_64::PReg}}
+\doxysubsubsection{\texorpdfstring{make()}{make()}}
+{\footnotesize\ttfamily \label{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21} 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{xiao::\+codegen::\+\+PReg::\+make}} (\begin{DoxyParamCaption}\item[{const uint8\+\_\+t}]{hw}{, }\item[{const \doxymbox{\hyperlink{namespacexiao_1_1codegen_a5bdfce66bc89d50cd7def0cda69899c6}{Reg\+Class}}}]{rc}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}, {\ttfamily [nodiscard]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+\Hypertarget{structxiao_1_1x86__64_1_1PReg_a31132a458cfa25551a84b13251e313df}\index{xiao::x86\_64::PReg@{xiao::x86\_64::PReg}!operator==@{operator==}}
+\index{operator==@{operator==}!xiao::x86\_64::PReg@{xiao::x86\_64::PReg}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily \label{structxiao_1_1x86__64_1_1PReg_a31132a458cfa25551a84b13251e313df} 
+bool xiao::\+codegen::\+\+PReg::\+operator== (\begin{DoxyParamCaption}\item[{const \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \&}]{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [nodiscard]}, {\ttfamily [constexpr]}, {\ttfamily [default]}, {\ttfamily [noexcept]}}
+
+\Hypertarget{structxiao_1_1x86__64_1_1PReg_a41532ce7482d43577b95a4b3c1e92b41}\index{xiao::x86\_64::PReg@{xiao::x86\_64::PReg}!rc@{rc}}
+\index{rc@{rc}!xiao::x86\_64::PReg@{xiao::x86\_64::PReg}}
+\doxysubsubsection{\texorpdfstring{rc()}{rc()}}
+{\footnotesize\ttfamily \label{structxiao_1_1x86__64_1_1PReg_a41532ce7482d43577b95a4b3c1e92b41} 
+\doxymbox{\hyperlink{namespacexiao_1_1codegen_a5bdfce66bc89d50cd7def0cda69899c6}{Reg\+Class}} \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg_a41532ce7482d43577b95a4b3c1e92b41}{xiao::\+codegen::\+\+PReg::\+rc}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+Register class of this \doxylink{structxiao_1_1x86__64_1_1PReg}{PReg}. 
+
+\Hypertarget{structxiao_1_1x86__64_1_1PReg_aafcc3d257f62f55d0f5654480d5db825}\index{xiao::x86\_64::PReg@{xiao::x86\_64::PReg}!valid@{valid}}
+\index{valid@{valid}!xiao::x86\_64::PReg@{xiao::x86\_64::PReg}}
+\doxysubsubsection{\texorpdfstring{valid()}{valid()}}
+{\footnotesize\ttfamily \label{structxiao_1_1x86__64_1_1PReg_aafcc3d257f62f55d0f5654480d5db825} 
+bool \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg_aafcc3d257f62f55d0f5654480d5db825}{xiao::\+codegen::\+\+PReg::\+valid}} (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+\label{structxiao_1_1x86__64_1_1PReg_doc-variable-members}
+\Hypertarget{structxiao_1_1x86__64_1_1PReg_doc-variable-members}
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structxiao_1_1x86__64_1_1PReg_a345bceac0c8b123819babc7bbd387f58}\index{xiao::x86\_64::PReg@{xiao::x86\_64::PReg}!bits@{bits}}
+\index{bits@{bits}!xiao::x86\_64::PReg@{xiao::x86\_64::PReg}}
+\doxysubsubsection{\texorpdfstring{bits}{bits}}
+{\footnotesize\ttfamily \label{structxiao_1_1x86__64_1_1PReg_a345bceac0c8b123819babc7bbd387f58} 
+uint8\+\_\+t \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg_a345bceac0c8b123819babc7bbd387f58}{xiao::\+codegen::\+\+PReg::\+bits}} \{ \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_afde19d842db3824d60d0e7fd640c78ea}{invalid\+\_\+bits}} \}}
+
+\Hypertarget{structxiao_1_1x86__64_1_1PReg_afde19d842db3824d60d0e7fd640c78ea}\index{xiao::x86\_64::PReg@{xiao::x86\_64::PReg}!invalid\_bits@{invalid\_bits}}
+\index{invalid\_bits@{invalid\_bits}!xiao::x86\_64::PReg@{xiao::x86\_64::PReg}}
+\doxysubsubsection{\texorpdfstring{invalid\_bits}{invalid\_bits}}
+{\footnotesize\ttfamily \label{structxiao_1_1x86__64_1_1PReg_afde19d842db3824d60d0e7fd640c78ea} 
+uint8\+\_\+t \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg_afde19d842db3824d60d0e7fd640c78ea}{xiao::\+codegen::\+\+PReg::\+invalid\+\_\+bits}} = 0x\+FF\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+\Hypertarget{structxiao_1_1x86__64_1_1PReg_a72b0b9a55040e218fed4c7a750992507}\index{xiao::x86\_64::PReg@{xiao::x86\_64::PReg}!max\_hw\_enc@{max\_hw\_enc}}
+\index{max\_hw\_enc@{max\_hw\_enc}!xiao::x86\_64::PReg@{xiao::x86\_64::PReg}}
+\doxysubsubsection{\texorpdfstring{max\_hw\_enc}{max\_hw\_enc}}
+{\footnotesize\ttfamily \label{structxiao_1_1x86__64_1_1PReg_a72b0b9a55040e218fed4c7a750992507} 
+uint8\+\_\+t \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg_a72b0b9a55040e218fed4c7a750992507}{xiao::\+codegen::\+\+PReg::\+max\+\_\+hw\+\_\+enc}} = 63\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+The documentation for this struct was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+include/\+xiao/\+codegen/\doxymbox{\hyperlink{codegen_2reg_8hh}{reg.\+hh}}\end{DoxyCompactItemize}

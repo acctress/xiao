@@ -1,0 +1,36 @@
+\doxysection{include/\+xiao/\+codegen/\+machinst.hh File Reference}
+\hypertarget{machinst_8hh}{}\label{machinst_8hh}\index{include/xiao/codegen/machinst.hh@{include/xiao/codegen/machinst.hh}}
+{\ttfamily \+\#include $<$xiao/\+codegen/\+reg.\+hh$>$}\newline
+{\ttfamily \+\#include $<$xiao/\+codegen/\+operand.\+hh$>$}\newline
+{\ttfamily \+\#include $<$xiao/\+ir/\+types.\+hh$>$}\newline
+{\ttfamily \+\#include $<$cstdint$>$}\newline
+{\ttfamily \+\#include $<$optional$>$}\newline
+{\ttfamily \+\#include $<$string$>$}\newline
+{\ttfamily \+\#include $<$utility$>$}\newline
+{\ttfamily \+\#include $<$vector$>$}\newline
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst}{xiao::\+codegen::\+\+Mach\+Inst$<$ Derived, Label\+Use $>$}}
+\begin{DoxyCompactList}\small\item\em CRTP base for a \doxylink{classxiao_1_1codegen_1_1MachInst}{Mach\+Inst} contract. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \doxymbox{\hyperlink{namespacexiao}{xiao}}
+\item 
+namespace \doxymbox{\hyperlink{namespacexiao_1_1codegen}{xiao::\+codegen}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Concepts}
+\begin{DoxyCompactItemize}
+\item 
+concept \doxymbox{\hyperlink{conceptxiao_1_1codegen_1_1MachInstC}{xiao::\+codegen::\+\+Mach\+InstC}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum class \doxymbox{\hyperlink{namespacexiao_1_1codegen_aa722ecb0ef0a99616802a913e5e3c008}{xiao::\+codegen::\+\+Mach\+Terminator}} : uint8\+\_\+t \{ \doxymbox{\hyperlink{namespacexiao_1_1codegen_aa722ecb0ef0a99616802a913e5e3c008a6adf97f83acf6453d4a6a4b1070f3754}{xiao::\+codegen::\+\+None}}
+, \doxymbox{\hyperlink{namespacexiao_1_1codegen_aa722ecb0ef0a99616802a913e5e3c008aa4228a09dd66155de8e93a39245768bd}{xiao::\+codegen::\+\+Ret}}
+, \doxymbox{\hyperlink{namespacexiao_1_1codegen_aa722ecb0ef0a99616802a913e5e3c008adacdb83ade6c4e8878717e206175dfd8}{xiao::\+codegen::\+\+Branch}}
+, \doxymbox{\hyperlink{namespacexiao_1_1codegen_aa722ecb0ef0a99616802a913e5e3c008acf318911898d0b10b63adc173f49a595}{xiao::\+codegen::\+\+Cond\+Branch}}
+ \}
+\begin{DoxyCompactList}\small\item\em Describes how a block ends. \end{DoxyCompactList}\end{DoxyCompactItemize}

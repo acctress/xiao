@@ -1,0 +1,92 @@
+\doxysection{xiao::codegen::VCode\texorpdfstring{$<$}{<} I \texorpdfstring{$>$}{>} Struct Template Reference}
+\hypertarget{structxiao_1_1codegen_1_1VCode}{}\label{structxiao_1_1codegen_1_1VCode}\index{xiao::codegen::VCode$<$ I $>$@{xiao::codegen::VCode$<$ I $>$}}
+
+
+Immutable virtual register code for one function.  
+
+
+
+
+{\ttfamily \+\#include $<$vcode.\+hh$>$}
+
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std::\+vector$<$ I $>$ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCode_aa28631a917137e37eeaeafa4c59b8974}{insts}}
+\item 
+std::\+vector$<$ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand}{Mach\+Operand}} $>$ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCode_ad606751528c929a0e879c1418479a45f}{operands}}
+\item 
+std::\+vector$<$ std::\+pair$<$ uint32\+\_\+t, uint32\+\_\+t $>$ $>$ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCode_a24b828fa6b93db064300badd1d10bbc1}{operand\+\_\+ranges}}
+\item 
+std::\+vector$<$ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCodeBlock}{VCode\+Block}} $>$ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCode_ab5028e985396fcf853afc28c83610c65}{blocks}}
+\item 
+std::\+vector$<$ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VReg}{VReg}} $>$ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCode_adf2abbfa661a3bc03cd4579e5a46d4a4}{block\+\_\+params}}
+\item 
+std::\+vector$<$ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VReg}{VReg}} $>$ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCode_a1cc53c3779da73529c14eaa37d6eca55}{branch\+\_\+block\+\_\+args}}
+\item 
+std::\+vector$<$ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1BlockId}{Block\+Id}} $>$ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCode_a12337709a88ad0557d7882e5d525f922}{succs}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$Mach\+InstC I$>$\newline
+struct xiao::\+codegen::\+\+VCode$<$ I $>$}
+Immutable virtual register code for one function. 
+
+\label{structxiao_1_1codegen_1_1VCode_doc-variable-members}
+\Hypertarget{structxiao_1_1codegen_1_1VCode_doc-variable-members}
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structxiao_1_1codegen_1_1VCode_adf2abbfa661a3bc03cd4579e5a46d4a4}\index{xiao::codegen::VCode$<$ I $>$@{xiao::codegen::VCode$<$ I $>$}!block\_params@{block\_params}}
+\index{block\_params@{block\_params}!xiao::codegen::VCode$<$ I $>$@{xiao::codegen::VCode$<$ I $>$}}
+\doxysubsubsection{\texorpdfstring{block\_params}{block\_params}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1VCode_adf2abbfa661a3bc03cd4579e5a46d4a4} 
+template$<$Mach\+InstC I$>$ \\
+std::\+vector$<$\doxymbox{\hyperlink{structxiao_1_1codegen_1_1VReg}{VReg}}$>$ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCode}{xiao::\+codegen::\+\+VCode}}$<$ I $>$::\+block\+\_\+params}
+
+\Hypertarget{structxiao_1_1codegen_1_1VCode_ab5028e985396fcf853afc28c83610c65}\index{xiao::codegen::VCode$<$ I $>$@{xiao::codegen::VCode$<$ I $>$}!blocks@{blocks}}
+\index{blocks@{blocks}!xiao::codegen::VCode$<$ I $>$@{xiao::codegen::VCode$<$ I $>$}}
+\doxysubsubsection{\texorpdfstring{blocks}{blocks}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1VCode_ab5028e985396fcf853afc28c83610c65} 
+template$<$Mach\+InstC I$>$ \\
+std::\+vector$<$\doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCodeBlock}{VCode\+Block}}$>$ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCode}{xiao::\+codegen::\+\+VCode}}$<$ I $>$::\+blocks}
+
+\Hypertarget{structxiao_1_1codegen_1_1VCode_a1cc53c3779da73529c14eaa37d6eca55}\index{xiao::codegen::VCode$<$ I $>$@{xiao::codegen::VCode$<$ I $>$}!branch\_block\_args@{branch\_block\_args}}
+\index{branch\_block\_args@{branch\_block\_args}!xiao::codegen::VCode$<$ I $>$@{xiao::codegen::VCode$<$ I $>$}}
+\doxysubsubsection{\texorpdfstring{branch\_block\_args}{branch\_block\_args}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1VCode_a1cc53c3779da73529c14eaa37d6eca55} 
+template$<$Mach\+InstC I$>$ \\
+std::\+vector$<$\doxymbox{\hyperlink{structxiao_1_1codegen_1_1VReg}{VReg}}$>$ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCode}{xiao::\+codegen::\+\+VCode}}$<$ I $>$::\+branch\+\_\+block\+\_\+args}
+
+\Hypertarget{structxiao_1_1codegen_1_1VCode_aa28631a917137e37eeaeafa4c59b8974}\index{xiao::codegen::VCode$<$ I $>$@{xiao::codegen::VCode$<$ I $>$}!insts@{insts}}
+\index{insts@{insts}!xiao::codegen::VCode$<$ I $>$@{xiao::codegen::VCode$<$ I $>$}}
+\doxysubsubsection{\texorpdfstring{insts}{insts}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1VCode_aa28631a917137e37eeaeafa4c59b8974} 
+template$<$Mach\+InstC I$>$ \\
+std::\+vector$<$I$>$ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCode}{xiao::\+codegen::\+\+VCode}}$<$ I $>$::\+insts}
+
+\Hypertarget{structxiao_1_1codegen_1_1VCode_a24b828fa6b93db064300badd1d10bbc1}\index{xiao::codegen::VCode$<$ I $>$@{xiao::codegen::VCode$<$ I $>$}!operand\_ranges@{operand\_ranges}}
+\index{operand\_ranges@{operand\_ranges}!xiao::codegen::VCode$<$ I $>$@{xiao::codegen::VCode$<$ I $>$}}
+\doxysubsubsection{\texorpdfstring{operand\_ranges}{operand\_ranges}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1VCode_a24b828fa6b93db064300badd1d10bbc1} 
+template$<$Mach\+InstC I$>$ \\
+std::\+vector$<$std::\+pair$<$uint32\+\_\+t,uint32\+\_\+t$>$ $>$ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCode}{xiao::\+codegen::\+\+VCode}}$<$ I $>$::\+operand\+\_\+ranges}
+
+\Hypertarget{structxiao_1_1codegen_1_1VCode_ad606751528c929a0e879c1418479a45f}\index{xiao::codegen::VCode$<$ I $>$@{xiao::codegen::VCode$<$ I $>$}!operands@{operands}}
+\index{operands@{operands}!xiao::codegen::VCode$<$ I $>$@{xiao::codegen::VCode$<$ I $>$}}
+\doxysubsubsection{\texorpdfstring{operands}{operands}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1VCode_ad606751528c929a0e879c1418479a45f} 
+template$<$Mach\+InstC I$>$ \\
+std::\+vector$<$\doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand}{Mach\+Operand}}$>$ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCode}{xiao::\+codegen::\+\+VCode}}$<$ I $>$::\+operands}
+
+\Hypertarget{structxiao_1_1codegen_1_1VCode_a12337709a88ad0557d7882e5d525f922}\index{xiao::codegen::VCode$<$ I $>$@{xiao::codegen::VCode$<$ I $>$}!succs@{succs}}
+\index{succs@{succs}!xiao::codegen::VCode$<$ I $>$@{xiao::codegen::VCode$<$ I $>$}}
+\doxysubsubsection{\texorpdfstring{succs}{succs}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1VCode_a12337709a88ad0557d7882e5d525f922} 
+template$<$Mach\+InstC I$>$ \\
+std::\+vector$<$\doxymbox{\hyperlink{structxiao_1_1codegen_1_1BlockId}{Block\+Id}}$>$ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCode}{xiao::\+codegen::\+\+VCode}}$<$ I $>$::\+succs}
+
+
+
+The documentation for this struct was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+include/\+xiao/\+codegen/\doxymbox{\hyperlink{vcode_8hh}{vcode.\+hh}}\end{DoxyCompactItemize}

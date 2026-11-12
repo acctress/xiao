@@ -1,0 +1,29 @@
+\doxysection{include/\+xiao/\+codegen/\+operand.hh File Reference}
+\hypertarget{operand_8hh}{}\label{operand_8hh}\index{include/xiao/codegen/operand.hh@{include/xiao/codegen/operand.hh}}
+{\ttfamily \+\#include $<$xiao/\+codegen/\+reg.\+hh$>$}\newline
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand}{xiao::\+codegen::\+\+Mach\+Operand}}
+\begin{DoxyCompactList}\small\item\em A packed register operand for a \doxylink{classxiao_1_1codegen_1_1MachInst}{Mach\+Inst}. Layout: bits 63:43 -\/ vreg index bit 42 -\/ vreg class bits 41:40 -\/ \doxylink{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7b}{Operand\+Kind} bit 39 -\/ \doxylink{namespacexiao_1_1codegen_a318f5ddbbcd950f939a08d496ec90dfe}{Operand\+Pos} bit 38 -\/ constraint kind bits 37:8 -\/ reserved bits 7:0 -\/ \doxylink{structxiao_1_1codegen_1_1PReg}{PReg} bits if Fixed, else 0. \end{DoxyCompactList}\item 
+struct \doxymbox{\hyperlink{structstd_1_1formatter_3_01xiao_1_1codegen_1_1MachOperand_01_4}{std::\+formatter$<$ xiao::\+codegen::\+\+Mach\+Operand $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \doxymbox{\hyperlink{namespacexiao}{xiao}}
+\item 
+namespace \doxymbox{\hyperlink{namespacexiao_1_1codegen}{xiao::\+codegen}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum class \doxymbox{\hyperlink{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7b}{xiao::\+codegen::\+\+Operand\+Kind}} : uint8\+\_\+t \{ \doxymbox{\hyperlink{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7baad8783089f828b927473fb61d51940ec}{xiao::\+codegen::\+\+Use}} = 0
+, \doxymbox{\hyperlink{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7badde5c8d4149c5072d2cb798706663e78}{xiao::\+codegen::\+\+Def}} = 1
+, \doxymbox{\hyperlink{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7baf4cf2b0ec494cef0ef13b854a249ad13}{xiao::\+codegen::\+\+Use\+Def}} = 2
+ \}
+\begin{DoxyCompactList}\small\item\em The kind of operand an instruction will be using. \end{DoxyCompactList}\item 
+enum class \doxymbox{\hyperlink{namespacexiao_1_1codegen_a318f5ddbbcd950f939a08d496ec90dfe}{xiao::\+codegen::\+\+Operand\+Pos}} : uint8\+\_\+t \{ \doxymbox{\hyperlink{namespacexiao_1_1codegen_a318f5ddbbcd950f939a08d496ec90dfea9060587edeb01a63e3d3edc959678d1e}{xiao::\+codegen::\+\+Before}} = 0
+, \doxymbox{\hyperlink{namespacexiao_1_1codegen_a318f5ddbbcd950f939a08d496ec90dfea7bfcadb5535fe8aad5032762b7bfe159}{xiao::\+codegen::\+\+After}} = 1
+ \}
+\begin{DoxyCompactList}\small\item\em Whether the operand is live before or after the instruction. \end{DoxyCompactList}\end{DoxyCompactItemize}

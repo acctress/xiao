@@ -1,0 +1,67 @@
+\doxysection{machenv.\+hh}
+\hypertarget{isa_2x86_2machenv_8hh_source}{}\label{isa_2x86_2machenv_8hh_source}\index{include/xiao/isa/x86/machenv.hh@{include/xiao/isa/x86/machenv.hh}}
+\doxymbox{\hyperlink{isa_2x86_2machenv_8hh}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{//}}
+\DoxyCodeLine{00002\ \textcolor{comment}{//\ Created\ by\ griffith\ on\ 19/10/2026.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ <\doxymbox{\hyperlink{codegen_2machenv_8hh}{xiao/codegen/machenv.hh}}>}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ <\doxymbox{\hyperlink{isa_2x86_2reg_8hh}{xiao/isa/x86/reg.hh}}>}}
+\DoxyCodeLine{00009\ }
+\DoxyCodeLine{00010\ \textcolor{keyword}{namespace\ }\doxymbox{\hyperlink{namespacexiao_1_1x86__64}{xiao::x86\_64}}\ \{}
+\DoxyCodeLine{00011\ }
+\DoxyCodeLine{00013\ }
+\DoxyCodeLine{00014\ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}}\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a1562558c098522cd7cfc7039c7e584f9}{k\_sysv\_preferred\_int}}[]\ =\ \{}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_abbdce0d6d6dccfbefb321e6bfaf0cbf7}{RAX}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a62d790f2b2c1dc9f417ebcfb841bdfc7}{RCX}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_aeb5089e7100d0888ddbdd273dfdada38}{RDX}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_ab6907731f0c0708833c6d1a22d8e6d66}{RSI}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_adf7f0bb517995b1be09bd97b39a63b32}{RDI}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_ab85c30963553d2c2f83bd750cec5bcbe}{R8}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_ab71935065058d27aa144313cecf3b88f}{R9}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a096e8af795e247ccc04a4758a53581fe}{R10}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a6bad661dc1fdfd9bda14fe58614492fc}{R11}}}
+\DoxyCodeLine{00016\ \ \ \ \ \};}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}}\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a28e51a0bc69d30f6884a1f5247bcfddf}{k\_sysv\_non\_preferred\_int}}[]\ =\ \{}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_abdf4c5db6c5e980a49dbafc0120b7c94}{RBX}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a235f876a69779badef59835dcaeb514a}{R12}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a685304743c74980aa149f46c79a45133}{R13}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a009896c55b28cbeaa6da0b580974b49b}{R14}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a1c8ecedc53c8afa437e21f8f8454ceee}{R15}}}
+\DoxyCodeLine{00020\ \ \ \ \ \};}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}}\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a2824d600674f05c9835f6f7037ca43ce}{k\_sysv\_preferred\_float}}[]\ =\ \{}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a69614015cfc805ba8e8f99883e521b21}{XMM0}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a6f6bbf1201fcb10e4d0066c28b4aea33}{XMM1}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_aadd70c5b0abf2af5b6443de0fb0d12bc}{XMM2}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a972321e8589eb95e70d163f7f2b35bf9}{XMM3}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a91b50e095a72d4de8711e18540339e04}{XMM4}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a173da9b07c485d2beaeee67f6386b9c4}{XMM5}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a70c6f13560ccdd784abae0253f7f79a0}{XMM6}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_abfa9d542b3addae94d8a13ee548f8608}{XMM7}},}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_af0fb34ac6d1cd033accf8a5dec494772}{XMM8}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a9f6e7ce7e0001b1a51f6e33330744d20}{XMM9}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_af105f1d7520f66ba36b1e60a7e77151b}{XMM10}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a48fda4f4ac9922d14654eca6140c18f7}{XMM11}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_ae6e7b0ba4ef9a8293a16e9279d01466d}{XMM12}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a3f29b0ce917d58757699975a925d5c11}{XMM13}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_aa8d44e0122bb81b2308cc714b26880b2}{XMM14}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a085ee31ad48e7e030e69c6ed9a287daa}{XMM15}}}
+\DoxyCodeLine{00025\ \ \ \ \ \};}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}}\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_af1f6de50d79b7240d7b6c4ab1f0e9046}{k\_sysv\_non\_preferred\_float}}[]\ =\ \{\};}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}}\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a638755aa2973516f3b83ff032e3e1075}{k\_win64\_preferred\_int}}[]\ =\ \{}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_abbdce0d6d6dccfbefb321e6bfaf0cbf7}{RAX}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a62d790f2b2c1dc9f417ebcfb841bdfc7}{RCX}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_aeb5089e7100d0888ddbdd273dfdada38}{RDX}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_ab85c30963553d2c2f83bd750cec5bcbe}{R8}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_ab71935065058d27aa144313cecf3b88f}{R9}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a096e8af795e247ccc04a4758a53581fe}{R10}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a6bad661dc1fdfd9bda14fe58614492fc}{R11}}}
+\DoxyCodeLine{00033\ \ \ \ \ \};}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}}\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_af43d7bfaa968810768a0576d66d2c02f}{k\_win64\_non\_preferred\_int}}[]\ =\ \{}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_abdf4c5db6c5e980a49dbafc0120b7c94}{RBX}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_ab6907731f0c0708833c6d1a22d8e6d66}{RSI}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_adf7f0bb517995b1be09bd97b39a63b32}{RDI}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a235f876a69779badef59835dcaeb514a}{R12}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a685304743c74980aa149f46c79a45133}{R13}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a009896c55b28cbeaa6da0b580974b49b}{R14}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a1c8ecedc53c8afa437e21f8f8454ceee}{R15}}}
+\DoxyCodeLine{00037\ \ \ \ \ \};}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}}\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_afa6141df987565250889e4fca3ce27a4}{k\_win64\_preferred\_float}}[]\ =\ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a69614015cfc805ba8e8f99883e521b21}{XMM0}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a6f6bbf1201fcb10e4d0066c28b4aea33}{XMM1}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_aadd70c5b0abf2af5b6443de0fb0d12bc}{XMM2}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a972321e8589eb95e70d163f7f2b35bf9}{XMM3}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a91b50e095a72d4de8711e18540339e04}{XMM4}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a173da9b07c485d2beaeee67f6386b9c4}{XMM5}}}
+\DoxyCodeLine{00041\ \ \ \ \ \};}
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00043\ \ \ \ \ \textcolor{keyword}{inline}\ \textcolor{keyword}{constexpr}\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}}\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_af82e1261e5055e52afb95a5d1413c3f3}{k\_win64\_non\_preferred\_float}}[]\ =\ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a70c6f13560ccdd784abae0253f7f79a0}{XMM6}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_abfa9d542b3addae94d8a13ee548f8608}{XMM7}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_af0fb34ac6d1cd033accf8a5dec494772}{XMM8}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a9f6e7ce7e0001b1a51f6e33330744d20}{XMM9}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_af105f1d7520f66ba36b1e60a7e77151b}{XMM10}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a48fda4f4ac9922d14654eca6140c18f7}{XMM11}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_ae6e7b0ba4ef9a8293a16e9279d01466d}{XMM12}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a3f29b0ce917d58757699975a925d5c11}{XMM13}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_aa8d44e0122bb81b2308cc714b26880b2}{XMM14}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a085ee31ad48e7e030e69c6ed9a287daa}{XMM15}}}
+\DoxyCodeLine{00045\ \ \ \ \ \};}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00050\ \ \ \ \ [[nodiscard]]\ \textcolor{keyword}{inline}\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachineEnv}{codegen::MachineEnv}}\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_abafd0e7da580309915bcbd5e69f525b0}{sysv\_env}}()\ noexcept\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ .preferred\ \ \ \ \ \ =\ \{\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a1562558c098522cd7cfc7039c7e584f9}{k\_sysv\_preferred\_int}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a2824d600674f05c9835f6f7037ca43ce}{k\_sysv\_preferred\_float}}\ \},}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ .non\_preferred\ \ =\ \{\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a28e51a0bc69d30f6884a1f5247bcfddf}{k\_sysv\_non\_preferred\_int}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_af1f6de50d79b7240d7b6c4ab1f0e9046}{k\_sysv\_non\_preferred\_float}}\ \},}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ .scratch\ \ \ \ \ \ \ \ =\ \{\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a096e8af795e247ccc04a4758a53581fe}{R10}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_aa8d44e0122bb81b2308cc714b26880b2}{XMM14}}\ \},}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00056\ \ \ \ \ \}}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00059\ \ \ \ \ [[nodiscard]]\ \textcolor{keyword}{inline}\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachineEnv}{codegen::MachineEnv}}\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a00e33106468f38e7a8e4562335e2474c}{win64\_env}}()\ noexcept\ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \{}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ .preferred\ \ \ \ \ \ =\ \{\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a638755aa2973516f3b83ff032e3e1075}{k\_win64\_preferred\_int}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_afa6141df987565250889e4fca3ce27a4}{k\_win64\_preferred\_float}}\ \},}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ .non\_preferred\ \ =\ \{\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_af43d7bfaa968810768a0576d66d2c02f}{k\_win64\_non\_preferred\_int}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_af82e1261e5055e52afb95a5d1413c3f3}{k\_win64\_non\_preferred\_float}}\ \},}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ .scratch\ \ \ \ \ \ \ \ =\ \{\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a096e8af795e247ccc04a4758a53581fe}{R10}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a91b50e095a72d4de8711e18540339e04}{XMM4}}\ \},}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00065\ \ \ \ \ \}}
+\DoxyCodeLine{00066\ \}}
+
+\end{DoxyCode}

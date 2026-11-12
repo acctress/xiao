@@ -1,0 +1,21 @@
+var searchData=
+[
+  ['b_0',['B',['../namespacexiao_1_1x86__64.html#ac1ec2bb04415d84b0aa38d8457e364c6a9d5ed678fe57bcca610140957afab571',1,'xiao::x86_64']]],
+  ['base_1',['base',['../structxiao_1_1x86__64_1_1AddressMode.html#a51f59926df3fc026305fcb515c13140d',1,'xiao::x86_64::AddressMode']]],
+  ['be_2',['BE',['../namespacexiao_1_1x86__64.html#ac1ec2bb04415d84b0aa38d8457e364c6ad3dcf429c679f9af82eb9a3b31c4df44',1,'xiao::x86_64']]],
+  ['before_3',['Before',['../namespacexiao_1_1codegen.html#a318f5ddbbcd950f939a08d496ec90dfea9060587edeb01a63e3d3edc959678d1e',1,'xiao::codegen']]],
+  ['bits_4',['bits',['../structxiao_1_1codegen_1_1MachOperand.html#a943b98da3bb40e392ac186d577ed4f7d',1,'xiao::codegen::MachOperand::bits'],['../structxiao_1_1codegen_1_1PReg.html#a345bceac0c8b123819babc7bbd387f58',1,'xiao::codegen::PReg::bits'],['../structxiao_1_1codegen_1_1VReg.html#a321c264ff5c493c62e6c45638f62f1c8',1,'xiao::codegen::VReg::bits'],['../structxiao_1_1codegen_1_1Reg.html#ad421127afbd9a586d9f453105ac89352',1,'xiao::codegen::Reg::bits'],['../structxiao_1_1x86__64_1_1PReg.html#a345bceac0c8b123819babc7bbd387f58',1,'xiao::x86_64::PReg::bits']]],
+  ['block_2ehh_5',['block.hh',['../block_8hh.html',1,'']]],
+  ['block_5fparam_6',['block_param',['../classxiao_1_1ir_1_1IRBuilder.html#aa8473dc704d2f2e955bd59d196c7ed52',1,'xiao::ir::IRBuilder']]],
+  ['block_5fparams_7',['block_params',['../structxiao_1_1codegen_1_1VCode.html#adf2abbfa661a3bc03cd4579e5a46d4a4',1,'xiao::codegen::VCode::block_params'],['../structxiao_1_1ir_1_1IRFunction.html#a6977956dbc6f50636d02fc0df799950f',1,'xiao::ir::IRFunction::block_params']]],
+  ['blockid_8',['BlockId',['../structxiao_1_1codegen_1_1BlockId.html',1,'xiao::codegen']]],
+  ['blockref_9',['BlockRef',['../namespacexiao_1_1ir.html#adce27e1b92f31de91f837887cf466a61',1,'xiao::ir']]],
+  ['blocks_10',['blocks',['../structxiao_1_1codegen_1_1VCode.html#ab5028e985396fcf853afc28c83610c65',1,'xiao::codegen::VCode::blocks'],['../structxiao_1_1ir_1_1IRFunction.html#a4a31d9fead66da79f595a7a382daa5a5',1,'xiao::ir::IRFunction::blocks']]],
+  ['br_11',['br',['../classxiao_1_1ir_1_1IRBuilder.html#ab4bc620047ebbce22cd1e0e6756b0ec0',1,'xiao::ir::IRBuilder::br()'],['../namespacexiao_1_1ir.html#ac329aef04cbbc2fe87693b471e87edf4adc634e2072827fe0b5be9a2063390544',1,'xiao::ir::br']]],
+  ['branch_12',['Branch',['../namespacexiao_1_1codegen.html#aa722ecb0ef0a99616802a913e5e3c008adacdb83ade6c4e8878717e206175dfd8',1,'xiao::codegen']]],
+  ['branch_5fblock_5fargs_13',['branch_block_args',['../structxiao_1_1codegen_1_1VCode.html#a1cc53c3779da73529c14eaa37d6eca55',1,'xiao::codegen::VCode']]],
+  ['brif_14',['brif',['../classxiao_1_1ir_1_1IRBuilder.html#a42fedd2b14ddeb5d23fa2f20117ae249',1,'xiao::ir::IRBuilder::brif()'],['../namespacexiao_1_1ir.html#ac329aef04cbbc2fe87693b471e87edf4aade2f43ecd49341c7a1934e0dd9293bf',1,'xiao::ir::brif']]],
+  ['builder_2ehh_15',['builder.hh',['../builder_8hh.html',1,'']]],
+  ['bytes_5fallocated_16',['bytes_allocated',['../classxiao_1_1support_1_1Arena.html#a21769c4a2218b80d6ffc1793cac1d1fd',1,'xiao::support::Arena']]],
+  ['bytes_5fused_17',['bytes_used',['../classxiao_1_1support_1_1Arena.html#a3d7d5f7756d93866770ff463f55ac809',1,'xiao::support::Arena']]]
+];

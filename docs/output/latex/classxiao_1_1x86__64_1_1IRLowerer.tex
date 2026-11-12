@@ -1,0 +1,109 @@
+\doxysection{xiao::x86\+\_\+64::IRLowerer Class Reference}
+\hypertarget{classxiao_1_1x86__64_1_1IRLowerer}{}\label{classxiao_1_1x86__64_1_1IRLowerer}\index{xiao::x86\_64::IRLowerer@{xiao::x86\_64::IRLowerer}}
+
+
+{\ttfamily \+\#include $<$lower.\+hh$>$}
+
+Inheritance diagram for xiao::x86\+\_\+64::IRLowerer:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classxiao_1_1x86__64_1_1IRLowerer}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{classxiao_1_1x86__64_1_1IRLowerer_ad87d889f6d2c9711227944cc703e1d5e}{IRLowerer}} (const \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachineEnv}{Machine\+Env}} \&env, const \doxymbox{\hyperlink{structxiao_1_1codegen_1_1ABISpec}{ABISpec}} \&abi) noexcept
+\item 
+\doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCode}{VCode}}$<$ \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1X86Inst}{X86\+Inst}} $>$ \doxymbox{\hyperlink{classxiao_1_1x86__64_1_1IRLowerer_ab86708a1e38153026a4566bcdc0a75d9}{lower}} (\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{ir::\+\+IRFunction}} \&fn, \doxymbox{\hyperlink{namespacexiao_1_1codegen_af1ef83d221f63efda2cdf4265f9db8c8}{Call\+Conv}} cc=Call\+Conv::\+\+SystemV)
+\item 
+void \doxymbox{\hyperlink{classxiao_1_1x86__64_1_1IRLowerer_ad9908490e21c4289467416d39e7ba17e}{on\+\_\+function}} (\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{ir::\+\+IRFunction}} \&)
+\item 
+void \doxymbox{\hyperlink{classxiao_1_1x86__64_1_1IRLowerer_a7264e39e60500ad2c783f552db1f8e40}{on\+\_\+function\+\_\+end}} (\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{ir::\+\+IRFunction}} \&)
+\item 
+void \doxymbox{\hyperlink{classxiao_1_1x86__64_1_1IRLowerer_ad717ab79903c499a763e9c852ce7cd3f}{on\+\_\+block}} (\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{ir::\+\+IRFunction}} \&, \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock}{ir::\+\+IRBlock}} \&)
+\item 
+void \doxymbox{\hyperlink{classxiao_1_1x86__64_1_1IRLowerer_a716f5820416209297e9727649439a8c8}{on\+\_\+block\+\_\+end}} (\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{ir::\+\+IRFunction}} \&, \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock}{ir::\+\+IRBlock}} \&)
+\item 
+void \doxymbox{\hyperlink{classxiao_1_1x86__64_1_1IRLowerer_ae0c8011134ec6a87e0ce47a5a899fbd7}{on\+\_\+inst}} (\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{ir::\+\+IRFunction}} \&, \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock}{ir::\+\+IRBlock}} \&, \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRInst}{ir::\+\+IRInst}} \&inst)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor}{xiao::\+ir::\+\+IRVisitor$<$ IRLowerer $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+void \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor_aa0a700b980666b2489c5454f51b27141}{visit\+\_\+module}} (\doxymbox{\hyperlink{classxiao_1_1ir_1_1IRModule}{IRModule}} \&m)
+\begin{DoxyCompactList}\small\item\em Visit all functions in a module. \end{DoxyCompactList}\item 
+void \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor_aa8639d203569aeb25c365867b68948ee}{visit\+\_\+function}} (\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}} \&fn)
+\begin{DoxyCompactList}\small\item\em Visit a function and all of its blocks. \end{DoxyCompactList}\item 
+void \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor_ae897e9754387e47e8439b40808461572}{visit\+\_\+block}} (\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}} \&fn, \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock}{IRBlock}} \&b)
+\begin{DoxyCompactList}\small\item\em Visit a block and all of its instructions. \end{DoxyCompactList}\item 
+void \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor_a5157733789493abfddbab99a0e3c353c}{visit\+\_\+inst}} (\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}} \&fn, \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock}{IRBlock}} \&b, \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRInst}{IRInst}} \&in)
+\begin{DoxyCompactList}\small\item\em Visit an instructions and all of its operands. \end{DoxyCompactList}\item 
+void \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor_a3900d24d9f70ba507d6bbcb2043cbe35}{on\+\_\+function}} (\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}} \&)
+\begin{DoxyCompactList}\small\item\em Hook called on entry to each function. \end{DoxyCompactList}\item 
+void \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor_aecaf1739395feb1a71c9aef8f5223fd8}{on\+\_\+function\+\_\+end}} (\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}} \&)
+\begin{DoxyCompactList}\small\item\em Hook called on exit of each function. \end{DoxyCompactList}\item 
+void \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor_aff515c314227f3db115c989b966455e5}{on\+\_\+block}} (\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}} \&, \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock}{IRBlock}} \&)
+\begin{DoxyCompactList}\small\item\em Hook called on entry to each block. \end{DoxyCompactList}\item 
+void \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor_adfb8005469c08a02f5531e44a5f41547}{on\+\_\+block\+\_\+end}} (\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}} \&, \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock}{IRBlock}} \&)
+\begin{DoxyCompactList}\small\item\em Hook called on exit of each block. \end{DoxyCompactList}\item 
+void \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor_a7139b99390536e23dd17cb19ed3e75f4}{on\+\_\+inst}} (\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}} \&, \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock}{IRBlock}} \&, \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRInst}{IRInst}} \&)
+\begin{DoxyCompactList}\small\item\em Hook called for each instruction before its operands. \end{DoxyCompactList}\item 
+void \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor_aa85cde68ca981bc68e158de7191d3453}{on\+\_\+operand}} (\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}} \&, \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock}{IRBlock}} \&, \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRInst}{IRInst}} \&, \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}})
+\begin{DoxyCompactList}\small\item\em Hook called for each operand of an instruction. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\label{classxiao_1_1x86__64_1_1IRLowerer_doc-constructors}
+\Hypertarget{classxiao_1_1x86__64_1_1IRLowerer_doc-constructors}
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classxiao_1_1x86__64_1_1IRLowerer_ad87d889f6d2c9711227944cc703e1d5e}\index{xiao::x86\_64::IRLowerer@{xiao::x86\_64::IRLowerer}!IRLowerer@{IRLowerer}}
+\index{IRLowerer@{IRLowerer}!xiao::x86\_64::IRLowerer@{xiao::x86\_64::IRLowerer}}
+\doxysubsubsection{\texorpdfstring{IRLowerer()}{IRLowerer()}}
+{\footnotesize\ttfamily \label{classxiao_1_1x86__64_1_1IRLowerer_ad87d889f6d2c9711227944cc703e1d5e} 
+xiao::\+x86\+\_\+64::\+\+IRLowerer::\+\+IRLowerer (\begin{DoxyParamCaption}\item[{const \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachineEnv}{Machine\+Env}} \&}]{env}{, }\item[{const \doxymbox{\hyperlink{structxiao_1_1codegen_1_1ABISpec}{ABISpec}} \&}]{abi}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}, {\ttfamily [noexcept]}}
+
+
+
+\label{classxiao_1_1x86__64_1_1IRLowerer_doc-func-members}
+\Hypertarget{classxiao_1_1x86__64_1_1IRLowerer_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classxiao_1_1x86__64_1_1IRLowerer_ab86708a1e38153026a4566bcdc0a75d9}\index{xiao::x86\_64::IRLowerer@{xiao::x86\_64::IRLowerer}!lower@{lower}}
+\index{lower@{lower}!xiao::x86\_64::IRLowerer@{xiao::x86\_64::IRLowerer}}
+\doxysubsubsection{\texorpdfstring{lower()}{lower()}}
+{\footnotesize\ttfamily \label{classxiao_1_1x86__64_1_1IRLowerer_ab86708a1e38153026a4566bcdc0a75d9} 
+\doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCode}{VCode}}$<$ \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1X86Inst}{X86\+Inst}} $>$ xiao::\+x86\+\_\+64::\+\+IRLowerer::\+lower (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{ir::\+\+IRFunction}} \&}]{fn}{, }\item[{\doxymbox{\hyperlink{namespacexiao_1_1codegen_af1ef83d221f63efda2cdf4265f9db8c8}{Call\+Conv}}}]{cc}{ = {\ttfamily CallConv::SystemV}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}}
+
+\Hypertarget{classxiao_1_1x86__64_1_1IRLowerer_ad717ab79903c499a763e9c852ce7cd3f}\index{xiao::x86\_64::IRLowerer@{xiao::x86\_64::IRLowerer}!on\_block@{on\_block}}
+\index{on\_block@{on\_block}!xiao::x86\_64::IRLowerer@{xiao::x86\_64::IRLowerer}}
+\doxysubsubsection{\texorpdfstring{on\_block()}{on\_block()}}
+{\footnotesize\ttfamily \label{classxiao_1_1x86__64_1_1IRLowerer_ad717ab79903c499a763e9c852ce7cd3f} 
+void xiao::\+x86\+\_\+64::\+\+IRLowerer::\+on\+\_\+block (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{ir::\+\+IRFunction}} \&}]{}{, }\item[{\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock}{ir::\+\+IRBlock}} \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\Hypertarget{classxiao_1_1x86__64_1_1IRLowerer_a716f5820416209297e9727649439a8c8}\index{xiao::x86\_64::IRLowerer@{xiao::x86\_64::IRLowerer}!on\_block\_end@{on\_block\_end}}
+\index{on\_block\_end@{on\_block\_end}!xiao::x86\_64::IRLowerer@{xiao::x86\_64::IRLowerer}}
+\doxysubsubsection{\texorpdfstring{on\_block\_end()}{on\_block\_end()}}
+{\footnotesize\ttfamily \label{classxiao_1_1x86__64_1_1IRLowerer_a716f5820416209297e9727649439a8c8} 
+void xiao::\+x86\+\_\+64::\+\+IRLowerer::\+on\+\_\+block\+\_\+end (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{ir::\+\+IRFunction}} \&}]{}{, }\item[{\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock}{ir::\+\+IRBlock}} \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\Hypertarget{classxiao_1_1x86__64_1_1IRLowerer_ad9908490e21c4289467416d39e7ba17e}\index{xiao::x86\_64::IRLowerer@{xiao::x86\_64::IRLowerer}!on\_function@{on\_function}}
+\index{on\_function@{on\_function}!xiao::x86\_64::IRLowerer@{xiao::x86\_64::IRLowerer}}
+\doxysubsubsection{\texorpdfstring{on\_function()}{on\_function()}}
+{\footnotesize\ttfamily \label{classxiao_1_1x86__64_1_1IRLowerer_ad9908490e21c4289467416d39e7ba17e} 
+void xiao::\+x86\+\_\+64::\+\+IRLowerer::\+on\+\_\+function (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{ir::\+\+IRFunction}} \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\Hypertarget{classxiao_1_1x86__64_1_1IRLowerer_a7264e39e60500ad2c783f552db1f8e40}\index{xiao::x86\_64::IRLowerer@{xiao::x86\_64::IRLowerer}!on\_function\_end@{on\_function\_end}}
+\index{on\_function\_end@{on\_function\_end}!xiao::x86\_64::IRLowerer@{xiao::x86\_64::IRLowerer}}
+\doxysubsubsection{\texorpdfstring{on\_function\_end()}{on\_function\_end()}}
+{\footnotesize\ttfamily \label{classxiao_1_1x86__64_1_1IRLowerer_a7264e39e60500ad2c783f552db1f8e40} 
+void xiao::\+x86\+\_\+64::\+\+IRLowerer::\+on\+\_\+function\+\_\+end (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{ir::\+\+IRFunction}} \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\Hypertarget{classxiao_1_1x86__64_1_1IRLowerer_ae0c8011134ec6a87e0ce47a5a899fbd7}\index{xiao::x86\_64::IRLowerer@{xiao::x86\_64::IRLowerer}!on\_inst@{on\_inst}}
+\index{on\_inst@{on\_inst}!xiao::x86\_64::IRLowerer@{xiao::x86\_64::IRLowerer}}
+\doxysubsubsection{\texorpdfstring{on\_inst()}{on\_inst()}}
+{\footnotesize\ttfamily \label{classxiao_1_1x86__64_1_1IRLowerer_ae0c8011134ec6a87e0ce47a5a899fbd7} 
+void xiao::\+x86\+\_\+64::\+\+IRLowerer::\+on\+\_\+inst (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{ir::\+\+IRFunction}} \&}]{}{, }\item[{\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock}{ir::\+\+IRBlock}} \&}]{}{, }\item[{\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRInst}{ir::\+\+IRInst}} \&}]{inst}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+The documentation for this class was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+include/\+xiao/\+isa/\+x86/\doxymbox{\hyperlink{lower_8hh}{lower.\+hh}}\end{DoxyCompactItemize}

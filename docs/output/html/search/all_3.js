@@ -1,0 +1,12 @@
+var searchData=
+[
+  ['data_0',['data',['../structxiao_1_1support_1_1Slab.html#abff8d0d8aeab173ff5ee5748a858e61c',1,'xiao::support::Slab']]],
+  ['declare_1',['declare',['../classxiao_1_1ir_1_1IRModule.html#a4216d04f4842e0c4d5732176310a0030',1,'xiao::ir::IRModule::declare(const std::string_view name, const Type ret, const std::span&lt; const Type &gt; params={})'],['../classxiao_1_1ir_1_1IRModule.html#a700e14d0bee06bfc2d3c9ba05a93efba',1,'xiao::ir::IRModule::declare(const std::string_view name, const Type ret, const std::initializer_list&lt; const Type &gt; params={})']]],
+  ['def_2',['DEF',['../isa_2x86_2inst_8hh.html#abf97fd748fceeb2d055f7033eb373e85',1,'inst.hh']]],
+  ['def_3',['Def',['../namespacexiao_1_1codegen.html#a0ffda67b6b2c0f7317dd01cc4e986c7badde5c8d4149c5072d2cb798706663e78',1,'xiao::codegen']]],
+  ['default_5fslab_5fsize_4',['default_slab_size',['../classxiao_1_1support_1_1Arena.html#a537d1ef24d7c2a3dc3ee47384d168c80',1,'xiao::support::Arena']]],
+  ['disp_5',['disp',['../structxiao_1_1x86__64_1_1AddressMode.html#afe14a7d46b66a6e951f6b71b423df418',1,'xiao::x86_64::AddressMode']]],
+  ['div_6',['Div',['../structxiao_1_1x86__64_1_1inst_1_1Div.html',1,'xiao::x86_64::inst']]],
+  ['dst_7',['dst',['../structxiao_1_1x86__64_1_1inst_1_1Alu.html#aa502bcf5a9b87a1429d686892cec6d97',1,'xiao::x86_64::inst::Alu::dst'],['../structxiao_1_1x86__64_1_1inst_1_1AluImm.html#a68a3ab3d4b6149d03d326276693bbb52',1,'xiao::x86_64::inst::AluImm::dst'],['../structxiao_1_1x86__64_1_1inst_1_1Mov.html#aa915b4330fa20b7f3ec1721b0c888e13',1,'xiao::x86_64::inst::Mov::dst'],['../structxiao_1_1x86__64_1_1inst_1_1MovImm.html#a6d3c808c36e80ca34fa06841c8f6ebf7',1,'xiao::x86_64::inst::MovImm::dst'],['../structxiao_1_1x86__64_1_1inst_1_1MovLoad.html#a94697ce170cc39e41332cc18201a3680',1,'xiao::x86_64::inst::MovLoad::dst'],['../structxiao_1_1x86__64_1_1inst_1_1Movzx.html#a8cb3c26cf03cbcb95a8520d9be66fa96',1,'xiao::x86_64::inst::Movzx::dst'],['../structxiao_1_1x86__64_1_1inst_1_1Movsx.html#af7aeb839522608c21cec2b9ff91c8ea7',1,'xiao::x86_64::inst::Movsx::dst'],['../structxiao_1_1x86__64_1_1inst_1_1Pop.html#a20fec176151953932072f8952086cf44',1,'xiao::x86_64::inst::Pop::dst'],['../structxiao_1_1x86__64_1_1inst_1_1LeaFrame.html#adf6c4fa5a710554396b49d63f4f5cc5d',1,'xiao::x86_64::inst::LeaFrame::dst'],['../structxiao_1_1x86__64_1_1inst_1_1SetCC.html#ab048942b6142f4c5402b90f2fe1fd065',1,'xiao::x86_64::inst::SetCC::dst']]],
+  ['dummyuse_8',['DummyUse',['../structxiao_1_1x86__64_1_1inst_1_1DummyUse.html',1,'xiao::x86_64::inst']]]
+];

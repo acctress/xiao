@@ -1,0 +1,94 @@
+\doxysection{xiao::codegen::VCode\+Builder\texorpdfstring{$<$}{<} I \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classxiao_1_1codegen_1_1VCodeBuilder}{}\label{classxiao_1_1codegen_1_1VCodeBuilder}\index{xiao::codegen::VCodeBuilder$<$ I $>$@{xiao::codegen::VCodeBuilder$<$ I $>$}}
+
+
+Builder for \doxylink{structxiao_1_1codegen_1_1VCode}{VCode}{\itshape . } 
+
+
+
+
+{\ttfamily \+\#include $<$vcode.\+hh$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{structxiao_1_1codegen_1_1BlockId}{Block\+Id}} \doxymbox{\hyperlink{classxiao_1_1codegen_1_1VCodeBuilder_a6911846cb1e5b0d7013241559f60ec08}{start\+\_\+block}} (const std::\+span$<$ const \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VReg}{VReg}} $>$ params=\{\})
+\begin{DoxyCompactList}\small\item\em Begin a new \doxylink{structxiao_1_1codegen_1_1VCode}{VCode} block with the given param vregs. \end{DoxyCompactList}\item 
+void \doxymbox{\hyperlink{classxiao_1_1codegen_1_1VCodeBuilder_a88d5fc0f568961ce5bcdf6b07ca34645}{end\+\_\+block}} (const std::\+span$<$ const \doxymbox{\hyperlink{structxiao_1_1codegen_1_1BlockId}{Block\+Id}} $>$ succs, const std::\+span$<$ const \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VReg}{VReg}} $>$ branch\+\_\+args=\{\})
+\begin{DoxyCompactList}\small\item\em Close the current block with its successors and branch args. \end{DoxyCompactList}\item 
+void \doxymbox{\hyperlink{classxiao_1_1codegen_1_1VCodeBuilder_a4cc040dc3ebdf2ff9565b98b355642a5}{set\+\_\+block}} (const \doxymbox{\hyperlink{structxiao_1_1codegen_1_1BlockId}{Block\+Id}} block)
+\begin{DoxyCompactList}\small\item\em Set the active block for next \doxylink{classxiao_1_1codegen_1_1VCodeBuilder_a812a571075dfdfbe339f280c8c689e7f}{push()} calls. \end{DoxyCompactList}\item 
+void \doxymbox{\hyperlink{classxiao_1_1codegen_1_1VCodeBuilder_a812a571075dfdfbe339f280c8c689e7f}{push}} (I inst)
+\begin{DoxyCompactList}\small\item\em Push an instruction into the current block. \end{DoxyCompactList}\item 
+\doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCode}{VCode}}$<$ I $>$ \doxymbox{\hyperlink{classxiao_1_1codegen_1_1VCodeBuilder_ae325c87f659a3fc0de11dcc77de55899}{finalise}} () \&\&
+\begin{DoxyCompactList}\small\item\em Finalise into an immutable \doxylink{structxiao_1_1codegen_1_1VCode}{VCode}{\itshape . }\end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$Mach\+InstC I$>$\newline
+class xiao::\+codegen::\+\+VCode\+Builder$<$ I $>$}
+Builder for \doxylink{structxiao_1_1codegen_1_1VCode}{VCode}{\itshape . }
+
+\label{classxiao_1_1codegen_1_1VCodeBuilder_doc-func-members}
+\Hypertarget{classxiao_1_1codegen_1_1VCodeBuilder_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classxiao_1_1codegen_1_1VCodeBuilder_a88d5fc0f568961ce5bcdf6b07ca34645}\index{xiao::codegen::VCodeBuilder$<$ I $>$@{xiao::codegen::VCodeBuilder$<$ I $>$}!end\_block@{end\_block}}
+\index{end\_block@{end\_block}!xiao::codegen::VCodeBuilder$<$ I $>$@{xiao::codegen::VCodeBuilder$<$ I $>$}}
+\doxysubsubsection{\texorpdfstring{end\_block()}{end\_block()}}
+{\footnotesize\ttfamily \label{classxiao_1_1codegen_1_1VCodeBuilder_a88d5fc0f568961ce5bcdf6b07ca34645} 
+template$<$Mach\+InstC I$>$ \\
+void \doxymbox{\hyperlink{classxiao_1_1codegen_1_1VCodeBuilder}{xiao::\+codegen::\+\+VCode\+Builder}}$<$ I $>$::\+end\+\_\+block (\begin{DoxyParamCaption}\item[{const std::\+span$<$ const \doxymbox{\hyperlink{structxiao_1_1codegen_1_1BlockId}{Block\+Id}} $>$}]{succs}{, }\item[{const std::\+span$<$ const \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VReg}{VReg}} $>$}]{branch\+\_\+args}{ = {\ttfamily \{\}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Close the current block with its successors and branch args. 
+
+\Hypertarget{classxiao_1_1codegen_1_1VCodeBuilder_ae325c87f659a3fc0de11dcc77de55899}\index{xiao::codegen::VCodeBuilder$<$ I $>$@{xiao::codegen::VCodeBuilder$<$ I $>$}!finalise@{finalise}}
+\index{finalise@{finalise}!xiao::codegen::VCodeBuilder$<$ I $>$@{xiao::codegen::VCodeBuilder$<$ I $>$}}
+\doxysubsubsection{\texorpdfstring{finalise()}{finalise()}}
+{\footnotesize\ttfamily \label{classxiao_1_1codegen_1_1VCodeBuilder_ae325c87f659a3fc0de11dcc77de55899} 
+template$<$Mach\+InstC I$>$ \\
+\doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCode}{VCode}}$<$ I $>$ \doxymbox{\hyperlink{classxiao_1_1codegen_1_1VCodeBuilder}{xiao::\+codegen::\+\+VCode\+Builder}}$<$ I $>$::\+finalise (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) \&\&\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}}
+
+
+
+Finalise into an immutable \doxylink{structxiao_1_1codegen_1_1VCode}{VCode}{\itshape . }
+
+\Hypertarget{classxiao_1_1codegen_1_1VCodeBuilder_a812a571075dfdfbe339f280c8c689e7f}\index{xiao::codegen::VCodeBuilder$<$ I $>$@{xiao::codegen::VCodeBuilder$<$ I $>$}!push@{push}}
+\index{push@{push}!xiao::codegen::VCodeBuilder$<$ I $>$@{xiao::codegen::VCodeBuilder$<$ I $>$}}
+\doxysubsubsection{\texorpdfstring{push()}{push()}}
+{\footnotesize\ttfamily \label{classxiao_1_1codegen_1_1VCodeBuilder_a812a571075dfdfbe339f280c8c689e7f} 
+template$<$Mach\+InstC I$>$ \\
+void \doxymbox{\hyperlink{classxiao_1_1codegen_1_1VCodeBuilder}{xiao::\+codegen::\+\+VCode\+Builder}}$<$ I $>$::\+push (\begin{DoxyParamCaption}\item[{I}]{inst}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Push an instruction into the current block. 
+
+\Hypertarget{classxiao_1_1codegen_1_1VCodeBuilder_a4cc040dc3ebdf2ff9565b98b355642a5}\index{xiao::codegen::VCodeBuilder$<$ I $>$@{xiao::codegen::VCodeBuilder$<$ I $>$}!set\_block@{set\_block}}
+\index{set\_block@{set\_block}!xiao::codegen::VCodeBuilder$<$ I $>$@{xiao::codegen::VCodeBuilder$<$ I $>$}}
+\doxysubsubsection{\texorpdfstring{set\_block()}{set\_block()}}
+{\footnotesize\ttfamily \label{classxiao_1_1codegen_1_1VCodeBuilder_a4cc040dc3ebdf2ff9565b98b355642a5} 
+template$<$Mach\+InstC I$>$ \\
+void \doxymbox{\hyperlink{classxiao_1_1codegen_1_1VCodeBuilder}{xiao::\+codegen::\+\+VCode\+Builder}}$<$ I $>$::\+set\+\_\+block (\begin{DoxyParamCaption}\item[{const \doxymbox{\hyperlink{structxiao_1_1codegen_1_1BlockId}{Block\+Id}}}]{block}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Set the active block for next \doxylink{classxiao_1_1codegen_1_1VCodeBuilder_a812a571075dfdfbe339f280c8c689e7f}{push()} calls. 
+
+\Hypertarget{classxiao_1_1codegen_1_1VCodeBuilder_a6911846cb1e5b0d7013241559f60ec08}\index{xiao::codegen::VCodeBuilder$<$ I $>$@{xiao::codegen::VCodeBuilder$<$ I $>$}!start\_block@{start\_block}}
+\index{start\_block@{start\_block}!xiao::codegen::VCodeBuilder$<$ I $>$@{xiao::codegen::VCodeBuilder$<$ I $>$}}
+\doxysubsubsection{\texorpdfstring{start\_block()}{start\_block()}}
+{\footnotesize\ttfamily \label{classxiao_1_1codegen_1_1VCodeBuilder_a6911846cb1e5b0d7013241559f60ec08} 
+template$<$Mach\+InstC I$>$ \\
+\doxymbox{\hyperlink{structxiao_1_1codegen_1_1BlockId}{Block\+Id}} \doxymbox{\hyperlink{classxiao_1_1codegen_1_1VCodeBuilder}{xiao::\+codegen::\+\+VCode\+Builder}}$<$ I $>$::\+start\+\_\+block (\begin{DoxyParamCaption}\item[{const std::\+span$<$ const \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VReg}{VReg}} $>$}]{params}{ = {\ttfamily \{\}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}}
+
+
+
+Begin a new \doxylink{structxiao_1_1codegen_1_1VCode}{VCode} block with the given param vregs. 
+
+
+
+The documentation for this class was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+include/\+xiao/\+codegen/\doxymbox{\hyperlink{vcode_8hh}{vcode.\+hh}}\end{DoxyCompactItemize}

@@ -1,0 +1,182 @@
+\doxysection{include/\+xiao/\+isa/\+x86/\+inst.hh File Reference}
+\hypertarget{isa_2x86_2inst_8hh}{}\label{isa_2x86_2inst_8hh}\index{include/xiao/isa/x86/inst.hh@{include/xiao/isa/x86/inst.hh}}
+{\ttfamily \+\#include $<$xiao/\+codegen/\+machinst.\+hh$>$}\newline
+{\ttfamily \+\#include $<$xiao/\+codegen/\+operand.\+hh$>$}\newline
+{\ttfamily \+\#include $<$xiao/\+codegen/\+vcode.\+hh$>$}\newline
+{\ttfamily \+\#include $<$xiao/\+codegen/\+reg.\+hh$>$}\newline
+{\ttfamily \+\#include $<$xiao/\+ir/\+types.\+hh$>$}\newline
+{\ttfamily \+\#include $<$cstdint$>$}\newline
+{\ttfamily \+\#include $<$optional$>$}\newline
+{\ttfamily \+\#include $<$string$>$}\newline
+{\ttfamily \+\#include $<$utility$>$}\newline
+{\ttfamily \+\#include $<$variant$>$}\newline
+{\ttfamily \+\#include $<$vector$>$}\newline
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1AddressMode}{xiao::\+x86\+\_\+64::\+\+Address\+Mode}}
+\item 
+struct \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1inst_1_1Alu}{xiao::\+x86\+\_\+64::\+inst::\+\+Alu}}
+\item 
+struct \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1inst_1_1AluImm}{xiao::\+x86\+\_\+64::\+inst::\+\+Alu\+Imm}}
+\item 
+struct \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1inst_1_1Mov}{xiao::\+x86\+\_\+64::\+inst::\+\+Mov}}
+\item 
+struct \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1inst_1_1MovImm}{xiao::\+x86\+\_\+64::\+inst::\+\+Mov\+Imm}}
+\item 
+struct \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1inst_1_1MovLoad}{xiao::\+x86\+\_\+64::\+inst::\+\+Mov\+Load}}
+\item 
+struct \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1inst_1_1MovStore}{xiao::\+x86\+\_\+64::\+inst::\+\+Mov\+Store}}
+\item 
+struct \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1inst_1_1Movzx}{xiao::\+x86\+\_\+64::\+inst::\+\+Movzx}}
+\item 
+struct \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1inst_1_1Movsx}{xiao::\+x86\+\_\+64::\+inst::\+\+Movsx}}
+\item 
+struct \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1inst_1_1Cdq}{xiao::\+x86\+\_\+64::\+inst::\+\+Cdq}}
+\item 
+struct \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1inst_1_1Div}{xiao::\+x86\+\_\+64::\+inst::\+\+Div}}
+\item 
+struct \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1inst_1_1Idiv}{xiao::\+x86\+\_\+64::\+inst::\+\+Idiv}}
+\item 
+struct \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1inst_1_1Push}{xiao::\+x86\+\_\+64::\+inst::\+\+Push}}
+\item 
+struct \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1inst_1_1Pop}{xiao::\+x86\+\_\+64::\+inst::\+\+Pop}}
+\item 
+struct \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1inst_1_1LeaFrame}{xiao::\+x86\+\_\+64::\+inst::\+\+Lea\+Frame}}
+\item 
+struct \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1inst_1_1SetCC}{xiao::\+x86\+\_\+64::\+inst::\+\+Set\+CC}}
+\item 
+struct \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1inst_1_1Jmp}{xiao::\+x86\+\_\+64::\+inst::\+\+Jmp}}
+\item 
+struct \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1inst_1_1Jcc}{xiao::\+x86\+\_\+64::\+inst::\+\+Jcc}}
+\item 
+struct \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1inst_1_1Call}{xiao::\+x86\+\_\+64::\+inst::\+\+Call}}
+\item 
+struct \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1inst_1_1Ret}{xiao::\+x86\+\_\+64::\+inst::\+\+Ret}}
+\item 
+struct \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1inst_1_1DummyUse}{xiao::\+x86\+\_\+64::\+inst::\+\+Dummy\+Use}}
+\item 
+struct \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1X86Inst}{xiao::\+x86\+\_\+64::\+\+X86\+Inst}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \doxymbox{\hyperlink{namespacexiao}{xiao}}
+\item 
+namespace \doxymbox{\hyperlink{namespacexiao_1_1x86__64}{xiao::\+x86\+\_\+64}}
+\item 
+namespace \doxymbox{\hyperlink{namespacexiao_1_1x86__64_1_1inst}{xiao::\+x86\+\_\+64::\+inst}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\+\#define \doxymbox{\hyperlink{isa_2x86_2inst_8hh_a901313e2e841b281dfc12df905fa979a}{XIAO\+\_\+\+OPERANDS}}(...)
+\item 
+\+\#define \doxymbox{\hyperlink{isa_2x86_2inst_8hh_ac57cf59b9485daafc53dbaea4bbb5898}{USE}}(reg)
+\item 
+\+\#define \doxymbox{\hyperlink{isa_2x86_2inst_8hh_abf97fd748fceeb2d055f7033eb373e85}{DEF}}(reg)
+\item 
+\+\#define \doxymbox{\hyperlink{isa_2x86_2inst_8hh_ab94714eefc1ac827f556f97e5454c696}{USEDEF}}(reg)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum class \doxymbox{\hyperlink{namespacexiao_1_1x86__64_ac1ec2bb04415d84b0aa38d8457e364c6}{xiao::\+x86\+\_\+64::\+\+CC}} : uint8\+\_\+t \{ \newline
+\doxymbox{\hyperlink{namespacexiao_1_1x86__64_ac1ec2bb04415d84b0aa38d8457e364c6a3a3ea00cfc35332cedf6e5e9a32e94da}{xiao::\+x86\+\_\+64::\+E}}
+, \doxymbox{\hyperlink{namespacexiao_1_1x86__64_ac1ec2bb04415d84b0aa38d8457e364c6adc33066c3993e0d50896e533fd692ce0}{xiao::\+x86\+\_\+64::\+\+NE}}
+, \doxymbox{\hyperlink{namespacexiao_1_1x86__64_ac1ec2bb04415d84b0aa38d8457e364c6ad20caec3b48a1eef164cb4ca81ba2587}{xiao::\+x86\+\_\+64::\+L}}
+, \doxymbox{\hyperlink{namespacexiao_1_1x86__64_ac1ec2bb04415d84b0aa38d8457e364c6acfe6055d2e0503be378bb63449ec7ba6}{xiao::\+x86\+\_\+64::\+\+LE}}
+, \newline
+\doxymbox{\hyperlink{namespacexiao_1_1x86__64_ac1ec2bb04415d84b0aa38d8457e364c6adfcf28d0734569a6a693bc8194de62bf}{xiao::\+x86\+\_\+64::\+G}}
+, \doxymbox{\hyperlink{namespacexiao_1_1x86__64_ac1ec2bb04415d84b0aa38d8457e364c6af803729628adf4199f224c2a225038e9}{xiao::\+x86\+\_\+64::\+\+GE}}
+, \doxymbox{\hyperlink{namespacexiao_1_1x86__64_ac1ec2bb04415d84b0aa38d8457e364c6a9d5ed678fe57bcca610140957afab571}{xiao::\+x86\+\_\+64::\+B}}
+, \doxymbox{\hyperlink{namespacexiao_1_1x86__64_ac1ec2bb04415d84b0aa38d8457e364c6ad3dcf429c679f9af82eb9a3b31c4df44}{xiao::\+x86\+\_\+64::\+\+BE}}
+, \newline
+\doxymbox{\hyperlink{namespacexiao_1_1x86__64_ac1ec2bb04415d84b0aa38d8457e364c6a7fc56270e7a70fa81a5935b72eacbe29}{xiao::\+x86\+\_\+64::\+A}}
+, \doxymbox{\hyperlink{namespacexiao_1_1x86__64_ac1ec2bb04415d84b0aa38d8457e364c6aea8a1a99f6c94c275a58dcd78f418c1f}{xiao::\+x86\+\_\+64::\+\+AE}}
+ \}
+\item 
+enum class \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a8da65268554e00220b5f0057e4b45145}{xiao::\+x86\+\_\+64::\+\+Alu\+Op}} : uint8\+\_\+t \{ \newline
+\doxymbox{\hyperlink{namespacexiao_1_1x86__64_a8da65268554e00220b5f0057e4b45145aec211f7c20af43e742bf2570c3cb84f9}{xiao::\+x86\+\_\+64::\+\+Add}}
+, \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a8da65268554e00220b5f0057e4b45145ae80155eceb940c89e2de63ad05868db2}{xiao::\+x86\+\_\+64::\+\+Sub}}
+, \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a8da65268554e00220b5f0057e4b45145a62b6d55816cf737bfc6f42e60df1a3f2}{xiao::\+x86\+\_\+64::\+\+Mul}}
+, \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a8da65268554e00220b5f0057e4b45145ac33315685a0cba3ce53be378b3c7874b}{xiao::\+x86\+\_\+64::\+\+And}}
+, \newline
+\doxymbox{\hyperlink{namespacexiao_1_1x86__64_a8da65268554e00220b5f0057e4b45145a3a2d5fe857d8f9541136a124c2edec6c}{xiao::\+x86\+\_\+64::\+\+Or}}
+, \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a8da65268554e00220b5f0057e4b45145a76feb79109026728a20736a8c6504548}{xiao::\+x86\+\_\+64::\+\+Xor}}
+, \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a8da65268554e00220b5f0057e4b45145ac9b4c62f6dc1bc5caf3c768b687cbf7e}{xiao::\+x86\+\_\+64::\+\+Cmp}}
+, \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a8da65268554e00220b5f0057e4b45145a0cbc6611f5540bd0809a388dc95a615b}{xiao::\+x86\+\_\+64::\+\+Test}}
+ \}
+\item 
+enum class \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a03a42d43fecc5581e76692ee13316ebd}{xiao::\+x86\+\_\+64::\+\+Operand\+Size}} : uint8\+\_\+t \{ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a03a42d43fecc5581e76692ee13316ebdaafb0fced528eaac5fe170b763cda5975}{xiao::\+x86\+\_\+64::\+\+S8}}
+, \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a03a42d43fecc5581e76692ee13316ebda6e0b0886efb94aec797f6b830329b72c}{xiao::\+x86\+\_\+64::\+\+S16}}
+, \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a03a42d43fecc5581e76692ee13316ebdaa1e28eee0339658d39a8b4d325b56e9c}{xiao::\+x86\+\_\+64::\+\+S32}}
+, \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a03a42d43fecc5581e76692ee13316ebda115dca124dc6423c7a400b8a8a0270cc}{xiao::\+x86\+\_\+64::\+\+S64}}
+ \}
+\item 
+enum class \doxymbox{\hyperlink{namespacexiao_1_1x86__64_ade2f638d5db0f04efb00828acc263a28}{xiao::\+x86\+\_\+64::\+\+Label\+Use}} : uint8\+\_\+t \{ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_ade2f638d5db0f04efb00828acc263a28ac7112d8e7d26390b8d0a0f5cb4862008}{xiao::\+x86\+\_\+64::\+\+Jmp\+Rel32}}
+, \doxymbox{\hyperlink{namespacexiao_1_1x86__64_ade2f638d5db0f04efb00828acc263a28a5b64637d481d90f69f96d0131324c1c4}{xiao::\+x86\+\_\+64::\+\+PCRel32}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+constexpr std::\+string\+\_\+view \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a1e3634e144f8330b4af841914cb25143}{xiao::\+x86\+\_\+64::\+to\+\_\+string}} (const \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a8da65268554e00220b5f0057e4b45145}{Alu\+Op}} op) noexcept
+\item 
+constexpr std::\+string\+\_\+view \doxymbox{\hyperlink{namespacexiao_1_1x86__64_adc49ae78103a075f5eecdbe3905b5ae3}{xiao::\+x86\+\_\+64::\+to\+\_\+string}} (const \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a03a42d43fecc5581e76692ee13316ebd}{Operand\+Size}} size) noexcept
+\item 
+constexpr std::\+string\+\_\+view \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a15437bbad79ee467cb0fa8cfb19bb80b}{xiao::\+x86\+\_\+64::\+to\+\_\+string}} (const \doxymbox{\hyperlink{namespacexiao_1_1x86__64_ac1ec2bb04415d84b0aa38d8457e364c6}{CC}} cc) noexcept
+\end{DoxyCompactItemize}
+
+
+\label{isa_2x86_2inst_8hh_doc-define-members}
+\Hypertarget{isa_2x86_2inst_8hh_doc-define-members}
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{isa_2x86_2inst_8hh_abf97fd748fceeb2d055f7033eb373e85}\index{inst.hh@{inst.hh}!DEF@{DEF}}
+\index{DEF@{DEF}!inst.hh@{inst.hh}}
+\doxysubsubsection{\texorpdfstring{DEF}{DEF}}
+{\footnotesize\ttfamily \label{isa_2x86_2inst_8hh_abf97fd748fceeb2d055f7033eb373e85} 
+\+\#define DEF(\begin{DoxyParamCaption}\item[{}]{reg}{}\end{DoxyParamCaption})}
+
+{\bfseries Value:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (\ (\ reg\ ).valid(\ )\ )\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ ops.push\_back(\ codegen::MachOperand::any(\ (\ reg\ ).as\_vreg(\ ),\ codegen::OperandKind::Def,\ codegen::OperandPos::After\ )\ );}
+
+\end{DoxyCode}
+\Hypertarget{isa_2x86_2inst_8hh_ac57cf59b9485daafc53dbaea4bbb5898}\index{inst.hh@{inst.hh}!USE@{USE}}
+\index{USE@{USE}!inst.hh@{inst.hh}}
+\doxysubsubsection{\texorpdfstring{USE}{USE}}
+{\footnotesize\ttfamily \label{isa_2x86_2inst_8hh_ac57cf59b9485daafc53dbaea4bbb5898} 
+\+\#define USE(\begin{DoxyParamCaption}\item[{}]{reg}{}\end{DoxyParamCaption})}
+
+{\bfseries Value:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (\ (\ reg\ ).valid(\ )\ )\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ ops.push\_back(\ codegen::MachOperand::any(\ (\ reg\ ).as\_vreg(\ ),\ codegen::OperandKind::Use,\ codegen::OperandPos::Before\ )\ );}
+
+\end{DoxyCode}
+\Hypertarget{isa_2x86_2inst_8hh_ab94714eefc1ac827f556f97e5454c696}\index{inst.hh@{inst.hh}!USEDEF@{USEDEF}}
+\index{USEDEF@{USEDEF}!inst.hh@{inst.hh}}
+\doxysubsubsection{\texorpdfstring{USEDEF}{USEDEF}}
+{\footnotesize\ttfamily \label{isa_2x86_2inst_8hh_ab94714eefc1ac827f556f97e5454c696} 
+\+\#define USEDEF(\begin{DoxyParamCaption}\item[{}]{reg}{}\end{DoxyParamCaption})}
+
+{\bfseries Value:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordflow}{if}\ (\ (\ reg\ ).valid(\ )\ )\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ ops.push\_back(\ codegen::MachOperand::any(\ (\ reg\ ).as\_vreg(\ ),\ codegen::OperandKind::UseDef,\ codegen::OperandPos::After\ )\ );}
+
+\end{DoxyCode}
+\Hypertarget{isa_2x86_2inst_8hh_a901313e2e841b281dfc12df905fa979a}\index{inst.hh@{inst.hh}!XIAO\_OPERANDS@{XIAO\_OPERANDS}}
+\index{XIAO\_OPERANDS@{XIAO\_OPERANDS}!inst.hh@{inst.hh}}
+\doxysubsubsection{\texorpdfstring{XIAO\_OPERANDS}{XIAO\_OPERANDS}}
+{\footnotesize\ttfamily \label{isa_2x86_2inst_8hh_a901313e2e841b281dfc12df905fa979a} 
+\+\#define XIAO\+\_\+\+OPERANDS(\begin{DoxyParamCaption}\item[{}]{}...{}\end{DoxyParamCaption})}
+
+{\bfseries Value:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{void}\ get\_operands(\ std::vector<\ codegen::MachOperand\ >\ \&ops\ )\ \textcolor{keyword}{const}\ \(\backslash\)}
+\DoxyCodeLine{\{\ \_\_VA\_ARGS\_\_\ \}}
+
+\end{DoxyCode}

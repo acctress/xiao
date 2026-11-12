@@ -1,0 +1,39 @@
+\doxysection{verifier.\+hh}
+\hypertarget{verifier_8hh_source}{}\label{verifier_8hh_source}\index{include/xiao/ir/verifier.hh@{include/xiao/ir/verifier.hh}}
+\doxymbox{\hyperlink{verifier_8hh}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{//}}
+\DoxyCodeLine{00002\ \textcolor{comment}{//\ Created\ by\ griffith\ on\ 18/10/2026.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ <\doxymbox{\hyperlink{visitor_8hh}{xiao/ir/visitor.hh}}>}}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \textcolor{keyword}{namespace\ }\doxymbox{\hyperlink{namespacexiao_1_1ir}{xiao::ir}}\ \{}
+\DoxyCodeLine{00011\ \ \ \ \ \textcolor{keyword}{struct\ }\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRVerifier}{IRVerifier}}\ :\ \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor}{IRVisitor}}<IRVerifier>\ \{}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \ \ \textcolor{keyword}{struct\ }\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRVerifier_1_1Err}{Err}}\ \{}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ \ \ \ \ std::string\ \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRVerifier_1_1Err_adc1643f854eb4398290a537cce36b6fd}{msg}};}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ std::vector<Err>\ \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRVerifier_a53b7218a8f92d8627f370aa6ae64569c}{errs}};}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ [[nodiscard]]\ \textcolor{keywordtype}{bool}\ \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRVerifier_a1cf32d113bf21a8cc3d6e8b416e16797}{ok}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRVerifier_a53b7218a8f92d8627f370aa6ae64569c}{errs}}.empty();\ \}}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRVerifier_a3dd30c5fc929dc13b40e6f756146daa9}{on\_block\_end}}(\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}}\&\ fn,\ \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock}{IRBlock}}\&\ block)\ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (block.\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock_a6f163dc9f4f3461a945b9cfc813a84ee}{insts\_count}}\ ==\ 0)\ \{}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRVerifier_a53b7218a8f92d8627f370aa6ae64569c}{errs}}.push\_back(\{\ \textcolor{stringliteral}{"{}block\ is\ empty,\ no\ terminator."{}}\ \});}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ l\ =\ fn.\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction_a9b3350a1b06230af1f6943a3d192966f}{insts}}[block.\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock_aa86fb675610af17513433f1606a8244d}{insts\_offset}}+block.\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock_a6f163dc9f4f3461a945b9cfc813a84ee}{insts\_count}}-\/1];}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{bool}\ is\_term\ =\ l.op\ ==\ \doxymbox{\hyperlink{namespacexiao_1_1ir_ac329aef04cbbc2fe87693b471e87edf4a2cb9df9898e55fd0ad829dc202ddbd1c}{IROp::ret}}}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ||\ l.op\ ==\ \doxymbox{\hyperlink{namespacexiao_1_1ir_ac329aef04cbbc2fe87693b471e87edf4adc634e2072827fe0b5be9a2063390544}{IROp::br}}}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ||\ l.op\ ==\ \doxymbox{\hyperlink{namespacexiao_1_1ir_ac329aef04cbbc2fe87693b471e87edf4aade2f43ecd49341c7a1934e0dd9293bf}{IROp::brif}};}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!is\_term)\ \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRVerifier_a53b7218a8f92d8627f370aa6ae64569c}{errs}}.push\_back(\{\ std::format(\textcolor{stringliteral}{"{}block\ does\ not\ end\ with\ a\ terminator:\ \{\}"{}},\ l)\ \});}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00033\ \ \ \ \ \};}
+\DoxyCodeLine{00034\ \}}
+
+\end{DoxyCode}

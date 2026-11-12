@@ -1,0 +1,23 @@
+var searchData=
+[
+  ['r10_0',['R10',['../namespacexiao_1_1x86__64.html#a096e8af795e247ccc04a4758a53581fe',1,'xiao::x86_64']]],
+  ['r11_1',['R11',['../namespacexiao_1_1x86__64.html#a6bad661dc1fdfd9bda14fe58614492fc',1,'xiao::x86_64']]],
+  ['r12_2',['R12',['../namespacexiao_1_1x86__64.html#a235f876a69779badef59835dcaeb514a',1,'xiao::x86_64']]],
+  ['r13_3',['R13',['../namespacexiao_1_1x86__64.html#a685304743c74980aa149f46c79a45133',1,'xiao::x86_64']]],
+  ['r14_4',['R14',['../namespacexiao_1_1x86__64.html#a009896c55b28cbeaa6da0b580974b49b',1,'xiao::x86_64']]],
+  ['r15_5',['R15',['../namespacexiao_1_1x86__64.html#a1c8ecedc53c8afa437e21f8f8454ceee',1,'xiao::x86_64']]],
+  ['r8_6',['R8',['../namespacexiao_1_1x86__64.html#ab85c30963553d2c2f83bd750cec5bcbe',1,'xiao::x86_64']]],
+  ['r9_7',['R9',['../namespacexiao_1_1x86__64.html#ab71935065058d27aa144313cecf3b88f',1,'xiao::x86_64']]],
+  ['rax_8',['RAX',['../namespacexiao_1_1x86__64.html#abbdce0d6d6dccfbefb321e6bfaf0cbf7',1,'xiao::x86_64']]],
+  ['rbp_9',['RBP',['../namespacexiao_1_1x86__64.html#aab9be1dd17065f006d7a59cfa7d667df',1,'xiao::x86_64']]],
+  ['rbx_10',['RBX',['../namespacexiao_1_1x86__64.html#abdf4c5db6c5e980a49dbafc0120b7c94',1,'xiao::x86_64']]],
+  ['rcx_11',['RCX',['../namespacexiao_1_1x86__64.html#a62d790f2b2c1dc9f417ebcfb841bdfc7',1,'xiao::x86_64']]],
+  ['rdi_12',['RDI',['../namespacexiao_1_1x86__64.html#adf7f0bb517995b1be09bd97b39a63b32',1,'xiao::x86_64']]],
+  ['rdx_13',['RDX',['../namespacexiao_1_1x86__64.html#aeb5089e7100d0888ddbdd273dfdada38',1,'xiao::x86_64']]],
+  ['reg_14',['reg',['../structxiao_1_1x86__64_1_1inst_1_1DummyUse.html#a70ee16310e3a8dad8d4d4baf145822c3',1,'xiao::x86_64::inst::DummyUse']]],
+  ['result_15',['result',['../structxiao_1_1ir_1_1IRInst.html#a6e2b8ae52cf6647e821d5f392adbbca2',1,'xiao::ir::IRInst']]],
+  ['ret_16',['ret',['../structxiao_1_1ir_1_1IRSig.html#a786e71a953e5e9dea6da6b7989951525',1,'xiao::ir::IRSig']]],
+  ['rets_17',['rets',['../structxiao_1_1codegen_1_1ABISig.html#af8ea312c237654579435d59a2a2b83c9',1,'xiao::codegen::ABISig']]],
+  ['rsi_18',['RSI',['../namespacexiao_1_1x86__64.html#ab6907731f0c0708833c6d1a22d8e6d66',1,'xiao::x86_64']]],
+  ['rsp_19',['RSP',['../namespacexiao_1_1x86__64.html#ac1438ce908f9f0f7fd4169a91ceb0762',1,'xiao::x86_64']]]
+];

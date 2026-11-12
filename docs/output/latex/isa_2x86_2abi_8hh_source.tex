@@ -1,0 +1,126 @@
+\doxysection{abi.\+hh}
+\hypertarget{isa_2x86_2abi_8hh_source}{}\label{isa_2x86_2abi_8hh_source}\index{include/xiao/isa/x86/abi.hh@{include/xiao/isa/x86/abi.hh}}
+\doxymbox{\hyperlink{isa_2x86_2abi_8hh}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00002\ }
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ <\doxymbox{\hyperlink{codegen_2abi_8hh}{xiao/codegen/abi.hh}}>}}
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ <\doxymbox{\hyperlink{isa_2x86_2reg_8hh}{xiao/isa/x86/reg.hh}}>}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <utility>}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ \textcolor{keyword}{namespace\ }\doxymbox{\hyperlink{namespacexiao_1_1x86__64}{xiao::x86\_64}}\ \{}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \ \ \ \ \textcolor{keyword}{using\ namespace\ }\doxymbox{\hyperlink{namespacexiao_1_1codegen}{codegen}};}
+\DoxyCodeLine{00010\ }
+\DoxyCodeLine{00011\ \ \ \ \ \textcolor{keyword}{struct\ }\doxymbox{\hyperlink{structxiao_1_1x86__64_1_1X86ABISpec}{X86ABISpec}}\ final\ :\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1ABISpec}{ABISpec}}\ \{}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1ABISig}{ABISig}}\ \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1X86ABISpec_a05e894c0693e8b1a0444c7c7d5a923c5}{compute}}(}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{namespacexiao_1_1codegen_af1ef83d221f63efda2cdf4265f9db8c8}{CallConv}}\ cc,\ }
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \ \ \ \ std::span<const\ ir::Type>\ params,\ }
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \ \ \ \ std::span<const\ ir::Type>\ rets}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ )\textcolor{keyword}{\ const\ override\ }\{}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (cc)\ \{}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ CallConv::SystemV:\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ compute\_sysv(params,\ rets);}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ CallConv::WindowsFastcall:\ \textcolor{keywordflow}{return}\ compute\_fastcall(params,\ rets);}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \ \ \ \ std::unreachable();}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}}\ k\_sysv\_int\_args[]\ \ \ =\ \{\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_adf7f0bb517995b1be09bd97b39a63b32}{RDI}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_ab6907731f0c0708833c6d1a22d8e6d66}{RSI}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_aeb5089e7100d0888ddbdd273dfdada38}{RDX}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a62d790f2b2c1dc9f417ebcfb841bdfc7}{RCX}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_ab85c30963553d2c2f83bd750cec5bcbe}{R8}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_ab71935065058d27aa144313cecf3b88f}{R9}}\ \};}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ PReg\ k\_sysv\_float\_args[]\ \ =\ \{\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a69614015cfc805ba8e8f99883e521b21}{XMM0}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a6f6bbf1201fcb10e4d0066c28b4aea33}{XMM1}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_aadd70c5b0abf2af5b6443de0fb0d12bc}{XMM2}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a972321e8589eb95e70d163f7f2b35bf9}{XMM3}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a91b50e095a72d4de8711e18540339e04}{XMM4}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a173da9b07c485d2beaeee67f6386b9c4}{XMM5}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a70c6f13560ccdd784abae0253f7f79a0}{XMM6}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_abfa9d542b3addae94d8a13ee548f8608}{XMM7}}\ \};}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ PReg\ k\_sysv\_int\_rets[]\ \ \ =\ \{\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_abbdce0d6d6dccfbefb321e6bfaf0cbf7}{RAX}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_aeb5089e7100d0888ddbdd273dfdada38}{RDX}}\ \};}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ PReg\ k\_sysv\_float\_rets[]\ =\ \{\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a69614015cfc805ba8e8f99883e521b21}{XMM0}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a6f6bbf1201fcb10e4d0066c28b4aea33}{XMM1}}\ \};}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ PReg\ k\_win64\_int\_args[]\ \ \ =\ \{\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a62d790f2b2c1dc9f417ebcfb841bdfc7}{RCX}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_aeb5089e7100d0888ddbdd273dfdada38}{RDX}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_ab85c30963553d2c2f83bd750cec5bcbe}{R8}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_ab71935065058d27aa144313cecf3b88f}{R9}}\ \};}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ PReg\ k\_win64\_float\_args[]\ =\ \{\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a69614015cfc805ba8e8f99883e521b21}{XMM0}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a6f6bbf1201fcb10e4d0066c28b4aea33}{XMM1}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_aadd70c5b0abf2af5b6443de0fb0d12bc}{XMM2}},\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a972321e8589eb95e70d163f7f2b35bf9}{XMM3}}\ \};}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ PReg\ k\_win64\_int\_rets[]\ \ \ =\ \{\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_abbdce0d6d6dccfbefb321e6bfaf0cbf7}{RAX}}\ \};}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ PReg\ k\_win64\_float\_rets[]\ =\ \{\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a69614015cfc805ba8e8f99883e521b21}{XMM0}}\ \};}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ [[nodiscard]]\ \textcolor{keyword}{static}\ ABISig\ compute\_sysv(}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ std::span<const\ ir::Type>\ params,}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ std::span<const\ ir::Type>\ rets}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ )\ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ ABISig\ sig;}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ sig.stack\_align\ =\ 16;}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ uint32\_t\ next\_int\ \ \ =\ 0;}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ uint32\_t\ next\_float\ =\ 0;}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ \ stack\_off\ \ =\ 0;}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ ty\ :\ params)\ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_float(ty))\ \{}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (next\_float\ <\ std::size(k\_sysv\_float\_args))\ \{}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sig.params.push\_back(\{\ k\_sysv\_float\_args[next\_float++],\ ty\ \});}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sig.params.push\_back(\{\ stack\_off,\ ty\ \});}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ stack\_off\ +=\ 8;}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (next\_int\ <\ std::size(k\_sysv\_int\_args))\ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sig.params.push\_back(\{\ k\_sysv\_int\_args[next\_int++],\ ty\ \});}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sig.params.push\_back(\{\ stack\_off,\ ty\ \});}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ stack\_off\ +=\ 8;}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ sig.stack\_arg\_bytes\ =\ \textcolor{keyword}{static\_cast<}uint32\_t\textcolor{keyword}{>}(stack\_off);}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ ty\ :\ rets)\ \{}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_float(ty))\ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sig.rets.push\_back(\{\ k\_sysv\_float\_rets[0],\ ty\ \});}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sig.rets.push\_back(\{\ k\_sysv\_int\_rets[0],\ ty\ \});}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ sig;}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ [[nodiscard]]\ \textcolor{keyword}{static}\ ABISig\ compute\_fastcall(}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \ \ \ \ std::span<const\ ir::Type>\ params,}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ std::span<const\ ir::Type>\ rets}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ )\ \{}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ ABISig\ sig;}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ sig.stack\_align\ =\ 16;}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ int32\_t\ stack\_off\ =\ 32;}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (uint32\_t\ i\ =\ 0;\ i\ <\ params.size();\ ++i)\ \{}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ ty\ =\ params[i];}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i\ <\ 4)\ \{}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ preg\ =\ is\_float(ty)\ ?\ k\_win64\_float\_args[i]}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ k\_win64\_int\_args[i];}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sig.params.push\_back(\{\ preg,\ ty\ \});}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sig.params.push\_back(\{\ stack\_off,\ ty\ \});}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ stack\_off\ +=\ 8;}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ sig.stack\_arg\_bytes\ =\ \textcolor{keyword}{static\_cast<}uint32\_t\textcolor{keyword}{>}(stack\_off);}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ ty\ :\ rets)\ \{}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (is\_float(ty))\ \{}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sig.rets.push\_back(\{\ k\_win64\_float\_rets[0],\ ty\ \});}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ sig.rets.push\_back(\{\ k\_win64\_int\_rets[0],\ ty\ \});}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00106\ }
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ sig;}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00109\ }
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ [[nodiscard]]\ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{bool}\ is\_float(\textcolor{keyword}{const}\ \doxymbox{\hyperlink{namespacexiao_1_1ir_a307713cf4121f80d62a84fb66835ef8f}{ir::Type}}\ ty)\ \textcolor{keyword}{noexcept}\ \{}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ty\ ==\ \doxymbox{\hyperlink{namespacexiao_1_1ir_a307713cf4121f80d62a84fb66835ef8fa714b98e0a797e8f119f257a4ab802f86}{ir::Type::f64}};}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00113\ \ \ \ \ \};}
+\DoxyCodeLine{00114\ }
+\DoxyCodeLine{00115\ \ \ \ \ [[nodiscard]]\ \textcolor{keyword}{inline}\ \textcolor{keyword}{const}\ \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1X86ABISpec}{X86ABISpec}}\&\ \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a2704ea512abc33470a300917f26bee7e}{host\_abi}}()\ noexcept\ \{}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1X86ABISpec}{X86ABISpec}}\ k\_spec;}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ k\_spec;}
+\DoxyCodeLine{00118\ \ \ \ \ \}}
+\DoxyCodeLine{00119\ }
+\DoxyCodeLine{00120\ \}}
+
+\end{DoxyCode}

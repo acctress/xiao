@@ -1,0 +1,63 @@
+\doxysection{xiao::codegen::Machine\+Env Struct Reference}
+\hypertarget{structxiao_1_1codegen_1_1MachineEnv}{}\label{structxiao_1_1codegen_1_1MachineEnv}\index{xiao::codegen::MachineEnv@{xiao::codegen::MachineEnv}}
+
+
+Register environment for a target ISA, register allocation facing Describes which registers the allocator may use and in what order.  
+
+
+
+
+{\ttfamily \+\#include $<$machenv.\+hh$>$}
+
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std::\+array$<$ std::\+span$<$ const \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} $>$, 2 $>$ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachineEnv_a060fff6b902f9b2156d8f316e577e35f}{preferred}}
+\begin{DoxyCompactList}\small\item\em Registers the allocator would prefer to use. \end{DoxyCompactList}\item 
+std::\+array$<$ std::\+span$<$ const \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} $>$, 2 $>$ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachineEnv_a8e73695d6cfb27ae0490fa0a05ef2ef3}{non\+\_\+preferred}}
+\begin{DoxyCompactList}\small\item\em Registers the allocator would use to fallback when preferred are exhausted. \end{DoxyCompactList}\item 
+std::\+array$<$ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}}, 2 $>$ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachineEnv_a848a1670b134280024056f8ad5108250}{scratch}}
+\begin{DoxyCompactList}\small\item\em One scratch register per class, reserved for spill. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Register environment for a target ISA, register allocation facing Describes which registers the allocator may use and in what order. 
+
+\label{structxiao_1_1codegen_1_1MachineEnv_doc-variable-members}
+\Hypertarget{structxiao_1_1codegen_1_1MachineEnv_doc-variable-members}
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structxiao_1_1codegen_1_1MachineEnv_a8e73695d6cfb27ae0490fa0a05ef2ef3}\index{xiao::codegen::MachineEnv@{xiao::codegen::MachineEnv}!non\_preferred@{non\_preferred}}
+\index{non\_preferred@{non\_preferred}!xiao::codegen::MachineEnv@{xiao::codegen::MachineEnv}}
+\doxysubsubsection{\texorpdfstring{non\_preferred}{non\_preferred}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1MachineEnv_a8e73695d6cfb27ae0490fa0a05ef2ef3} 
+std::\+array$<$std::\+span$<$const \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}}$>$, 2$>$ xiao::\+codegen::\+\+Machine\+Env::\+non\+\_\+preferred}
+
+
+
+Registers the allocator would use to fallback when preferred are exhausted. 
+
+\Hypertarget{structxiao_1_1codegen_1_1MachineEnv_a060fff6b902f9b2156d8f316e577e35f}\index{xiao::codegen::MachineEnv@{xiao::codegen::MachineEnv}!preferred@{preferred}}
+\index{preferred@{preferred}!xiao::codegen::MachineEnv@{xiao::codegen::MachineEnv}}
+\doxysubsubsection{\texorpdfstring{preferred}{preferred}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1MachineEnv_a060fff6b902f9b2156d8f316e577e35f} 
+std::\+array$<$std::\+span$<$const \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}}$>$, 2$>$ xiao::\+codegen::\+\+Machine\+Env::\+preferred}
+
+
+
+Registers the allocator would prefer to use. 
+
+\Hypertarget{structxiao_1_1codegen_1_1MachineEnv_a848a1670b134280024056f8ad5108250}\index{xiao::codegen::MachineEnv@{xiao::codegen::MachineEnv}!scratch@{scratch}}
+\index{scratch@{scratch}!xiao::codegen::MachineEnv@{xiao::codegen::MachineEnv}}
+\doxysubsubsection{\texorpdfstring{scratch}{scratch}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1MachineEnv_a848a1670b134280024056f8ad5108250} 
+std::\+array$<$\doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}}, 2$>$ xiao::\+codegen::\+\+Machine\+Env::\+scratch}
+
+
+
+One scratch register per class, reserved for spill. 
+
+
+
+The documentation for this struct was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+include/\+xiao/\+codegen/\doxymbox{\hyperlink{codegen_2machenv_8hh}{machenv.\+hh}}\end{DoxyCompactItemize}

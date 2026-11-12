@@ -1,0 +1,107 @@
+\doxysection{vcode.\+hh}
+\hypertarget{vcode_8hh_source}{}\label{vcode_8hh_source}\index{include/xiao/codegen/vcode.hh@{include/xiao/codegen/vcode.hh}}
+\doxymbox{\hyperlink{vcode_8hh}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{//}}
+\DoxyCodeLine{00002\ \textcolor{comment}{//\ Created\ by\ griffith\ on\ 18/10/2026.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ <\doxymbox{\hyperlink{operand_8hh}{xiao/codegen/operand.hh}}>}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ <\doxymbox{\hyperlink{machinst_8hh}{xiao/codegen/machinst.hh}}>}}
+\DoxyCodeLine{00009\ }
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#include\ <cstdint>}}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#include\ <span>}}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\#include\ <utility>}}
+\DoxyCodeLine{00014\ }
+\DoxyCodeLine{00015\ \textcolor{keyword}{namespace\ }\doxymbox{\hyperlink{namespacexiao_1_1codegen}{xiao::codegen}}\ \{}
+\DoxyCodeLine{00016\ }
+\DoxyCodeLine{00018\ \ \ \ \ \textcolor{keyword}{struct\ }\doxymbox{\hyperlink{structxiao_1_1codegen_1_1BlockId}{BlockId}}\ \{\ uint32\_t\ \textcolor{keywordtype}{id}\ \{\};\ \};}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00021\ \ \ \ \ \textcolor{keyword}{struct\ }\doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCodeBlock}{VCodeBlock}}\ \{}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ uint32\_t\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCodeBlock_ac1907f0a1daa64bb503b444cdf55d24b}{insts\_offset}}\ \ \ \{\};}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ uint16\_t\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCodeBlock_aa032fa30c4161e04ba5fad10f1a6d465}{insts\_count}}\ \ \ \ \{\};}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ uint32\_t\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCodeBlock_ad9e9480e0bc9116ac05b3cc91f6f2f2f}{succs\_offset}}\ \ \ \{\};}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ uint8\_t\ \ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCodeBlock_a234a6c230be2e47f75ce8105d1326199}{succs\_count}}\ \ \ \ \{\};}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ uint32\_t\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCodeBlock_a53ca69239b3144e3c0ebbf05a852ffec}{params\_offset}}\ \ \{\};}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ uint16\_t\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCodeBlock_a761aa6e8058e3ab079954b17e9cb093d}{params\_count}}\ \ \ \{\};}
+\DoxyCodeLine{00028\ \ \ \ \ \};}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00031\ \ \ \ \ \textcolor{keyword}{template}\ <MachInstC\ I>}
+\DoxyCodeLine{00032\ \ \ \ \ \textcolor{keyword}{struct\ }\doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCode}{VCode}}\ \{}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ std::vector<I>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCode_aa28631a917137e37eeaeafa4c59b8974}{insts}};}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ std::vector<MachOperand>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCode_ad606751528c929a0e879c1418479a45f}{operands}};}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ std::vector<std::pair<uint32\_t,uint32\_t>>\ \ \ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCode_a24b828fa6b93db064300badd1d10bbc1}{operand\_ranges}};}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ std::vector<VCodeBlock>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCode_ab5028e985396fcf853afc28c83610c65}{blocks}};}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ std::vector<VReg>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCode_adf2abbfa661a3bc03cd4579e5a46d4a4}{block\_params}};}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ std::vector<VReg>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCode_a1cc53c3779da73529c14eaa37d6eca55}{branch\_block\_args}};}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ std::vector<BlockId>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCode_a12337709a88ad0557d7882e5d525f922}{succs}};}
+\DoxyCodeLine{00040\ \ \ \ \ \};}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00043\ \ \ \ \ \textcolor{keyword}{template}\ <MachInstC\ I>}
+\DoxyCodeLine{00044\ \ \ \ \ \textcolor{keyword}{class\ }\doxymbox{\hyperlink{classxiao_1_1codegen_1_1VCodeBuilder}{VCodeBuilder}}\ \{}
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ [[nodiscard]]\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1BlockId}{BlockId}}\ \doxymbox{\hyperlink{classxiao_1_1codegen_1_1VCodeBuilder_a6911846cb1e5b0d7013241559f60ec08}{start\_block}}(\textcolor{keyword}{const}\ std::span<const\ VReg>\ params\ =\ \{\})\ \{}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ \textcolor{keywordtype}{id}\ =\ \textcolor{keyword}{static\_cast<}uint32\_t\textcolor{keyword}{>}(m\_blocks.size());}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCodeBlock}{VCodeBlock}}\ b\ \{\ \};}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ b.\doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCodeBlock_a53ca69239b3144e3c0ebbf05a852ffec}{params\_offset}}\ =\ \textcolor{keyword}{static\_cast<}uint32\_t\textcolor{keyword}{>}(m\_block\_params.size());}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ b.\doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCodeBlock_a761aa6e8058e3ab079954b17e9cb093d}{params\_count}}\ \ =\ \textcolor{keyword}{static\_cast<}uint16\_t\textcolor{keyword}{>}(params.size());}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ b.\doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCodeBlock_ad9e9480e0bc9116ac05b3cc91f6f2f2f}{succs\_offset}}\ \ =\ \textcolor{keyword}{static\_cast<}uint32\_t\textcolor{keyword}{>}(m\_succs.size());}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ b.\doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCodeBlock_ac1907f0a1daa64bb503b444cdf55d24b}{insts\_offset}}\ \ =\ \textcolor{keyword}{static\_cast<}uint32\_t\textcolor{keyword}{>}(m\_insts.size());}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ vr\ :\ params)\ m\_block\_params.push\_back(vr);}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ m\_blocks.push\_back(b);}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ BlockId\{\ \textcolor{keywordtype}{id}\ \};}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \doxymbox{\hyperlink{classxiao_1_1codegen_1_1VCodeBuilder_a88d5fc0f568961ce5bcdf6b07ca34645}{end\_block}}(}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::span<const\ BlockId>\ succs,}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ std::span<const\ VReg>\ \ \ \ branch\_args\ =\ \{\}}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ )\ \{}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\&\ b\ =\ m\_blocks[m\_cur.\doxymbox{\hyperlink{structxiao_1_1codegen_1_1BlockId_aceeb147642594a5c6821d3f209ff63db}{id}}];}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ b.\doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCodeBlock_aa032fa30c4161e04ba5fad10f1a6d465}{insts\_count}}\ =\ \textcolor{keyword}{static\_cast<}uint16\_t\textcolor{keyword}{>}(m\_insts.size()\ -\/\ b.\doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCodeBlock_ac1907f0a1daa64bb503b444cdf55d24b}{insts\_offset}});}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ b.\doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCodeBlock_a234a6c230be2e47f75ce8105d1326199}{succs\_count}}\ =\ \textcolor{keyword}{static\_cast<}uint8\_t\textcolor{keyword}{>}(succs.size());}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ s\ \ :\ succs)\ \ \ \ \ \ \ m\_succs.push\_back(s);}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ vr\ :\ branch\_args)\ m\_branch\_block\_args.push\_back(vr);}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \doxymbox{\hyperlink{classxiao_1_1codegen_1_1VCodeBuilder_a4cc040dc3ebdf2ff9565b98b355642a5}{set\_block}}(\textcolor{keyword}{const}\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1BlockId}{BlockId}}\ block)\ \{\ m\_cur\ =\ block;\ \}}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \doxymbox{\hyperlink{classxiao_1_1codegen_1_1VCodeBuilder_a812a571075dfdfbe339f280c8c689e7f}{push}}(I\ inst)\ \{}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ ops\_offset\ =\ \textcolor{keyword}{static\_cast<}uint32\_t\textcolor{keyword}{>}(m\_operands.size());}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \ \ \ \ inst.get\_operands(m\_operands);}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\ ops\_count\ =\ \textcolor{keyword}{static\_cast<}uint32\_t\textcolor{keyword}{>}(m\_operands.size())\ -\/\ ops\_offset;}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \ \ \ \ m\_operand\_ranges.emplace\_back(ops\_offset,\ ops\_count);}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \ \ \ \ m\_insts.push\_back(std::move(inst));}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ [[nodiscard]]\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCode}{VCode<I>}}\ \doxymbox{\hyperlink{classxiao_1_1codegen_1_1VCodeBuilder_ae325c87f659a3fc0de11dcc77de55899}{finalise}}()\ \&\&\ \{}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCode}{VCode<I>}}\{}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .insts\ \ \ \ \ \ \ \ \ \ \ \ \ =\ std::move(m\_insts),}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .operands\ \ \ \ \ \ \ \ \ \ =\ std::move(m\_operands),}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .operand\_ranges\ \ \ \ =\ std::move(m\_operand\_ranges),}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .blocks\ \ \ \ \ \ \ \ \ \ \ \ =\ std::move(m\_blocks),}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .block\_params\ \ \ \ \ \ =\ std::move(m\_block\_params),}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .branch\_block\_args\ =\ std::move(m\_branch\_block\_args),}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .succs\ \ \ \ \ \ \ \ \ \ \ \ \ =\ std::move(m\_succs),}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00099\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1BlockId}{BlockId}}\ m\_cur\ \{\ \};}
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ std::vector<I>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_insts;}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ std::vector<MachOperand>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_operands;}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ std::vector<std::pair<uint32\_t,\ uint32\_t>>\ \ m\_operand\_ranges;}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ std::vector<VCodeBlock>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_blocks;}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ std::vector<VReg>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_block\_params;}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ std::vector<VReg>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_branch\_block\_args;}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ std::vector<BlockId>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_succs;}
+\DoxyCodeLine{00109\ \ \ \ \ \};}
+\DoxyCodeLine{00110\ \}}
+
+\end{DoxyCode}

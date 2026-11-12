@@ -1,0 +1,100 @@
+\doxysection{xiao::ir::IRBlock Struct Reference}
+\hypertarget{structxiao_1_1ir_1_1IRBlock}{}\label{structxiao_1_1ir_1_1IRBlock}\index{xiao::ir::IRBlock@{xiao::ir::IRBlock}}
+
+
+A basic block in IR CFG.  
+
+
+
+
+{\ttfamily \+\#include $<$block.\+hh$>$}
+
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+uint32\+\_\+t \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock_aa86fb675610af17513433f1606a8244d}{insts\+\_\+offset}} \{\}
+\item 
+uint16\+\_\+t \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock_a6f163dc9f4f3461a945b9cfc813a84ee}{insts\+\_\+count}} \{\}
+\begin{DoxyCompactList}\small\item\em Offset into owning \doxylink{structxiao_1_1ir_1_1IRFunction}{IRFunction}\textquotesingle{}s instruction pool. \end{DoxyCompactList}\item 
+uint32\+\_\+t \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock_a1e0991618dc16766b18e69bae55f60b8}{succs\+\_\+offset}} \{\}
+\begin{DoxyCompactList}\small\item\em Count of instructions in this \doxylink{structxiao_1_1ir_1_1IRBlock}{IRBlock}. \end{DoxyCompactList}\item 
+uint8\+\_\+t \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock_ab2e483370d09be918ebe29cdc2afa982}{succs\+\_\+count}} \{\}
+\begin{DoxyCompactList}\small\item\em Offset into owning \doxylink{structxiao_1_1ir_1_1IRFunction}{IRFunction}\textquotesingle{}s successor pool. \end{DoxyCompactList}\item 
+uint32\+\_\+t \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock_a06cdddf3e0605a2e97cda45fcdc00a3b}{params\+\_\+offset}} \{\}
+\begin{DoxyCompactList}\small\item\em Count of successors in this \doxylink{structxiao_1_1ir_1_1IRBlock}{IRBlock}. \end{DoxyCompactList}\item 
+uint16\+\_\+t \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock_ae724eecbcf57fdd5d72da1bb269d379a}{params\+\_\+count}} \{\}
+\begin{DoxyCompactList}\small\item\em Offset into owning \doxylink{structxiao_1_1ir_1_1IRFunction}{IRFunction}\textquotesingle{}s parameters pool. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+A basic block in IR CFG. 
+
+\begin{DoxyNote}{Note}
+Instructions and successor blocks are stored outside of \doxylink{structxiao_1_1ir_1_1IRBlock}{IRBlock} in flat pools on the owning \doxylink{structxiao_1_1ir_1_1IRFunction}{IRFunction}. 
+\end{DoxyNote}
+
+
+\label{structxiao_1_1ir_1_1IRBlock_doc-variable-members}
+\Hypertarget{structxiao_1_1ir_1_1IRBlock_doc-variable-members}
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structxiao_1_1ir_1_1IRBlock_a6f163dc9f4f3461a945b9cfc813a84ee}\index{xiao::ir::IRBlock@{xiao::ir::IRBlock}!insts\_count@{insts\_count}}
+\index{insts\_count@{insts\_count}!xiao::ir::IRBlock@{xiao::ir::IRBlock}}
+\doxysubsubsection{\texorpdfstring{insts\_count}{insts\_count}}
+{\footnotesize\ttfamily \label{structxiao_1_1ir_1_1IRBlock_a6f163dc9f4f3461a945b9cfc813a84ee} 
+uint16\+\_\+t xiao::\+ir::\+\+IRBlock::\+insts\+\_\+count \{\}}
+
+
+
+Offset into owning \doxylink{structxiao_1_1ir_1_1IRFunction}{IRFunction}\textquotesingle{}s instruction pool. 
+
+\Hypertarget{structxiao_1_1ir_1_1IRBlock_aa86fb675610af17513433f1606a8244d}\index{xiao::ir::IRBlock@{xiao::ir::IRBlock}!insts\_offset@{insts\_offset}}
+\index{insts\_offset@{insts\_offset}!xiao::ir::IRBlock@{xiao::ir::IRBlock}}
+\doxysubsubsection{\texorpdfstring{insts\_offset}{insts\_offset}}
+{\footnotesize\ttfamily \label{structxiao_1_1ir_1_1IRBlock_aa86fb675610af17513433f1606a8244d} 
+uint32\+\_\+t xiao::\+ir::\+\+IRBlock::\+insts\+\_\+offset \{\}}
+
+\Hypertarget{structxiao_1_1ir_1_1IRBlock_ae724eecbcf57fdd5d72da1bb269d379a}\index{xiao::ir::IRBlock@{xiao::ir::IRBlock}!params\_count@{params\_count}}
+\index{params\_count@{params\_count}!xiao::ir::IRBlock@{xiao::ir::IRBlock}}
+\doxysubsubsection{\texorpdfstring{params\_count}{params\_count}}
+{\footnotesize\ttfamily \label{structxiao_1_1ir_1_1IRBlock_ae724eecbcf57fdd5d72da1bb269d379a} 
+uint16\+\_\+t xiao::\+ir::\+\+IRBlock::\+params\+\_\+count \{\}}
+
+
+
+Offset into owning \doxylink{structxiao_1_1ir_1_1IRFunction}{IRFunction}\textquotesingle{}s parameters pool. 
+
+\Hypertarget{structxiao_1_1ir_1_1IRBlock_a06cdddf3e0605a2e97cda45fcdc00a3b}\index{xiao::ir::IRBlock@{xiao::ir::IRBlock}!params\_offset@{params\_offset}}
+\index{params\_offset@{params\_offset}!xiao::ir::IRBlock@{xiao::ir::IRBlock}}
+\doxysubsubsection{\texorpdfstring{params\_offset}{params\_offset}}
+{\footnotesize\ttfamily \label{structxiao_1_1ir_1_1IRBlock_a06cdddf3e0605a2e97cda45fcdc00a3b} 
+uint32\+\_\+t xiao::\+ir::\+\+IRBlock::\+params\+\_\+offset \{\}}
+
+
+
+Count of successors in this \doxylink{structxiao_1_1ir_1_1IRBlock}{IRBlock}. 
+
+\Hypertarget{structxiao_1_1ir_1_1IRBlock_ab2e483370d09be918ebe29cdc2afa982}\index{xiao::ir::IRBlock@{xiao::ir::IRBlock}!succs\_count@{succs\_count}}
+\index{succs\_count@{succs\_count}!xiao::ir::IRBlock@{xiao::ir::IRBlock}}
+\doxysubsubsection{\texorpdfstring{succs\_count}{succs\_count}}
+{\footnotesize\ttfamily \label{structxiao_1_1ir_1_1IRBlock_ab2e483370d09be918ebe29cdc2afa982} 
+uint8\+\_\+t xiao::\+ir::\+\+IRBlock::\+succs\+\_\+count \{\}}
+
+
+
+Offset into owning \doxylink{structxiao_1_1ir_1_1IRFunction}{IRFunction}\textquotesingle{}s successor pool. 
+
+\Hypertarget{structxiao_1_1ir_1_1IRBlock_a1e0991618dc16766b18e69bae55f60b8}\index{xiao::ir::IRBlock@{xiao::ir::IRBlock}!succs\_offset@{succs\_offset}}
+\index{succs\_offset@{succs\_offset}!xiao::ir::IRBlock@{xiao::ir::IRBlock}}
+\doxysubsubsection{\texorpdfstring{succs\_offset}{succs\_offset}}
+{\footnotesize\ttfamily \label{structxiao_1_1ir_1_1IRBlock_a1e0991618dc16766b18e69bae55f60b8} 
+uint32\+\_\+t xiao::\+ir::\+\+IRBlock::\+succs\+\_\+offset \{\}}
+
+
+
+Count of instructions in this \doxylink{structxiao_1_1ir_1_1IRBlock}{IRBlock}. 
+
+
+
+The documentation for this struct was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+include/\+xiao/\+ir/\doxymbox{\hyperlink{block_8hh}{block.\+hh}}\end{DoxyCompactItemize}

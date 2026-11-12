@@ -1,0 +1,228 @@
+\doxysection{xiao::support::Arena Class Reference}
+\hypertarget{classxiao_1_1support_1_1Arena}{}\label{classxiao_1_1support_1_1Arena}\index{xiao::support::Arena@{xiao::support::Arena}}
+
+
+{\ttfamily \+\#include $<$arena.\+hh$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{classxiao_1_1support_1_1Arena_aaf21771bde9a04db2bc98bc181d79665}{Arena}} (const std::\+size\+\_\+t slab\+\_\+size=\doxymbox{\hyperlink{classxiao_1_1support_1_1Arena_a537d1ef24d7c2a3dc3ee47384d168c80}{default\+\_\+slab\+\_\+size}}) noexcept
+\item 
+\doxymbox{\hyperlink{classxiao_1_1support_1_1Arena_a5718b1a172041a912201bda4fe54a73a}{Arena}} (Arena \&\&) noexcept=default
+\item 
+\doxymbox{\hyperlink{classxiao_1_1support_1_1Arena_aaf21771bde9a04db2bc98bc181d79665}{Arena}} \& \doxymbox{\hyperlink{classxiao_1_1support_1_1Arena_a5ca009351d2d9bb4798bab7ee0e18458}{operator=}} (\doxymbox{\hyperlink{classxiao_1_1support_1_1Arena_aaf21771bde9a04db2bc98bc181d79665}{Arena}} \&\&) noexcept=default
+\item 
+\doxymbox{\hyperlink{classxiao_1_1support_1_1Arena_a8a6766a681df77d3155358c5cae09528}{Arena}} (const Arena \&)=delete
+\item 
+\doxymbox{\hyperlink{classxiao_1_1support_1_1Arena_aaf21771bde9a04db2bc98bc181d79665}{Arena}} \& \doxymbox{\hyperlink{classxiao_1_1support_1_1Arena_a96d6aaf87f646f8240eab7d561afe8e9}{operator=}} (const \doxymbox{\hyperlink{classxiao_1_1support_1_1Arena_aaf21771bde9a04db2bc98bc181d79665}{Arena}} \&)=delete
+\item 
+\doxymbox{\hyperlink{classxiao_1_1support_1_1Arena_abd5d8613a2f9755c71c63eb2a8bd9191}{\texorpdfstring{$\sim$}{\string~}\+Arena}} ()=default
+\item 
+void \texorpdfstring{$\ast$}{*} \doxymbox{\hyperlink{classxiao_1_1support_1_1Arena_ad03545fcfd01bc9e92d9878ebc098d58}{allocate}} (const std::\+size\+\_\+t size, const std::\+size\+\_\+t align=alignof(std::\+max\+\_\+align\+\_\+t))
+\item 
+{\footnotesize template$<$typename T, typename... Args$>$ \newline
+requires std::\+is\+\_\+constructible\+\_\+v$<$T, Args...$>$ \&\& std::\+is\+\_\+trivially\+\_\+destructible\+\_\+v$<$T$>$}\\T \texorpdfstring{$\ast$}{*} \doxymbox{\hyperlink{classxiao_1_1support_1_1Arena_a7e8bdb7cc018875d345c16385048c819}{alloc}} (Args \&\&... args)
+\begin{DoxyCompactList}\small\item\em Typed allocation of T, constructed in place. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename T$>$ \newline
+requires std::\+is\+\_\+trivially\+\_\+destructible\+\_\+v$<$T$>$}\\std::\+span$<$ T $>$ \doxymbox{\hyperlink{classxiao_1_1support_1_1Arena_a802aa78c8932ec0e0f330548d68a7b69}{alloc\+\_\+array}} (const std::\+size\+\_\+t n)
+\begin{DoxyCompactList}\small\item\em N default initialised array of T. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename T$>$ \newline
+requires std::\+is\+\_\+trivially\+\_\+destructible\+\_\+v$<$T$>$}\\std::\+span$<$ T $>$ \doxymbox{\hyperlink{classxiao_1_1support_1_1Arena_ade1f4e8a0c5077a24a0c9139e4c35ca9}{alloc\+\_\+array\+\_\+uninit}} (const std::\+size\+\_\+t n)
+\begin{DoxyCompactList}\small\item\em N uninitialised array of T. \end{DoxyCompactList}\item 
+std::\+string\+\_\+view \doxymbox{\hyperlink{classxiao_1_1support_1_1Arena_a97dfb63c983d8240f73f4d94aecf163b}{alloc\+\_\+str}} (const std::\+string\+\_\+view sv)
+\begin{DoxyCompactList}\small\item\em Copies {\ttfamily sv} into the arena and returns a string\+\_\+view over it. \end{DoxyCompactList}\item 
+\doxymbox{\hyperlink{structxiao_1_1support_1_1Checkpoint}{Checkpoint}} \doxymbox{\hyperlink{classxiao_1_1support_1_1Arena_a3470b5059aefb3a67567164da75d9b34}{mark}} () const noexcept
+\begin{DoxyCompactList}\small\item\em Save the current bump position to a \doxylink{structxiao_1_1support_1_1Checkpoint}{Checkpoint}. \end{DoxyCompactList}\item 
+void \doxymbox{\hyperlink{classxiao_1_1support_1_1Arena_aac62b431cbfc03e17ad3485cdf8d73d1}{rewind}} (const \doxymbox{\hyperlink{structxiao_1_1support_1_1Checkpoint}{Checkpoint}} \&c) noexcept
+\begin{DoxyCompactList}\small\item\em Rewind to a checkpoint, discarding all allocations made after a {\ttfamily \doxylink{classxiao_1_1support_1_1Arena_a3470b5059aefb3a67567164da75d9b34}{mark}}. \end{DoxyCompactList}\item 
+void \doxymbox{\hyperlink{classxiao_1_1support_1_1Arena_a71d6abae603e3eacb1e83230c4f9932b}{reset}} () noexcept
+\begin{DoxyCompactList}\small\item\em Reset all slabs without releasing memory. \end{DoxyCompactList}\item 
+void \doxymbox{\hyperlink{classxiao_1_1support_1_1Arena_a3adfd523246a8e11cff0255044a80bf2}{release}} () noexcept
+\begin{DoxyCompactList}\small\item\em Release all slabs. \end{DoxyCompactList}\item 
+std::\+size\+\_\+t \doxymbox{\hyperlink{classxiao_1_1support_1_1Arena_a118cd159f8e0a6aef630ebcb15c28ada}{slab\+\_\+count}} () const noexcept
+\item 
+std::\+size\+\_\+t \doxymbox{\hyperlink{classxiao_1_1support_1_1Arena_a21769c4a2218b80d6ffc1793cac1d1fd}{bytes\+\_\+allocated}} () const noexcept
+\item 
+std::\+size\+\_\+t \doxymbox{\hyperlink{classxiao_1_1support_1_1Arena_a3d7d5f7756d93866770ff463f55ac809}{bytes\+\_\+used}} () const noexcept
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr std::\+size\+\_\+t \doxymbox{\hyperlink{classxiao_1_1support_1_1Arena_a537d1ef24d7c2a3dc3ee47384d168c80}{default\+\_\+slab\+\_\+size}} = 4096 \texorpdfstring{$\ast$}{*} 4
+\end{DoxyCompactItemize}
+
+
+\label{classxiao_1_1support_1_1Arena_doc-constructors}
+\Hypertarget{classxiao_1_1support_1_1Arena_doc-constructors}
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classxiao_1_1support_1_1Arena_aaf21771bde9a04db2bc98bc181d79665}\index{xiao::support::Arena@{xiao::support::Arena}!Arena@{Arena}}
+\index{Arena@{Arena}!xiao::support::Arena@{xiao::support::Arena}}
+\doxysubsubsection{\texorpdfstring{Arena()}{Arena()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{classxiao_1_1support_1_1Arena_aaf21771bde9a04db2bc98bc181d79665} 
+xiao::\+support::\+\+Arena::\+\+Arena (\begin{DoxyParamCaption}\item[{const std::\+size\+\_\+t}]{slab\+\_\+size}{ = {\ttfamily \doxymbox{\hyperlink{classxiao_1_1support_1_1Arena_a537d1ef24d7c2a3dc3ee47384d168c80}{default\+\_\+slab\+\_\+size}}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}, {\ttfamily [noexcept]}}
+
+\Hypertarget{classxiao_1_1support_1_1Arena_a5718b1a172041a912201bda4fe54a73a}\index{xiao::support::Arena@{xiao::support::Arena}!Arena@{Arena}}
+\index{Arena@{Arena}!xiao::support::Arena@{xiao::support::Arena}}
+\doxysubsubsection{\texorpdfstring{Arena()}{Arena()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{classxiao_1_1support_1_1Arena_a5718b1a172041a912201bda4fe54a73a} 
+xiao::\+support::\+\+Arena::\+\+Arena (\begin{DoxyParamCaption}\item[{Arena \&\&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}, {\ttfamily [noexcept]}}
+
+\Hypertarget{classxiao_1_1support_1_1Arena_a8a6766a681df77d3155358c5cae09528}\index{xiao::support::Arena@{xiao::support::Arena}!Arena@{Arena}}
+\index{Arena@{Arena}!xiao::support::Arena@{xiao::support::Arena}}
+\doxysubsubsection{\texorpdfstring{Arena()}{Arena()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{classxiao_1_1support_1_1Arena_a8a6766a681df77d3155358c5cae09528} 
+xiao::\+support::\+\+Arena::\+\+Arena (\begin{DoxyParamCaption}\item[{const Arena \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+\Hypertarget{classxiao_1_1support_1_1Arena_abd5d8613a2f9755c71c63eb2a8bd9191}\index{xiao::support::Arena@{xiao::support::Arena}!````~Arena@{\texorpdfstring{$\sim$}{\string~}Arena}}
+\index{````~Arena@{\texorpdfstring{$\sim$}{\string~}Arena}!xiao::support::Arena@{xiao::support::Arena}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}Arena()}{\string~Arena()}}
+{\footnotesize\ttfamily \label{classxiao_1_1support_1_1Arena_abd5d8613a2f9755c71c63eb2a8bd9191} 
+xiao::\+support::\+\+Arena::\+\texorpdfstring{$\sim$}{\string~}\+Arena (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}}
+
+
+
+\label{classxiao_1_1support_1_1Arena_doc-func-members}
+\Hypertarget{classxiao_1_1support_1_1Arena_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classxiao_1_1support_1_1Arena_a7e8bdb7cc018875d345c16385048c819}\index{xiao::support::Arena@{xiao::support::Arena}!alloc@{alloc}}
+\index{alloc@{alloc}!xiao::support::Arena@{xiao::support::Arena}}
+\doxysubsubsection{\texorpdfstring{alloc()}{alloc()}}
+{\footnotesize\ttfamily \label{classxiao_1_1support_1_1Arena_a7e8bdb7cc018875d345c16385048c819} 
+template$<$typename T, typename... Args$>$ \newline
+requires std::\+is\+\_\+constructible\+\_\+v$<$T, Args...$>$ \&\& std::\+is\+\_\+trivially\+\_\+destructible\+\_\+v$<$T$>$\\
+T \texorpdfstring{$\ast$}{*} xiao::\+support::\+\+Arena::\+alloc (\begin{DoxyParamCaption}\item[{Args \&\&...}]{args}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}}
+
+
+
+Typed allocation of T, constructed in place. 
+
+\Hypertarget{classxiao_1_1support_1_1Arena_a802aa78c8932ec0e0f330548d68a7b69}\index{xiao::support::Arena@{xiao::support::Arena}!alloc\_array@{alloc\_array}}
+\index{alloc\_array@{alloc\_array}!xiao::support::Arena@{xiao::support::Arena}}
+\doxysubsubsection{\texorpdfstring{alloc\_array()}{alloc\_array()}}
+{\footnotesize\ttfamily \label{classxiao_1_1support_1_1Arena_a802aa78c8932ec0e0f330548d68a7b69} 
+template$<$typename T$>$ \newline
+requires std::\+is\+\_\+trivially\+\_\+destructible\+\_\+v$<$T$>$\\
+std::\+span$<$ T $>$ xiao::\+support::\+\+Arena::\+alloc\+\_\+array (\begin{DoxyParamCaption}\item[{const std::\+size\+\_\+t}]{n}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}}
+
+
+
+N default initialised array of T. 
+
+\Hypertarget{classxiao_1_1support_1_1Arena_ade1f4e8a0c5077a24a0c9139e4c35ca9}\index{xiao::support::Arena@{xiao::support::Arena}!alloc\_array\_uninit@{alloc\_array\_uninit}}
+\index{alloc\_array\_uninit@{alloc\_array\_uninit}!xiao::support::Arena@{xiao::support::Arena}}
+\doxysubsubsection{\texorpdfstring{alloc\_array\_uninit()}{alloc\_array\_uninit()}}
+{\footnotesize\ttfamily \label{classxiao_1_1support_1_1Arena_ade1f4e8a0c5077a24a0c9139e4c35ca9} 
+template$<$typename T$>$ \newline
+requires std::\+is\+\_\+trivially\+\_\+destructible\+\_\+v$<$T$>$\\
+std::\+span$<$ T $>$ xiao::\+support::\+\+Arena::\+alloc\+\_\+array\+\_\+uninit (\begin{DoxyParamCaption}\item[{const std::\+size\+\_\+t}]{n}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}}
+
+
+
+N uninitialised array of T. 
+
+\Hypertarget{classxiao_1_1support_1_1Arena_a97dfb63c983d8240f73f4d94aecf163b}\index{xiao::support::Arena@{xiao::support::Arena}!alloc\_str@{alloc\_str}}
+\index{alloc\_str@{alloc\_str}!xiao::support::Arena@{xiao::support::Arena}}
+\doxysubsubsection{\texorpdfstring{alloc\_str()}{alloc\_str()}}
+{\footnotesize\ttfamily \label{classxiao_1_1support_1_1Arena_a97dfb63c983d8240f73f4d94aecf163b} 
+std::\+string\+\_\+view xiao::\+support::\+\+Arena::\+alloc\+\_\+str (\begin{DoxyParamCaption}\item[{const std::\+string\+\_\+view}]{sv}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}}
+
+
+
+Copies {\ttfamily sv} into the arena and returns a string\+\_\+view over it. 
+
+\begin{DoxyNote}{Note}
+The returned {\ttfamily string\+\_\+view}\textquotesingle{}s lifetime is the same as the \doxylink{classxiao_1_1support_1_1Arena}{Arena}\textquotesingle{}s lifetime. 
+\end{DoxyNote}
+\Hypertarget{classxiao_1_1support_1_1Arena_ad03545fcfd01bc9e92d9878ebc098d58}\index{xiao::support::Arena@{xiao::support::Arena}!allocate@{allocate}}
+\index{allocate@{allocate}!xiao::support::Arena@{xiao::support::Arena}}
+\doxysubsubsection{\texorpdfstring{allocate()}{allocate()}}
+{\footnotesize\ttfamily \label{classxiao_1_1support_1_1Arena_ad03545fcfd01bc9e92d9878ebc098d58} 
+void \texorpdfstring{$\ast$}{*} xiao::\+support::\+\+Arena::\+allocate (\begin{DoxyParamCaption}\item[{const std::\+size\+\_\+t}]{size}{, }\item[{const std::\+size\+\_\+t}]{align}{ = {\ttfamily alignof(std::max\_align\_t)}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}}
+
+\Hypertarget{classxiao_1_1support_1_1Arena_a21769c4a2218b80d6ffc1793cac1d1fd}\index{xiao::support::Arena@{xiao::support::Arena}!bytes\_allocated@{bytes\_allocated}}
+\index{bytes\_allocated@{bytes\_allocated}!xiao::support::Arena@{xiao::support::Arena}}
+\doxysubsubsection{\texorpdfstring{bytes\_allocated()}{bytes\_allocated()}}
+{\footnotesize\ttfamily \label{classxiao_1_1support_1_1Arena_a21769c4a2218b80d6ffc1793cac1d1fd} 
+std::\+size\+\_\+t xiao::\+support::\+\+Arena::\+bytes\+\_\+allocated (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}, {\ttfamily [noexcept]}}
+
+\Hypertarget{classxiao_1_1support_1_1Arena_a3d7d5f7756d93866770ff463f55ac809}\index{xiao::support::Arena@{xiao::support::Arena}!bytes\_used@{bytes\_used}}
+\index{bytes\_used@{bytes\_used}!xiao::support::Arena@{xiao::support::Arena}}
+\doxysubsubsection{\texorpdfstring{bytes\_used()}{bytes\_used()}}
+{\footnotesize\ttfamily \label{classxiao_1_1support_1_1Arena_a3d7d5f7756d93866770ff463f55ac809} 
+std::\+size\+\_\+t xiao::\+support::\+\+Arena::\+bytes\+\_\+used (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}, {\ttfamily [noexcept]}}
+
+\Hypertarget{classxiao_1_1support_1_1Arena_a3470b5059aefb3a67567164da75d9b34}\index{xiao::support::Arena@{xiao::support::Arena}!mark@{mark}}
+\index{mark@{mark}!xiao::support::Arena@{xiao::support::Arena}}
+\doxysubsubsection{\texorpdfstring{mark()}{mark()}}
+{\footnotesize\ttfamily \label{classxiao_1_1support_1_1Arena_a3470b5059aefb3a67567164da75d9b34} 
+\doxymbox{\hyperlink{structxiao_1_1support_1_1Checkpoint}{Checkpoint}} xiao::\+support::\+\+Arena::\+mark (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}, {\ttfamily [noexcept]}}
+
+
+
+Save the current bump position to a \doxylink{structxiao_1_1support_1_1Checkpoint}{Checkpoint}. 
+
+\Hypertarget{classxiao_1_1support_1_1Arena_a5ca009351d2d9bb4798bab7ee0e18458}\index{xiao::support::Arena@{xiao::support::Arena}!operator=@{operator=}}
+\index{operator=@{operator=}!xiao::support::Arena@{xiao::support::Arena}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classxiao_1_1support_1_1Arena_a5ca009351d2d9bb4798bab7ee0e18458} 
+\doxymbox{\hyperlink{classxiao_1_1support_1_1Arena_aaf21771bde9a04db2bc98bc181d79665}{Arena}} \& xiao::\+support::\+\+Arena::\+operator= (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{classxiao_1_1support_1_1Arena_aaf21771bde9a04db2bc98bc181d79665}{Arena}} \&\&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}, {\ttfamily [noexcept]}}
+
+\Hypertarget{classxiao_1_1support_1_1Arena_a96d6aaf87f646f8240eab7d561afe8e9}\index{xiao::support::Arena@{xiao::support::Arena}!operator=@{operator=}}
+\index{operator=@{operator=}!xiao::support::Arena@{xiao::support::Arena}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classxiao_1_1support_1_1Arena_a96d6aaf87f646f8240eab7d561afe8e9} 
+\doxymbox{\hyperlink{classxiao_1_1support_1_1Arena_aaf21771bde9a04db2bc98bc181d79665}{Arena}} \& xiao::\+support::\+\+Arena::\+operator= (\begin{DoxyParamCaption}\item[{const \doxymbox{\hyperlink{classxiao_1_1support_1_1Arena_aaf21771bde9a04db2bc98bc181d79665}{Arena}} \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+\Hypertarget{classxiao_1_1support_1_1Arena_a3adfd523246a8e11cff0255044a80bf2}\index{xiao::support::Arena@{xiao::support::Arena}!release@{release}}
+\index{release@{release}!xiao::support::Arena@{xiao::support::Arena}}
+\doxysubsubsection{\texorpdfstring{release()}{release()}}
+{\footnotesize\ttfamily \label{classxiao_1_1support_1_1Arena_a3adfd523246a8e11cff0255044a80bf2} 
+void xiao::\+support::\+\+Arena::\+release (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Release all slabs. 
+
+\Hypertarget{classxiao_1_1support_1_1Arena_a71d6abae603e3eacb1e83230c4f9932b}\index{xiao::support::Arena@{xiao::support::Arena}!reset@{reset}}
+\index{reset@{reset}!xiao::support::Arena@{xiao::support::Arena}}
+\doxysubsubsection{\texorpdfstring{reset()}{reset()}}
+{\footnotesize\ttfamily \label{classxiao_1_1support_1_1Arena_a71d6abae603e3eacb1e83230c4f9932b} 
+void xiao::\+support::\+\+Arena::\+reset (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Reset all slabs without releasing memory. 
+
+\Hypertarget{classxiao_1_1support_1_1Arena_aac62b431cbfc03e17ad3485cdf8d73d1}\index{xiao::support::Arena@{xiao::support::Arena}!rewind@{rewind}}
+\index{rewind@{rewind}!xiao::support::Arena@{xiao::support::Arena}}
+\doxysubsubsection{\texorpdfstring{rewind()}{rewind()}}
+{\footnotesize\ttfamily \label{classxiao_1_1support_1_1Arena_aac62b431cbfc03e17ad3485cdf8d73d1} 
+void xiao::\+support::\+\+Arena::\+rewind (\begin{DoxyParamCaption}\item[{const \doxymbox{\hyperlink{structxiao_1_1support_1_1Checkpoint}{Checkpoint}} \&}]{c}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Rewind to a checkpoint, discarding all allocations made after a {\ttfamily \doxylink{classxiao_1_1support_1_1Arena_a3470b5059aefb3a67567164da75d9b34}{mark}}. 
+
+\Hypertarget{classxiao_1_1support_1_1Arena_a118cd159f8e0a6aef630ebcb15c28ada}\index{xiao::support::Arena@{xiao::support::Arena}!slab\_count@{slab\_count}}
+\index{slab\_count@{slab\_count}!xiao::support::Arena@{xiao::support::Arena}}
+\doxysubsubsection{\texorpdfstring{slab\_count()}{slab\_count()}}
+{\footnotesize\ttfamily \label{classxiao_1_1support_1_1Arena_a118cd159f8e0a6aef630ebcb15c28ada} 
+std::\+size\+\_\+t xiao::\+support::\+\+Arena::\+slab\+\_\+count (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}, {\ttfamily [noexcept]}}
+
+
+
+\label{classxiao_1_1support_1_1Arena_doc-variable-members}
+\Hypertarget{classxiao_1_1support_1_1Arena_doc-variable-members}
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classxiao_1_1support_1_1Arena_a537d1ef24d7c2a3dc3ee47384d168c80}\index{xiao::support::Arena@{xiao::support::Arena}!default\_slab\_size@{default\_slab\_size}}
+\index{default\_slab\_size@{default\_slab\_size}!xiao::support::Arena@{xiao::support::Arena}}
+\doxysubsubsection{\texorpdfstring{default\_slab\_size}{default\_slab\_size}}
+{\footnotesize\ttfamily \label{classxiao_1_1support_1_1Arena_a537d1ef24d7c2a3dc3ee47384d168c80} 
+std::\+size\+\_\+t xiao::\+support::\+\+Arena::\+default\+\_\+slab\+\_\+size = 4096 \texorpdfstring{$\ast$}{*} 4\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+The documentation for this class was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+include/\+xiao/\+support/\doxymbox{\hyperlink{arena_8hh}{arena.\+hh}}\end{DoxyCompactItemize}

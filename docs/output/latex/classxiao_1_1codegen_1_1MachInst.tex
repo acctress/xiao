@@ -1,0 +1,199 @@
+\doxysection{xiao::codegen::Mach\+Inst\texorpdfstring{$<$}{<} Derived, Label\+Use \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classxiao_1_1codegen_1_1MachInst}{}\label{classxiao_1_1codegen_1_1MachInst}\index{xiao::codegen::MachInst$<$ Derived, LabelUse $>$@{xiao::codegen::MachInst$<$ Derived, LabelUse $>$}}
+
+
+CRTP base for a \doxylink{classxiao_1_1codegen_1_1MachInst}{Mach\+Inst} contract.  
+
+
+
+
+{\ttfamily \+\#include $<$machinst.\+hh$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst_a51b6f32e73f7f8b99fecd9b3d5cdbbdf}{get\+\_\+operands}} (std::\+vector$<$ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand}{Mach\+Operand}} $>$ \&ops)
+\begin{DoxyCompactList}\small\item\em Collect all register operands into {\ttfamily ops}. \end{DoxyCompactList}\item 
+\doxymbox{\hyperlink{namespacexiao_1_1codegen_aa722ecb0ef0a99616802a913e5e3c008}{Mach\+Terminator}} \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst_af6e8b9f5bcbf25332c1806f98cab4df4}{is\+\_\+term}} () const noexcept
+\begin{DoxyCompactList}\small\item\em How this instruction ends its block. \end{DoxyCompactList}\item 
+std::\+optional$<$ std::\+pair$<$ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg}{Reg}}, \doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg}{Reg}} $>$ $>$ \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst_a4740caa2f92e7f56a277901fbf95a3a5}{as\+\_\+move}} () const noexcept
+\begin{DoxyCompactList}\small\item\em Is this a pure reg to reg move, if so return dst and src. \end{DoxyCompactList}\item 
+bool \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst_ab82e15ad7da93dc984c74aa93c0028f5}{is\+\_\+mem\+\_\+access}} () const noexcept
+\begin{DoxyCompactList}\small\item\em Does this instruction access memory? \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename State, typename Info$>$ }\\void \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst_af0fdc6d5c16c93ac26d84413048904d2}{emit}} (std::\+vector$<$ uint8\+\_\+t $>$ \&buf, const Info \&info, State \&state) const =delete
+\begin{DoxyCompactList}\small\item\em Emit this instruction into {\ttfamily buf}. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename State$>$ }\\std::\+string \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst_a756d5504aee44cd1b8e02aef0eeb31a6}{fmt}} (State \&state) const =delete
+\begin{DoxyCompactList}\small\item\em Return a formatted, readable representation of this instruction. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static Derived \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst_ac37dab25054f1451edc9022bb38eadba}{gen\+\_\+move}} (\doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg}{Reg}} dst, \doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg}{Reg}} src, \doxymbox{\hyperlink{namespacexiao_1_1ir_a307713cf4121f80d62a84fb66835ef8f}{ir::\+\+Type}} ty)=delete
+\begin{DoxyCompactList}\small\item\em Generate a reg to reg move of the given type. \end{DoxyCompactList}\item 
+static Derived \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst_af741e85d07c49ca621c5b415e9fc4622}{gen\+\_\+dummy\+\_\+use}} (\doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg}{Reg}} reg)=delete
+\begin{DoxyCompactList}\small\item\em Generate a dummy use of reg to keep it alive. \end{DoxyCompactList}\item 
+static Derived \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst_ac02ecc42e201155b159150a9bb93541f}{gen\+\_\+jump}} (uint32\+\_\+t target)=delete
+\begin{DoxyCompactList}\small\item\em Generate an unconditional jump to {\ttfamily target}. \end{DoxyCompactList}\item 
+static Derived \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst_aed9f73229e4fd3c264157651e48579eb}{gen\+\_\+nop}} (std::\+size\+\_\+t preferred\+\_\+size)=delete
+\begin{DoxyCompactList}\small\item\em Generate a nop of at most {\ttfamily preferred\+\_\+size}. \end{DoxyCompactList}\item 
+static constexpr uint32\+\_\+t \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst_a125e4ee9087decb7366b6671530d5cda}{worst\+\_\+case\+\_\+size}} ()=delete
+\begin{DoxyCompactList}\small\item\em Worst case byte size of an instruction. \end{DoxyCompactList}\item 
+static constexpr uint32\+\_\+t \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst_ad528741da5ee6ea95555d4265079d8bb}{worst\+\_\+case\+\_\+island\+\_\+growth}} ()=delete
+\begin{DoxyCompactList}\small\item\em Worse case additional is;land growth per instruction. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename Derived, typename Label\+Use$>$\newline
+class xiao::\+codegen::\+\+Mach\+Inst$<$ Derived, Label\+Use $>$}
+CRTP base for a \doxylink{classxiao_1_1codegen_1_1MachInst}{Mach\+Inst} contract. 
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Derived} & The concrete instruction type \\
+\hline
+{\em Label\+Use} & A type describing label reference fixup kinds \\
+\hline
+\end{DoxyTemplParams}
+
+
+\label{classxiao_1_1codegen_1_1MachInst_doc-func-members}
+\Hypertarget{classxiao_1_1codegen_1_1MachInst_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classxiao_1_1codegen_1_1MachInst_a4740caa2f92e7f56a277901fbf95a3a5}\index{xiao::codegen::MachInst$<$ Derived, LabelUse $>$@{xiao::codegen::MachInst$<$ Derived, LabelUse $>$}!as\_move@{as\_move}}
+\index{as\_move@{as\_move}!xiao::codegen::MachInst$<$ Derived, LabelUse $>$@{xiao::codegen::MachInst$<$ Derived, LabelUse $>$}}
+\doxysubsubsection{\texorpdfstring{as\_move()}{as\_move()}}
+{\footnotesize\ttfamily \label{classxiao_1_1codegen_1_1MachInst_a4740caa2f92e7f56a277901fbf95a3a5} 
+template$<$typename Derived, typename Label\+Use$>$ \\
+std::\+optional$<$ std::\+pair$<$ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg}{Reg}}, \doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg}{Reg}} $>$ $>$ \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst}{xiao::\+codegen::\+\+Mach\+Inst}}$<$ Derived, Label\+Use $>$::\+as\+\_\+move (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}, {\ttfamily [noexcept]}}
+
+
+
+Is this a pure reg to reg move, if so return dst and src. 
+
+\Hypertarget{classxiao_1_1codegen_1_1MachInst_af0fdc6d5c16c93ac26d84413048904d2}\index{xiao::codegen::MachInst$<$ Derived, LabelUse $>$@{xiao::codegen::MachInst$<$ Derived, LabelUse $>$}!emit@{emit}}
+\index{emit@{emit}!xiao::codegen::MachInst$<$ Derived, LabelUse $>$@{xiao::codegen::MachInst$<$ Derived, LabelUse $>$}}
+\doxysubsubsection{\texorpdfstring{emit()}{emit()}}
+{\footnotesize\ttfamily \label{classxiao_1_1codegen_1_1MachInst_af0fdc6d5c16c93ac26d84413048904d2} 
+template$<$typename Derived, typename Label\+Use$>$ \\
+template$<$typename State, typename Info$>$ \\
+void \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst}{xiao::\+codegen::\+\+Mach\+Inst}}$<$ Derived, Label\+Use $>$::\+emit (\begin{DoxyParamCaption}\item[{std::\+vector$<$ uint8\+\_\+t $>$ \&}]{buf}{, }\item[{const Info \&}]{info}{, }\item[{State \&}]{state}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [delete]}}
+
+
+
+Emit this instruction into {\ttfamily buf}. 
+
+\Hypertarget{classxiao_1_1codegen_1_1MachInst_a756d5504aee44cd1b8e02aef0eeb31a6}\index{xiao::codegen::MachInst$<$ Derived, LabelUse $>$@{xiao::codegen::MachInst$<$ Derived, LabelUse $>$}!fmt@{fmt}}
+\index{fmt@{fmt}!xiao::codegen::MachInst$<$ Derived, LabelUse $>$@{xiao::codegen::MachInst$<$ Derived, LabelUse $>$}}
+\doxysubsubsection{\texorpdfstring{fmt()}{fmt()}}
+{\footnotesize\ttfamily \label{classxiao_1_1codegen_1_1MachInst_a756d5504aee44cd1b8e02aef0eeb31a6} 
+template$<$typename Derived, typename Label\+Use$>$ \\
+template$<$typename State$>$ \\
+std::\+string \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst}{xiao::\+codegen::\+\+Mach\+Inst}}$<$ Derived, Label\+Use $>$::\+fmt (\begin{DoxyParamCaption}\item[{State \&}]{state}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [nodiscard]}, {\ttfamily [delete]}}
+
+
+
+Return a formatted, readable representation of this instruction. 
+
+\Hypertarget{classxiao_1_1codegen_1_1MachInst_af741e85d07c49ca621c5b415e9fc4622}\index{xiao::codegen::MachInst$<$ Derived, LabelUse $>$@{xiao::codegen::MachInst$<$ Derived, LabelUse $>$}!gen\_dummy\_use@{gen\_dummy\_use}}
+\index{gen\_dummy\_use@{gen\_dummy\_use}!xiao::codegen::MachInst$<$ Derived, LabelUse $>$@{xiao::codegen::MachInst$<$ Derived, LabelUse $>$}}
+\doxysubsubsection{\texorpdfstring{gen\_dummy\_use()}{gen\_dummy\_use()}}
+{\footnotesize\ttfamily \label{classxiao_1_1codegen_1_1MachInst_af741e85d07c49ca621c5b415e9fc4622} 
+template$<$typename Derived, typename Label\+Use$>$ \\
+Derived \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst}{xiao::\+codegen::\+\+Mach\+Inst}}$<$ Derived, Label\+Use $>$::\+gen\+\_\+dummy\+\_\+use (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg}{Reg}}}]{reg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [nodiscard]}, {\ttfamily [delete]}}
+
+
+
+Generate a dummy use of reg to keep it alive. 
+
+\Hypertarget{classxiao_1_1codegen_1_1MachInst_ac02ecc42e201155b159150a9bb93541f}\index{xiao::codegen::MachInst$<$ Derived, LabelUse $>$@{xiao::codegen::MachInst$<$ Derived, LabelUse $>$}!gen\_jump@{gen\_jump}}
+\index{gen\_jump@{gen\_jump}!xiao::codegen::MachInst$<$ Derived, LabelUse $>$@{xiao::codegen::MachInst$<$ Derived, LabelUse $>$}}
+\doxysubsubsection{\texorpdfstring{gen\_jump()}{gen\_jump()}}
+{\footnotesize\ttfamily \label{classxiao_1_1codegen_1_1MachInst_ac02ecc42e201155b159150a9bb93541f} 
+template$<$typename Derived, typename Label\+Use$>$ \\
+Derived \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst}{xiao::\+codegen::\+\+Mach\+Inst}}$<$ Derived, Label\+Use $>$::\+gen\+\_\+jump (\begin{DoxyParamCaption}\item[{uint32\+\_\+t}]{target}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [nodiscard]}, {\ttfamily [delete]}}
+
+
+
+Generate an unconditional jump to {\ttfamily target}. 
+
+\Hypertarget{classxiao_1_1codegen_1_1MachInst_ac37dab25054f1451edc9022bb38eadba}\index{xiao::codegen::MachInst$<$ Derived, LabelUse $>$@{xiao::codegen::MachInst$<$ Derived, LabelUse $>$}!gen\_move@{gen\_move}}
+\index{gen\_move@{gen\_move}!xiao::codegen::MachInst$<$ Derived, LabelUse $>$@{xiao::codegen::MachInst$<$ Derived, LabelUse $>$}}
+\doxysubsubsection{\texorpdfstring{gen\_move()}{gen\_move()}}
+{\footnotesize\ttfamily \label{classxiao_1_1codegen_1_1MachInst_ac37dab25054f1451edc9022bb38eadba} 
+template$<$typename Derived, typename Label\+Use$>$ \\
+Derived \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst}{xiao::\+codegen::\+\+Mach\+Inst}}$<$ Derived, Label\+Use $>$::\+gen\+\_\+move (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg}{Reg}}}]{dst}{, }\item[{\doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg}{Reg}}}]{src}{, }\item[{\doxymbox{\hyperlink{namespacexiao_1_1ir_a307713cf4121f80d62a84fb66835ef8f}{ir::\+\+Type}}}]{ty}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [nodiscard]}, {\ttfamily [delete]}}
+
+
+
+Generate a reg to reg move of the given type. 
+
+\Hypertarget{classxiao_1_1codegen_1_1MachInst_aed9f73229e4fd3c264157651e48579eb}\index{xiao::codegen::MachInst$<$ Derived, LabelUse $>$@{xiao::codegen::MachInst$<$ Derived, LabelUse $>$}!gen\_nop@{gen\_nop}}
+\index{gen\_nop@{gen\_nop}!xiao::codegen::MachInst$<$ Derived, LabelUse $>$@{xiao::codegen::MachInst$<$ Derived, LabelUse $>$}}
+\doxysubsubsection{\texorpdfstring{gen\_nop()}{gen\_nop()}}
+{\footnotesize\ttfamily \label{classxiao_1_1codegen_1_1MachInst_aed9f73229e4fd3c264157651e48579eb} 
+template$<$typename Derived, typename Label\+Use$>$ \\
+Derived \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst}{xiao::\+codegen::\+\+Mach\+Inst}}$<$ Derived, Label\+Use $>$::\+gen\+\_\+nop (\begin{DoxyParamCaption}\item[{std::\+size\+\_\+t}]{preferred\+\_\+size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [nodiscard]}, {\ttfamily [delete]}}
+
+
+
+Generate a nop of at most {\ttfamily preferred\+\_\+size}. 
+
+\Hypertarget{classxiao_1_1codegen_1_1MachInst_a51b6f32e73f7f8b99fecd9b3d5cdbbdf}\index{xiao::codegen::MachInst$<$ Derived, LabelUse $>$@{xiao::codegen::MachInst$<$ Derived, LabelUse $>$}!get\_operands@{get\_operands}}
+\index{get\_operands@{get\_operands}!xiao::codegen::MachInst$<$ Derived, LabelUse $>$@{xiao::codegen::MachInst$<$ Derived, LabelUse $>$}}
+\doxysubsubsection{\texorpdfstring{get\_operands()}{get\_operands()}}
+{\footnotesize\ttfamily \label{classxiao_1_1codegen_1_1MachInst_a51b6f32e73f7f8b99fecd9b3d5cdbbdf} 
+template$<$typename Derived, typename Label\+Use$>$ \\
+void \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst}{xiao::\+codegen::\+\+Mach\+Inst}}$<$ Derived, Label\+Use $>$::\+get\+\_\+operands (\begin{DoxyParamCaption}\item[{std::\+vector$<$ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand}{Mach\+Operand}} $>$ \&}]{ops}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Collect all register operands into {\ttfamily ops}. 
+
+\Hypertarget{classxiao_1_1codegen_1_1MachInst_ab82e15ad7da93dc984c74aa93c0028f5}\index{xiao::codegen::MachInst$<$ Derived, LabelUse $>$@{xiao::codegen::MachInst$<$ Derived, LabelUse $>$}!is\_mem\_access@{is\_mem\_access}}
+\index{is\_mem\_access@{is\_mem\_access}!xiao::codegen::MachInst$<$ Derived, LabelUse $>$@{xiao::codegen::MachInst$<$ Derived, LabelUse $>$}}
+\doxysubsubsection{\texorpdfstring{is\_mem\_access()}{is\_mem\_access()}}
+{\footnotesize\ttfamily \label{classxiao_1_1codegen_1_1MachInst_ab82e15ad7da93dc984c74aa93c0028f5} 
+template$<$typename Derived, typename Label\+Use$>$ \\
+bool \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst}{xiao::\+codegen::\+\+Mach\+Inst}}$<$ Derived, Label\+Use $>$::\+is\+\_\+mem\+\_\+access (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}, {\ttfamily [noexcept]}}
+
+
+
+Does this instruction access memory? 
+
+\Hypertarget{classxiao_1_1codegen_1_1MachInst_af6e8b9f5bcbf25332c1806f98cab4df4}\index{xiao::codegen::MachInst$<$ Derived, LabelUse $>$@{xiao::codegen::MachInst$<$ Derived, LabelUse $>$}!is\_term@{is\_term}}
+\index{is\_term@{is\_term}!xiao::codegen::MachInst$<$ Derived, LabelUse $>$@{xiao::codegen::MachInst$<$ Derived, LabelUse $>$}}
+\doxysubsubsection{\texorpdfstring{is\_term()}{is\_term()}}
+{\footnotesize\ttfamily \label{classxiao_1_1codegen_1_1MachInst_af6e8b9f5bcbf25332c1806f98cab4df4} 
+template$<$typename Derived, typename Label\+Use$>$ \\
+\doxymbox{\hyperlink{namespacexiao_1_1codegen_aa722ecb0ef0a99616802a913e5e3c008}{Mach\+Terminator}} \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst}{xiao::\+codegen::\+\+Mach\+Inst}}$<$ Derived, Label\+Use $>$::\+is\+\_\+term (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}, {\ttfamily [noexcept]}}
+
+
+
+How this instruction ends its block. 
+
+\Hypertarget{classxiao_1_1codegen_1_1MachInst_ad528741da5ee6ea95555d4265079d8bb}\index{xiao::codegen::MachInst$<$ Derived, LabelUse $>$@{xiao::codegen::MachInst$<$ Derived, LabelUse $>$}!worst\_case\_island\_growth@{worst\_case\_island\_growth}}
+\index{worst\_case\_island\_growth@{worst\_case\_island\_growth}!xiao::codegen::MachInst$<$ Derived, LabelUse $>$@{xiao::codegen::MachInst$<$ Derived, LabelUse $>$}}
+\doxysubsubsection{\texorpdfstring{worst\_case\_island\_growth()}{worst\_case\_island\_growth()}}
+{\footnotesize\ttfamily \label{classxiao_1_1codegen_1_1MachInst_ad528741da5ee6ea95555d4265079d8bb} 
+template$<$typename Derived, typename Label\+Use$>$ \\
+constexpr uint32\+\_\+t \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst}{xiao::\+codegen::\+\+Mach\+Inst}}$<$ Derived, Label\+Use $>$::\+worst\+\_\+case\+\_\+island\+\_\+growth (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [nodiscard]}, {\ttfamily [constexpr]}, {\ttfamily [delete]}}
+
+
+
+Worse case additional is;land growth per instruction. 
+
+\Hypertarget{classxiao_1_1codegen_1_1MachInst_a125e4ee9087decb7366b6671530d5cda}\index{xiao::codegen::MachInst$<$ Derived, LabelUse $>$@{xiao::codegen::MachInst$<$ Derived, LabelUse $>$}!worst\_case\_size@{worst\_case\_size}}
+\index{worst\_case\_size@{worst\_case\_size}!xiao::codegen::MachInst$<$ Derived, LabelUse $>$@{xiao::codegen::MachInst$<$ Derived, LabelUse $>$}}
+\doxysubsubsection{\texorpdfstring{worst\_case\_size()}{worst\_case\_size()}}
+{\footnotesize\ttfamily \label{classxiao_1_1codegen_1_1MachInst_a125e4ee9087decb7366b6671530d5cda} 
+template$<$typename Derived, typename Label\+Use$>$ \\
+constexpr uint32\+\_\+t \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst}{xiao::\+codegen::\+\+Mach\+Inst}}$<$ Derived, Label\+Use $>$::\+worst\+\_\+case\+\_\+size (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [nodiscard]}, {\ttfamily [constexpr]}, {\ttfamily [delete]}}
+
+
+
+Worst case byte size of an instruction. 
+
+
+
+The documentation for this class was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+include/\+xiao/\+codegen/\doxymbox{\hyperlink{machinst_8hh}{machinst.\+hh}}\end{DoxyCompactItemize}
