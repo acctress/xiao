@@ -1,15 +1,59 @@
 #pragma once
 
 #include <xiao/codegen/vcode.hh>
-#include <unordered_set>
+#include <cstdint>
 #include <vector>
+#include <bit>
 
 namespace xiao::regalloc
 {
+    struct VRegSet
+    {
+        std::vector< uint64_t > words { };
+
+        VRegSet( ) = default;
+
+        explicit VRegSet( const std::size_t n ) : words( ( n + 63 ) / 64, 0 ) { }
+
+        void insert( const uint32_t value ) noexcept
+        { words[ value >> 6 ] |= uint64_t { 1 } << ( value & 63 ); }
+
+        [[nodiscard]] bool contains( const uint32_t value ) const noexcept
+        { return value >> 6 < words.size( ) && words[ value >> 6 ] >> ( value & 63 ) & 1; }
+
+        [[nodiscard]] bool empty( ) const noexcept
+        {
+            for ( const auto w : words )
+                if ( w ) return false;
+            return true;
+        }
+
+        template < typename F >
+        void for_each( F&& f ) const
+        {
+            for ( auto i { 0uz }; i < words.size( ); ++i )
+                for ( auto w { words[ i ] }; w; w &= w - 1 ) f( static_cast< uint32_t >( i * 64 + std::countr_zero( w ) ) );
+        }
+
+        [[nodiscard]] std::vector< uint32_t > to_vector( ) const
+        {
+            std::vector< uint32_t > result;
+            for_each(
+                [ & ]( const uint32_t value )
+                {
+                    result.push_back( value );
+                } );
+
+            return result;
+        }
+
+        [[nodiscard]] bool operator== ( const VRegSet& ) const noexcept = default;
+    };
+
     struct BlockLiveness
     {
-        std::unordered_set< uint32_t > live_in { };
-        std::unordered_set< uint32_t > live_out { };
+        VRegSet live_in { };
+        VRegSet live_out { };
     };
 
     struct Liveness
@@ -19,75 +63,55 @@ namespace xiao::regalloc
         template < codegen::MachInstC I >
         [[nodiscard]] static Liveness compute( const codegen::VCode< I >& vc )
         {
-            struct GenKill
+            const auto n_blocks = vc.blocks.size( );
+            const auto n_vregs  = vc.vclasses.size( );
+
+            std::vector< VRegSet > gen( n_blocks, VRegSet { n_vregs } ), kill( n_blocks, VRegSet { n_vregs } );
+
+            for ( auto b { 0uz }; b < n_blocks; ++b )
             {
-                std::unordered_set< uint32_t > gen { }, kill { };
-            };
-
-            std::vector< GenKill > gen_kill( vc.blocks.size( ) );
-
-            for ( auto b { 0u }; b < vc.blocks.size( ); ++b )
-            {
-                const auto& block   = vc.blocks[ b ];
-                auto& [ gen, kill ] = gen_kill[ b ];
-
+                const auto& block = vc.blocks[ b ];
                 for ( auto i { block.insts_offset }; i < block.insts_offset + block.insts_count; ++i )
                 {
-                    const auto [ ops_off, ops_cnt ] = vc.operand_ranges[ i ];
-
-                    for ( auto o { ops_off }; o < ops_off + ops_cnt; ++o )
+                    const auto [ off, cnt ] = vc.operand_ranges[ i ];
+                    for ( auto o { off }; o < off + cnt; ++o )
                     {
                         const auto& op = vc.operands[ o ];
                         const auto  vr = op.vreg( );
 
                         if ( !vr.valid( ) || vr.index( ) < codegen::Reg::pinned_count ) continue;
 
-                        const bool is_use = op.kind( ) == codegen::OperandKind::Use || op.kind( ) == codegen::OperandKind::UseDef;
-                        const bool is_def = op.kind( ) == codegen::OperandKind::Def || op.kind( ) == codegen::OperandKind::UseDef;
-
-                        if ( is_use && !kill.contains( vr.index( ) ) ) gen.insert( vr.index( ) );
-                        if ( is_def ) kill.insert( vr.index( ) );
-                    }
-                }
-            }
-
-            std::vector< std::unordered_set< uint32_t > > live_in( vc.blocks.size( ) );
-            std::vector< std::unordered_set< uint32_t > > live_out( vc.blocks.size( ) );
-
-            bool changed { true };
-            while ( changed )
-            {
-                changed = false;
-
-                for ( auto b { 0u }; b < vc.blocks.size( ); ++b )
-                {
-                    const auto& block = vc.blocks[ b ];
-
-                    std::unordered_set< uint32_t > new_out { };
-                    for ( auto s { block.succs_offset }; s < block.succs_offset + block.succs_count; ++s )
-                        for ( const auto v : live_in[ vc.succs[ s ].id ] ) new_out.insert( v );
-
-                    const auto& [ gen, kill ]             = gen_kill[ b ];
-                    std::unordered_set< uint32_t > new_in = gen;
-                    for ( const auto v : new_out )
-                        if ( !kill.contains( v ) ) new_in.insert( v );
-
-                    if ( new_in != live_in[ b ] || new_out != live_out[ b ] )
-                    {
-                        live_in[ b ]  = std::move( new_in );
-                        live_out[ b ] = std::move( new_out );
-                        changed       = true;
+                        if ( op.kind( ) != codegen::OperandKind::Def && !kill[ b ].contains( vr.index( ) ) ) gen[ b ].insert( vr.index( ) );
+                        if ( op.kind( ) != codegen::OperandKind::Use ) kill[ b ].insert( vr.index( ) );
                     }
                 }
             }
 
             Liveness result;
+            result.blocks.assign( n_blocks, { VRegSet { n_vregs }, VRegSet { n_vregs } } );
 
-            result.blocks.resize( vc.blocks.size( ) );
-            for ( auto b { 0u }; b < vc.blocks.size( ); ++b )
+            for ( bool changed { true }; changed; )
             {
-                result.blocks[ b ].live_in  = std::move( live_in[ b ] );
-                result.blocks[ b ].live_out = std::move( live_out[ b ] );
+                changed = false;
+
+                for ( auto b { n_blocks }; b-- > 0; )
+                {
+                    auto& [ in, out ] = result.blocks[ b ];
+                    const auto& block = vc.blocks[ b ];
+
+                    for ( auto s { block.succs_offset }; s < block.succs_offset + block.succs_count; ++s )
+                    {
+                        const auto& succ_in = result.blocks[ vc.succs[ s ].id ].live_in.words;
+                        for ( auto w { 0uz }; w < out.words.size( ); ++w ) out.words[ w ] |= succ_in[ w ];
+                    }
+
+                    for ( auto w { 0uz }; w < in.words.size( ); ++w )
+                    {
+                        const auto nx  = gen[ b ].words[ w ] | out.words[ w ] & ~kill[ b ].words[ w ];
+                        changed       |= nx != in.words[ w ];
+                        in.words[ w ]  = nx;
+                    }
+                }
             }
 
             return result;

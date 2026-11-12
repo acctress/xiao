@@ -109,7 +109,8 @@ namespace xiao::ir
             return SigRef { static_cast< uint32_t >( m_signatures.size( ) - 1 ) };
         }
 
-        [[nodiscard]] SigRef import_signature( const std::initializer_list< const Type > params, const Type ret, const codegen::CallConv cc )
+        [[nodiscard]] SigRef import_signature( const std::initializer_list< const Type > params, const Type ret,
+                                               const codegen::CallConv cc )
         { return import_signature( std::span { params.begin( ), params.size( ) }, ret, cc ); }
 
         [[nodiscard]] ValueRef func_addr( const Type ty, const FuncRef func )
@@ -126,6 +127,13 @@ namespace xiao::ir
         {
             m_global_values.push_back( data );
             return GlobalValueRef { static_cast< uint32_t >( m_global_values.size( ) - 1 ) };
+        }
+
+        [[nodiscard]] StackSlotRef create_stack_slot( const uint32_t size, const uint32_t align )
+        {
+            assert( std::has_single_bit( align ) && "[xiao::IRBuilder::create_stack_slot] alignment must be n^2" );
+            m_stack_slots.push_back( StackSlotData { .size = size, .align_shift = static_cast< uint8_t >( std::countr_zero( align ) ) } );
+            return StackSlotRef { static_cast< uint32_t >( m_stack_slots.size( ) - 1 ) };
         }
 
         [[nodiscard]] ValueRef symbol_value( const Type ty, const GlobalValueRef gv )
@@ -240,6 +248,9 @@ namespace xiao::ir
             return emit( IROp::load, ty, ops, static_cast< uint64_t >( static_cast< int64_t >( offset ) ) );
         }
 
+        [[nodiscard]] ValueRef stack_addr( const Type ty, const StackSlotRef ref, const int32_t offset = 0 )
+        { return emit( IROp::stack_addr, ty, { }, slot_imm( ref, offset ) ); }
+
         void store( const ValueRef value, const ValueRef addr, const int32_t offset = 0 )
         {
             const ValueRef ops[] = { value, addr };
@@ -267,25 +278,27 @@ namespace xiao::ir
             m_fn.ext_param_types = copy_to_arena< Type >( arena, m_ext_param_types );
             m_fn.global_values   = copy_to_arena< GlobalValueData >( arena, m_global_values );
             m_fn.signatures      = copy_to_arena< ExtSig >( arena, m_signatures );
+            m_fn.stack_slots     = copy_to_arena< StackSlotData >( arena, m_stack_slots );
         }
 
     private:
         IRFunction& m_fn;
         BlockRef    m_cur { };
 
-        std::vector< IRBlock >  m_blocks;
-        std::vector< IRInst >   m_insts;
-        std::vector< ValueRef > m_operands;
-        std::vector< BlockRef > m_succs;
-        std::vector< Value >    m_values;
-        std::vector< ValueRef > m_block_params;
-        std::vector< uint32_t > m_block_inst_starts;
-        std::vector< uint32_t > m_block_param_offsets;
-        std::vector< uint32_t > m_block_inst_ends;
-        std::vector< ExtFunc >  m_ext_funcs;
-        std::vector< Type >     m_ext_param_types;
+        std::vector< IRBlock >         m_blocks;
+        std::vector< IRInst >          m_insts;
+        std::vector< ValueRef >        m_operands;
+        std::vector< BlockRef >        m_succs;
+        std::vector< Value >           m_values;
+        std::vector< ValueRef >        m_block_params;
+        std::vector< uint32_t >        m_block_inst_starts;
+        std::vector< uint32_t >        m_block_param_offsets;
+        std::vector< uint32_t >        m_block_inst_ends;
+        std::vector< ExtFunc >         m_ext_funcs;
+        std::vector< Type >            m_ext_param_types;
         std::vector< GlobalValueData > m_global_values;
         std::vector< ExtSig >          m_signatures;
+        std::vector< StackSlotData >   m_stack_slots;
 
         [[nodiscard]] ValueRef push_value( const Type ty, const InstRef inst )
         {

@@ -14,21 +14,21 @@
 
 namespace xiao::x86_64
 {
-    struct X86Isa final : codegen::TargetIsa
+    struct X86Isa final : TargetIsa
     {
         [[nodiscard]] std::string_view name( ) const noexcept override
         { return "x86_64"; }
 
-        [[nodiscard]] codegen::CallConv default_cc( ) const noexcept override
-        { return codegen::host_call_conv( ); }
+        [[nodiscard]] CallConv default_cc( ) const noexcept override
+        { return host_call_conv( ); }
 
-        std::expected< codegen::CompiledCode, codegen::CodegenError > compile_function( ir::IRFunction& fn ) const override
+        std::expected< CompiledCode, CodegenError > compile_function( ir::IRFunction& fn ) const override
         {
             const auto             env = env_for( fn.sig.cc );
             IRLowerer              lowerer { env, host_abi( ) };
             auto                   vcode  = lowerer.lower( fn );
             const auto             allocs = regalloc::allocate( vcode, env );
-            const auto             frame  = compute_frame( vcode, allocs, env, fn.sig.cc );
+            const auto             frame  = compute_frame( vcode, allocs, env, fn.sig.cc, fn.stack_slots );
             MachBuffer< LabelUse > buf;
             emit( vcode, allocs, frame, buf );
             return std::move( buf ).finish( );

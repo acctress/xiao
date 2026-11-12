@@ -24,6 +24,7 @@ namespace xiao::ir
     using FuncRef        = Ref< struct FuncRefTag >; //! Different to `FunctionRef`, this is an index into `IRFunction::ext_funcs`
     using GlobalValueRef = Ref< struct GlobalValueTag >;
     using SigRef         = Ref< struct SigRefTag >;
+    using StackSlotRef   = Ref< struct StackSlotTag >;
 } // namespace xiao::ir
 
 template < typename Tag >

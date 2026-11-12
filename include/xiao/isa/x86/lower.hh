@@ -14,6 +14,7 @@
 #include <xiao/codegen/vcode.hh>
 
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <optional>
 #include <span>
@@ -44,7 +45,12 @@ namespace xiao::x86_64
             m_value_regs.resize( fn.values.size( ) );
             for ( auto i { 0u }; i < fn.values.size( ); ++i ) m_value_regs[ i ] = alloc_vreg( fn.values[ i ].type );
 
+            m_pred_count.assign( fn.blocks.size( ), 0 );
+            for ( const auto& b : fn.blocks )
+                for ( uint32_t s { 0 }; s < b.succs_count; ++s ) ++m_pred_count[ fn.succs[ b.succs_offset + s ].id ];
+
             m_block_map.resize( fn.blocks.size( ) );
+            m_edges.assign( fn.blocks.size( ), { } );
             for ( auto i { 0u }; i < fn.blocks.size( ); ++i )
             {
                 const auto& b = fn.blocks[ i ];
@@ -53,11 +59,8 @@ namespace xiao::x86_64
                 for ( auto j { 0u }; j < b.params_count; ++j ) params.push_back( vreg_for( fn.block_params[ b.params_offset + j ] ) );
 
                 m_block_map[ i ] = m_builder.start_block( params );
+                reserve_edges( fn, i );
             }
-
-            m_pred_count.assign( fn.blocks.size( ), 0 );
-            for ( const auto& b : fn.blocks )
-                for ( uint32_t s { 0 }; s < b.succs_count; ++s ) ++m_pred_count[ fn.succs[ b.succs_offset + s ].id ];
 
             m_needs_reg.assign( fn.values.size( ), false );
             for ( const auto& inst : fn.insts )
@@ -67,17 +70,6 @@ namespace xiao::x86_64
             find_fused_compares( fn );
 
             visit_function( fn );
-
-            for ( const auto& edge : m_pending_edges )
-            {
-                m_builder.begin_block( edge.block );
-                lower_block_args( edge.args, *edge.target );
-                m_builder.push( inst::Jmp { .target = edge.target_id } );
-
-                m_term_succs.clear( );
-                m_term_succs.push_back( edge.target_id );
-                m_builder.end_block( m_term_succs );
-            }
 
             m_fn = nullptr;
             return std::move( m_builder ).finalise( );
@@ -96,8 +88,22 @@ namespace xiao::x86_64
             if ( is_ent ) lower_params( fn, b );
         }
 
-        void on_block_end( ir::IRFunction& fn, ir::IRBlock& block )
-        { m_builder.end_block( m_term_succs ); }
+        void on_block_end( ir::IRFunction&, ir::IRBlock& )
+        {
+            m_builder.end_block( m_term_succs );
+
+            for ( const auto& edge : m_pending_edges )
+            {
+                m_builder.begin_block( edge.block );
+                lower_block_args( edge.args, *edge.target );
+                m_builder.push( inst::Jmp { .target = edge.target_id } );
+
+                const BlockId succ[] = { edge.target_id };
+                m_builder.end_block( succ );
+            }
+
+            m_pending_edges.clear( );
+        }
 
         void on_inst( ir::IRFunction&, ir::IRBlock& block, ir::IRInst& inst )
         {
@@ -134,6 +140,7 @@ namespace xiao::x86_64
                 case symbol_value: lower_symbol_value( inst ); break;
                 case func_addr: lower_func_addr( inst ); break;
                 case call_indirect: lower_call_indirect( inst ); break;
+                case stack_addr: lower_stack_addr( inst ); break;
             }
         }
 
@@ -155,6 +162,7 @@ namespace xiao::x86_64
         std::vector< BlockId >     m_block_map { };
         std::vector< BlockId >     m_term_succs { };
         std::vector< PendingEdge > m_pending_edges { };
+        std::vector< std::array< std::optional< BlockId >, 2 > > m_edges { };
         std::vector< bool >        m_needs_reg { };
         std::vector< bool >        m_fused { };
         std::vector< uint32_t >    m_pred_count { };
@@ -281,24 +289,15 @@ namespace xiao::x86_64
 
         void lower_binop( const ir::IRInst& inst, AluOp op )
         {
-            const auto dst = reg_for( inst.result );
+            const auto     dst      = reg_for( inst.result );
+            const auto     imm_rhs  = fold_operand( inst, 1 );
+            const auto     imm_lhs  = imm_rhs ? std::nullopt : fold_operand( inst, 0 );
+            const uint16_t reg_side = imm_lhs ? 1 : 0;
 
-            if ( const auto imm = fold_operand( inst, 1 ) )
-            {
-                m_builder.push( inst::Mov { .dst = dst, .src = reg_for( operand( inst, 0 ) ) } );
-                m_builder.push( inst::AluImm { .op = op, .dst = dst, .imm = *imm } );
-                return;
-            }
-
-            if ( const auto imm = fold_operand( inst, 0 ) )
-            {
-                m_builder.push( inst::Mov { .dst = dst, .src = reg_for( operand( inst, 1 ) ) } );
-                m_builder.push( inst::AluImm { .op = op, .dst = dst, .imm = *imm } );
-                return;
-            }
-
-            m_builder.push( inst::Mov { .dst = dst, .src = reg_for( operand( inst, 0 ) ) } );
-            m_builder.push( inst::Alu { .op = op, .dst = dst, .src = reg_for( operand( inst, 1 ) ) } );
+            m_builder.push( inst::Mov { .dst = dst, .src = reg_for( operand( inst, reg_side ) ) } );
+            if ( const auto imm { imm_rhs ? imm_rhs : imm_lhs } ) m_builder.push( inst::AluImm { .op = op, .dst = dst, .imm = *imm } );
+            else
+                m_builder.push( inst::Alu { .op = op, .dst = dst, .src = reg_for( operand( inst, 1 ) ) } );
         }
 
         void lower_ret( const ir::IRInst& inst )
@@ -381,35 +380,54 @@ namespace xiao::x86_64
             m_term_succs.push_back( ref );
         }
 
+        void reserve_edges( const ir::IRFunction& fn, const uint32_t i )
+        {
+            const auto& b = fn.blocks[ i ];
+            if ( b.insts_count == 0 ) return;
+
+            const auto& term = fn.insts[ b.insts_offset + b.insts_count - 1 ];
+            if ( term.op != ir::IROp::brif ) return;
+
+            const auto [ then_args, else_args ] = ir::branch_args( fn, b, term );
+            for ( const uint32_t side : { 1u, 0u } )
+            {
+                const auto  target = fn.succs[ b.succs_offset + side ].id;
+                const auto& params = fn.blocks[ target ];
+                const auto  args   = side ? else_args : then_args;
+
+                bool copies { false };
+                for ( uint16_t j { 0 }; j < args.size( ); ++j ) copies |= args[ j ].id != fn.block_params[ params.params_offset + j ].id;
+
+                if ( copies || m_pred_count[ target ] > 1 ) m_edges[ i ][ side ] = m_builder.start_block( );
+            }
+        }
+
         void lower_brif( ir::IRBlock& block, const ir::IRInst& inst )
         {
-            const auto [ a_id ]                 = m_fn->succs[ block.succs_offset ];
-            const auto [ b_id ]                 = m_fn->succs[ block.succs_offset + 1 ];
-            const auto& then_b                  = m_fn->blocks[ a_id ];
-            const auto& else_b                  = m_fn->blocks[ b_id ];
             const auto [ then_args, else_args ] = ir::branch_args( *m_fn, block, inst );
-            const auto cond                     = m_fn->operands[ inst.ops_offset ];
+            const auto  cond                    = m_fn->operands[ inst.ops_offset ];
+            const auto& edges                   = m_edges[ m_cur_block - 1 ];
 
-            const auto then_id = m_block_map[ a_id ];
-            const auto else_id = m_block_map[ b_id ];
-
-            auto jcc_target = then_id;
-            if ( !then_args.empty( ) || m_pred_count[ a_id ] > 1 )
+            std::array< BlockId, 2 > targets;
+            for ( const uint32_t side : { 1u, 0u } )
             {
-                jcc_target = m_builder.start_block( );
-                m_pending_edges.push_back( { .block = jcc_target, .args = then_args, .target = &then_b, .target_id = then_id } );
+                const auto id   = m_fn->succs[ block.succs_offset + side ].id;
+                targets[ side ] = edges[ side ].value_or( m_block_map[ id ] );
+                if ( edges[ side ] )
+                    m_pending_edges.push_back( { .block     = *edges[ side ],
+                                                 .args      = side ? else_args : then_args,
+                                                 .target    = &m_fn->blocks[ id ],
+                                                 .target_id = m_block_map[ id ] } );
             }
 
             auto cc = CC::NE;
             if ( m_fused[ cond.id ] ) cc = emit_cmp( m_fn->insts[ m_fn->values[ cond.id ].inst.id ] );
             else
                 m_builder.push( inst::TestReg { .reg = reg_for( cond ), .size = size_of( type_of( cond ) ) } );
-            m_builder.push( inst::Jcc { .cc = cc, .target = jcc_target } );
-            lower_block_args( else_args, else_b );
-            m_builder.push( inst::Jmp { .target = else_id } );
+            m_builder.push( inst::Jcc { .cc = cc, .taken = targets[ 0 ], .not_taken = targets[ 1 ] } );
 
-            m_term_succs.push_back( jcc_target );
-            m_term_succs.push_back( else_id );
+            m_term_succs.push_back( targets[ 0 ] );
+            m_term_succs.push_back( targets[ 1 ] );
         }
 
         void lower_func_addr( const ir::IRInst& inst )
@@ -430,6 +448,15 @@ namespace xiao::x86_64
                 .name     = gv.name,
                 .offset   = gv.offset,
                 .distance = gv.colocated ? RelocDistance::Near : RelocDistance::Far,
+            } );
+        }
+
+        void lower_stack_addr( const ir::IRInst& inst )
+        {
+            m_builder.push( inst::StackAddr {
+                .dst    = reg_for( inst.result ),
+                .slot   = ir::slot_of( inst ).id,
+                .offset = ir::slot_offset( inst ),
             } );
         }
 
@@ -585,7 +612,7 @@ namespace xiao::x86_64
 
             std::vector< PReg > args;
             args.reserve( params.size( ) );
-            for ( uint16_t i = 0; i < params.size( ); ++i )
+            for ( auto i { 0 }; i < params.size( ); ++i )
             {
                 assert( csig.params[ i ].is_reg( ) && "[xiao::lower::emit_call] stack passed args not supported YET" );
                 args.push_back( csig.params[ i ].reg( ) );

@@ -132,19 +132,24 @@ int main( )
 }
 ```
 
-The function's IR:
+The function's IR, printed with `irm.fmt( out, names )`, where `names` maps each external name to
+its symbol:
 
 ```
-fn calc(v0: i64, v1: i64) -> i64 {
-    fn0 = u0:0(i64) -> i64
-b0(v0: i64, v1: i64):
-    v2 = iadd v0, v1
-    v3 = call fn0(v2)
-    v4 = imul v0, v1
-    v5 = isub v3, v4
-    ret v5
+define @calc(%v0: i64, %v1: i64) -> i64 {
+block0:
+    %v2 = iadd %v0, %v1
+    %v3 = call @sqr_func(%v2)
+    %v4 = imul %v0, %v1
+    %v5 = isub %v3, %v4
+    return %v5
 }
 ```
+
+The text format mixes LLVM and Cranelift: `@` for symbols and `%` for values as in LLVM, with
+Cranelift's instruction names, block parameters and calling conventions written after the
+signature (`-> i64 system_v`). Constants and symbol addresses are printed inline where their type
+can be inferred, and a function whose calling convention is not the host's says so.
 
 ### Data and strings
 

@@ -47,9 +47,16 @@ namespace xiao::x86_64
                 emit_edits( buf, frame, std::span< const regalloc::Edit > { edit, edits_end } );
                 edit = edits_end;
 
-                if ( const auto* jmp = std::get_if< inst::Jmp >( &vcode.insts[ i_idx ].inner );
-                     jmp && ii + 1 == block.insts_count && jmp->target.id == bi + 1 )
+                if ( const auto* jmp = std::get_if<inst::Jmp>(&vcode.insts[i_idx].inner); jmp && jmp->target.id == bi + 1) continue;
+
+                if ( const auto* jcc = std::get_if<inst::Jcc>(&vcode.insts[i_idx].inner);
+                    jcc && (jcc->taken.id == bi + 1 || jcc->not_taken.id == bi + 1 )
+                )
+                {
+                    if ( jcc->not_taken.id == bi + 1) emit_jcc( buf, cc_nibble( jcc->cc ), jcc->taken.id);
+                    else emit_jcc( buf, cc_nibble( jcc->cc ) ^ 1, jcc->not_taken.id);
                     continue;
+                }
 
                 if ( vcode.insts[ i_idx ].as_move( ) && cnt == 2 )
                 {
@@ -98,7 +105,7 @@ namespace xiao::x86_64
                 for ( std::size_t s { 0 }; s < n_spills; ++s )
                     if ( spills[ s ].reload ) emit_spill_load( buf, spills[ s ].scratch, frame.spill_offset( spills[ s ].slot ) );
 
-                vcode.insts[ i_idx ].emit( buf, pregs );
+                vcode.insts[ i_idx ].emit( buf, pregs, frame.slot_offsets );
 
                 for ( std::size_t s { 0 }; s < n_spills; ++s )
                     if ( spills[ s ].store ) emit_spill_store( buf, frame.spill_offset( spills[ s ].slot ), spills[ s ].scratch );

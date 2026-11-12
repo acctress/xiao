@@ -127,7 +127,7 @@ namespace xiao::support
             if (m_slabs.empty()) return;
             for (auto i { c.slab + 1}; i < m_slabs.size(); ++i)
                 m_slabs[i].cursor = m_slabs[i].data.get();
-            if (c.cursor != nullptr) m_slabs[c.slab].cursor = c.cursor;
+            m_slabs[c.slab].cursor = c.cursor != nullptr ? c.cursor : m_slabs[c.slab].data.get();
         }
 
         //! @brief Reset all slabs without releasing memory.

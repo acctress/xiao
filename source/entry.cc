@@ -1,86 +1,52 @@
-#include <xiao-object/dump.hh>
-#include <xiao-object/module.hh>
+#include <xiao-jit/module.hh>
+#include <xiao/codegen/context.hh>
 #include <xiao/isa/host.hh>
 #include <xiao/ir/builder.hh>
 #include <xiao/ir/module.hh>
-#include <xiao/ir/verifier.hh>
 
 #ifdef XIAO_HAS_ZYDIS
 #include <xiao-disasm/disasm.hh>
 #endif
 
-#include <cstdio>
-#include <cstdlib>
-#include <filesystem>
-#include <format>
+#include <cstdint>
+#include <iterator>
 #include <print>
-#include <string_view>
+#include <string>
 
 using namespace xiao;
 using ir::Type;
 
 int main( )
 {
-    object::ObjectModule obj {
-        object::ObjectBuilder { isa::lookup_host( ), "hello" }
-    };
+    jit::JITModule jit { jit::JITBuilder { isa::lookup_host( ) } };
+    ir::IRModule   irm;
 
-    constexpr auto cc = codegen::host_call_conv( );
-
-    const auto puts_id = *obj.declare_function( "puts", module::Linkage::Import, { { Type::ptr }, Type::i32, cc } );
-    const auto text_id = *obj.declare_data( "hello", module::Linkage::Local, false );
-
-    static constexpr char   message[] = "hello, world";
-    module::DataDescription text;
-    text.define( std::string_view { message, sizeof message } );
-    if ( !obj.define_data( text_id, text ) ) return 1;
-
-    ir::IRModule irm;
-    const auto   main_ref = irm.declare( "main", Type::i32, { } );
-    const auto   main_id  = *obj.declare_function( "main", module::Linkage::Export, module::signature_of( *irm.get( main_ref ) ) );
+    constexpr Type params[] = { Type::i64 };
+    const auto     fn_ref   = irm.declare( "f", Type::i64, params );
+    const auto     fn_id    = *jit.declare_function( "f", module::Linkage::Export, module::signature_of( *irm.get( fn_ref ) ) );
     {
-        ir::IRBuilder b { *irm.get( main_ref ) };
-        const auto    puts_fn = obj.declare_func_in_func( puts_id, b );
-        const auto    text_gv = obj.declare_data_in_func( text_id, b );
-        b.switch_to_block( b.add_block( { } ) );
+        ir::IRBuilder b { *irm.get( fn_ref ) };
+        const auto    slot = b.create_stack_slot( 8, 8 );
+        b.switch_to_block( b.add_block( params ) );
 
-        const ir::ValueRef args[] = { b.symbol_value( Type::ptr, text_gv ) };
-        ( void ) b.call( puts_fn, args );
-        b.ret( b.iconst( Type::i32, 0 ) );
+        const auto addr = b.stack_addr( Type::ptr, slot );
+        b.store( b.param( 0 ), addr );
+        const auto x = b.load( Type::i64, addr );
+        b.ret( b.iadd( x, b.iconst( Type::i64, 1 ) ) );
         b.finalise( );
     }
 
-    ir::IRVerifier verifier;
-    verifier.visit_module( irm );
-    if ( !verifier.ok( ) )
-    {
-        for ( const auto& [ msg ] : verifier.errs ) std::println( "[error] {}", msg );
-        return 1;
-    }
+    std::string text;
+    irm.fmt( std::back_inserter( text ) );
+    std::println( "{}", text );
 
-    codegen::Context ctx { *irm.get( main_ref ) };
-    if ( !obj.define_function( main_id, ctx ) ) return 1;
+    codegen::Context ctx { *irm.get( fn_ref ) };
+    if ( !jit.define_function( fn_id, ctx ) || !jit.finalise_definitions( ) ) return 1;
 
-    auto product = std::move( obj ).finish( );
-    if ( !product ) return 1;
-
-    const auto dir      = std::filesystem::current_path( ) / "xiao_hello";
-    const auto obj_path = dir / "hello.obj";
-    const auto exe_path = dir / "hello.exe";
-    std::filesystem::create_directories( dir );
-    if ( !product->write( obj_path ) ) return 1;
-
-    std::println( "wrote {} ({} bytes)\n", obj_path.string( ), product->emit( ).size( ) );
-    std::println( "{}", object::dump( product->object( ) ) );
 #ifdef XIAO_HAS_ZYDIS
-    std::println( "  disassembly of main\n{}", disasm::dump( *ctx.compiled( ) ) );
+    std::println( "{}", disasm::dump( *ctx.compiled( ) ) );
 #endif
 
-    const auto link = std::format( "clang -fuse-ld=lld \"{}\" -o \"{}\"", obj_path.string( ), exe_path.string( ) );
-    std::println( "> {}", link );
-    if ( std::system( link.c_str( ) ) != 0 ) return 1;
-
-    std::println( "> {}", exe_path.string( ) );
-    std::fflush( stdout );
-    return std::system( std::format( "\"\"{}\"\"", exe_path.string( ) ).c_str( ) );
+    const auto f = jit.get_finalised_function< int64_t( int64_t ) >( fn_id );
+    std::println( "f(41) = {}", f( 41 ) );
 }

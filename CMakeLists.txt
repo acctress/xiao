@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(XIAO_DISASM "fetch zydis and build the xiao-disasm code dumper into the example" ON)
+option(XIAO_TESTS "fetch catch2 and build the xiao test suite" ON)
 
 if (POLICY CMP0135)
     cmake_policy(SET CMP0135 NEW)
@@ -61,3 +62,8 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin/lib"    
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin/lib"    
 )
+
+if (XIAO_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()

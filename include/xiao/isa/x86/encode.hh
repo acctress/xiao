@@ -33,6 +33,18 @@ namespace xiao::x86_64
         if ( rex != 0x40 || ( byte_op && needs_rex_for_byte( reg ) ) ) buf.emit_u8( rex );
     }
 
+    inline void emit_push( MachBuffer< LabelUse >& buf, const PReg r ) noexcept
+    {
+        if ( r.hw( ) >= 8 ) buf.emit_u8( 0x41 );
+        buf.emit_u8( static_cast< uint8_t >( 0x50 + ( r.hw( ) & 7 ) ) );
+    }
+
+    inline void emit_pop( MachBuffer< LabelUse >& buf, const PReg r ) noexcept
+    {
+        if ( r.hw( ) >= 8 ) buf.emit_u8( 0x41 );
+        buf.emit_u8( static_cast< uint8_t >( 0x58 + ( r.hw( ) & 7 ) ) );
+    }
+
     [[nodiscard]] constexpr uint8_t cc_nibble( const CC cc ) noexcept
     {
         switch ( cc )
@@ -49,6 +61,19 @@ namespace xiao::x86_64
             case CC::G: return 0xF;
         }
         return 0x4;
+    }
+
+    inline void emit_jmp( MachBuffer< LabelUse >& buf, const uint32_t label ) noexcept
+    {
+        buf.emit_u8( 0xE9 );
+        buf.emit_label_ref( label, LabelUse { LabelUse::Kind::JmpRel32 } );
+    }
+
+    inline void emit_jcc( MachBuffer< LabelUse >& buf, const uint8_t cc, const uint32_t label ) noexcept
+    {
+        buf.emit_u8( 0x0F );
+        buf.emit_u8( static_cast< uint8_t >( 0x80 | cc ) );
+        buf.emit_label_ref( label, LabelUse { LabelUse::Kind::JmpRel32 } );
     }
 
     [[nodiscard]] constexpr bool fits_i8( const int64_t v ) noexcept

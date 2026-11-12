@@ -51,6 +51,12 @@ namespace xiao::ir
         bool         colocated { };
     };
 
+    struct StackSlotData
+    {
+        uint32_t size { };
+        uint8_t  align_shift { };
+    };
+
     //! @brief Owns flat pools for one IR function,
     //! @note All are views into the owning IRModule's arena
     struct IRFunction
@@ -69,6 +75,7 @@ namespace xiao::ir
         std::span< Type >            ext_param_types { };
         std::span< GlobalValueData > global_values { };
         std::span< ExtSig >          signatures { };
+        std::span< StackSlotData >   stack_slots { };
     };
 
     struct BranchArgs

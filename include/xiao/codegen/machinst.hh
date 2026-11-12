@@ -24,8 +24,7 @@ namespace xiao::codegen
     {
         None,       //! Not a terminator
         Ret,        //! Return from function
-        Branch,     //! Unconditional branch
-        CondBranch, //! Conditional branch
+        Branch,     //! Branch to one or more blocks
     };
 
     //! @brief CRTP base for a MachInst contract

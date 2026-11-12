@@ -45,38 +45,14 @@ namespace xiao::regalloc
         bool                                             minimal { };
     };
 
-    struct CutPoints
-    {
-        std::vector< bool > allowed { };
-
-        [[nodiscard]] bool can_cut( const ProgPoint p ) const noexcept
-        { return p % 2 == 0 && p / 2 < allowed.size( ) && allowed[ p / 2 ]; }
-
-        [[nodiscard]] ProgPoint next( ProgPoint p ) const noexcept
-        {
-            if ( p % 2 ) ++p;
-            while ( p / 2 < allowed.size( ) && !allowed[ p / 2 ] ) p += 2;
-            return p;
-        }
-
-        [[nodiscard]] ProgPoint prev( ProgPoint p ) const noexcept
-        {
-            if ( p % 2 ) --p;
-            while ( p > 0 && ( p / 2 >= allowed.size( ) || !allowed[ p / 2 ] ) ) p -= 2;
-            return p;
-        }
-    };
-
     class BacktrackingAllocator
     {
     public:
         static constexpr uint32_t fixed_owner    = ~0u;
         static constexpr float    minimal_weight = 1e30f;
 
-        BacktrackingAllocator( const Bundles& bundles, const LiveRanges& ranges, std::array< std::vector< codegen::PReg >, 2 > order,
-                               CutPoints cuts ) :
-            m_order { std::move( order ) },
-            m_cuts { std::move( cuts ) }
+        BacktrackingAllocator( const Bundles& bundles, const LiveRanges& ranges, std::array< std::vector< codegen::PReg >, 2 > order ) :
+            m_order { std::move( order ) }
         {
             for ( std::size_t pr { 0 }; pr < codegen::Reg::pinned_count; ++pr ) m_pregs[ pr ].insert( ranges.fixed[ pr ], fixed_owner );
 
@@ -150,19 +126,30 @@ namespace xiao::regalloc
                 }
             }
 
-            void remove( const uint32_t owner )
+            void remove( const LiveRange& range, [[maybe_unused]] const uint32_t owner )
             {
-                std::erase_if( entries,
-                               [ & ]( const Entry& e )
-                               {
-                                   return e.owner == owner;
-                               } );
+                for ( const auto& [ from, to ] : range.segments )
+                {
+                    const auto iter = std::ranges::lower_bound( entries, from, { },
+                                                                []( const Entry& e )
+                                                                {
+                                                                    return e.seg.from;
+                                                                } );
+
+                    assert( iter != entries.end( ) && iter->owner == owner && "[xiao::regalloc::PRegMap::remove] segment not found" );
+                    entries.erase( iter );
+                }
             }
 
             template < typename F >
             void for_each_overlap( const LiveRange& range, F&& f ) const
             {
-                auto a = entries.begin( );
+                if ( range.empty( ) ) return;
+                auto a = std::ranges::upper_bound( entries, range.start( ), { },
+                                                   []( const Entry& e )
+                                                   {
+                                                       return e.seg.to;
+                                                   } );
                 auto b = range.segments.begin( );
                 while ( a != entries.end( ) && b != range.segments.end( ) )
                 {
@@ -177,7 +164,7 @@ namespace xiao::regalloc
         static void finish( LiveBundle& b )
         {
             b.range.segments.clear( );
-            for ( const auto& p : b.pieces ) b.range.merge( p.range );
+            for ( const auto& [ vreg, range ] : b.pieces ) b.range.merge( range );
 
             float total { 0.f };
             for ( const auto& m : b.mentions ) total += m.weight;
@@ -191,7 +178,7 @@ namespace xiao::regalloc
         }
 
         void enqueue( const uint32_t b )
-        { m_queue.push( { m_bundles[ b ].range.length( ), b } ); }
+        { m_queue.emplace( m_bundles[ b ].range.length( ), b ); }
 
         [[nodiscard]] const std::vector< codegen::PReg >& order_of( const codegen::RegClass cls ) const
         { return m_order[ static_cast< uint8_t >( cls ) ]; }
@@ -287,7 +274,7 @@ namespace xiao::regalloc
 
                 for ( const auto v : best->victims )
                 {
-                    m_pregs[ best->preg.index( ) ].remove( v );
+                    m_pregs[ best->preg.index( ) ].remove( m_bundles[ v ].range, v );
                     m_bundles[ v ].alloc   = Allocation { };
                     m_bundles[ v ].cascade = m_bundles[ b ].cascade;
                     enqueue( v );
@@ -331,8 +318,8 @@ namespace xiao::regalloc
                 const auto consider = [ & ]( const ProgPoint g0, const ProgPoint g1 )
                 {
                     if ( g0 >= g1 ) return;
-                    const ProgPoint s0 = g0 == start ? start : m_cuts.next( g0 );
-                    const ProgPoint s1 = g1 == end ? end : m_cuts.prev( g1 );
+                    const ProgPoint s0 = g0 == start ? start : g0 + ( g0 & 1 );
+                    const ProgPoint s1 = g1 == end ? end : g1 & ~1u;
                     if ( s0 >= s1 || ( s0 == start && s1 == end ) ) return;
 
                     float score { 0.f };
@@ -371,7 +358,7 @@ namespace xiao::regalloc
 
         [[nodiscard]] uint32_t cut( const uint32_t b, const ProgPoint p )
         {
-            assert( m_cuts.can_cut( p ) && "[xiao::regalloc::BacktrackingAllocator::cut] split point is not a legal cut" );
+            assert( p % 2 == 0 && "[xiao::regalloc::BacktrackingAllocator::cut] split point is not before an instruction" );
 
             LiveBundle hi {
                 .cls      = m_bundles[ b ].cls,
@@ -416,7 +403,6 @@ namespace xiao::regalloc
         }
 
         std::array< std::vector< codegen::PReg >, 2 >          m_order;
-        CutPoints                                              m_cuts;
         std::array< PRegMap, codegen::Reg::pinned_count >      m_pregs { };
         std::vector< LiveBundle >                              m_bundles { };
         std::vector< std::vector< uint32_t > >                 m_members { };

@@ -257,10 +257,11 @@ namespace xiao::x86_64
             XIAO_OPERANDS( DEF( dst ) )
         };
 
-        struct LeaFrame
+        struct StackAddr
         {
-            Reg     dst { };
-            int32_t offset { };
+            Reg      dst { };
+            uint32_t slot { };
+            int32_t  offset { };
             XIAO_OPERANDS( DEF( dst ) )
         };
 
@@ -280,7 +281,8 @@ namespace xiao::x86_64
         struct Jcc
         {
             CC      cc { };
-            BlockId target { };
+            BlockId taken { };
+            BlockId not_taken { };
             XIAO_OPERANDS( )
         };
 
@@ -425,7 +427,7 @@ namespace xiao::x86_64
     {
         using Inst = std::variant< inst::Alu, inst::AluImm, inst::Unary, inst::Shift, inst::ShiftImm, inst::TestReg, inst::CMov, inst::Mov,
                                    inst::MovImm, inst::MovLoad, inst::MovStore, inst::Movzx, inst::Movsx, inst::Cdq, inst::Div, inst::Idiv,
-                                   inst::Push, inst::Pop, inst::LeaFrame, inst::SetCC, inst::Jmp, inst::Jcc, inst::Call, inst::LoadExtName,
+                                   inst::Push, inst::Pop, inst::StackAddr, inst::SetCC, inst::Jmp, inst::Jcc, inst::Call, inst::LoadExtName,
                                    inst::CallInd, inst::Ret, inst::DummyUse >;
 
         Inst inner;
@@ -449,8 +451,8 @@ namespace xiao::x86_64
         [[nodiscard]] MachTerminator is_term( ) const noexcept
         {
             if ( std::holds_alternative< inst::Ret >( inner ) ) return MachTerminator::Ret;
-            if ( std::holds_alternative< inst::Jmp >( inner ) ) return MachTerminator::Branch;
-            if ( std::holds_alternative< inst::Jcc >( inner ) ) return MachTerminator::CondBranch;
+            if ( std::holds_alternative< inst::Jmp >( inner ) || std::holds_alternative< inst::Jcc >( inner ) )
+                return MachTerminator::Branch;
             return MachTerminator::None;
         }
 
@@ -485,7 +487,7 @@ namespace xiao::x86_64
 
         [[nodiscard]] static constexpr uint32_t worst_case_island_growth( ) = delete;
 
-        void emit( MachBuffer< LabelUse >& buf, std::span< const PReg > pregs ) const;
+        void emit( MachBuffer< LabelUse >& buf, std::span< const PReg > pregs, std::span< const int32_t > slot_offsets = { } ) const;
 
         void apply_alloc( const std::span< const PReg > pregs )
         {
@@ -567,7 +569,7 @@ namespace xiao::x86_64
                     {
                         if ( inst.dst.valid( ) ) inst.dst = next( );
                     }
-                    else if constexpr ( std::is_same_v< T, inst::LeaFrame > )
+                    else if constexpr ( std::is_same_v< T, inst::StackAddr > )
                     {
                         if ( inst.dst.valid( ) ) inst.dst = next( );
                     }
@@ -664,9 +666,10 @@ namespace xiao::x86_64
                     else if constexpr ( std::is_same_v< T, inst::Idiv > ) { return std::format( "idiv {}", i.src ); }
                     else if constexpr ( std::is_same_v< T, inst::Push > ) { return std::format( "push {}", i.src ); }
                     else if constexpr ( std::is_same_v< T, inst::Pop > ) { return std::format( "pop {}", i.dst ); }
-                    else if constexpr ( std::is_same_v< T, inst::LeaFrame > )
+                    else if constexpr ( std::is_same_v< T, inst::StackAddr > )
                     {
-                        return std::format( "lea {}, [rbp{}{}]", i.dst, i.offset > 0 ? "+" : "", i.offset );
+                        return i.offset ? std::format( "lea {}, [ss{}{:+}]", i.dst, i.slot, i.offset )
+                                        : std::format( "lea {}, [ss{}]", i.dst, i.slot );
                     }
                     else if constexpr ( std::is_same_v< T, inst::SetCC > )
                     {
@@ -675,13 +678,14 @@ namespace xiao::x86_64
                     else if constexpr ( std::is_same_v< T, inst::Jmp > ) { return std::format( "jmp .L{}", i.target.id ); }
                     else if constexpr ( std::is_same_v< T, inst::Jcc > )
                     {
-                        return std::format( "j{} .L{}", x86_64::to_string( i.cc ), i.target.id );
+                        return std::format( "j{} .L{}; jmp .L{}", x86_64::to_string( i.cc ), i.taken.id, i.not_taken.id );
                     }
                     else if constexpr ( std::is_same_v< T, inst::Call > ) { return std::format( "call u{}:{}", i.name.ns, i.name.index ); }
                     else if constexpr ( std::is_same_v< T, inst::LoadExtName > )
                     {
                         const auto off = i.offset ? std::format( "{:+}", i.offset ) : std::string { };
-                        if ( i.distance == RelocDistance::Near ) return std::format( "lea {}, [rip+u{}:{}{}]", i.dst, i.name.ns, i.name.index, off );
+                        if ( i.distance == RelocDistance::Near )
+                            return std::format( "lea {}, [rip+u{}:{}{}]", i.dst, i.name.ns, i.name.index, off );
                         return std::format( "mov {}, u{}:{}{}", i.dst, i.name.ns, i.name.index, off );
                     }
                     else if constexpr ( std::is_same_v< T, inst::CallInd > ) { return std::format( "call *{}", i.target ); }

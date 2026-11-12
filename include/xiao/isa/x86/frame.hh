@@ -1,9 +1,11 @@
 #pragma once
 
+#include <ranges>
 #include <xiao/codegen/call_conv.hh>
 #include <xiao/codegen/machbuffer.hh>
 #include <xiao/codegen/machenv.hh>
 #include <xiao/codegen/vcode.hh>
+#include <xiao/ir/function.hh>
 #include <xiao/isa/x86/encode.hh>
 #include <xiao/isa/x86/inst.hh>
 #include <xiao/isa/x86/reg.hh>
@@ -20,18 +22,20 @@ namespace xiao::x86_64
 {
     struct FrameLayout
     {
-        std::vector< PReg >   saved { };
-        uint32_t              stack_adjust { };
-        bool                  has_calls { };
-        uint32_t              spill_base { };
-        std::array< PReg, 2 > scratch { };
+        std::vector< PReg >    saved { };
+        uint32_t               stack_adjust { };
+        bool                   has_calls { };
+        uint32_t               spill_base { };
+        std::array< PReg, 2 >  scratch { };
+        std::vector< int32_t > slot_offsets { };
 
         [[nodiscard]] int32_t spill_offset( const int32_t slot ) const noexcept
         { return static_cast< int32_t >( spill_base ) + slot * 8; }
     };
 
     [[nodiscard]] inline FrameLayout compute_frame( const VCode< X86Inst >& vcode, const regalloc::Allocations& allocs,
-                                                    const codegen::MachineEnv& env, const codegen::CallConv cc )
+                                                    const MachineEnv& env, const CallConv cc,
+                                                    const std::span< const ir::StackSlotData > slots = { } )
     {
         FrameLayout frame { };
 
@@ -61,11 +65,23 @@ namespace xiao::x86_64
                                                    return i.is_call( );
                                                } );
 
-        const uint32_t shadow      = frame.has_calls && cc == codegen::CallConv::WindowsFastcall ? 32 : 0;
-        const uint32_t spill_bytes = 8 * allocs.spill_slots;
-        const uint32_t base        = shadow + spill_bytes;
+        const uint32_t shadow = frame.has_calls && cc == CallConv::WindowsFastcall ? 32 : 0;
+        uint32_t       cursor = shadow + 8 * allocs.spill_slots;
 
-        if ( frame.has_calls || allocs.spill_slots > 0 )
+        frame.slot_offsets.reserve( slots.size( ) );
+        for ( const auto& [ size, align_shift ] : slots )
+        {
+            assert( align_shift <= 4 && "[xiao::x86_64::compute_frame] stack slots aligned over 16 need stack realignment" );
+            const uint32_t align = 1u << align_shift;
+            cursor               = ( cursor + align - 1 ) & ~( align - 1 );
+            frame.slot_offsets.push_back( static_cast< int32_t >( cursor ) );
+            cursor += size;
+        }
+
+        const uint32_t base = ( cursor + 7 ) & ~7u;
+        assert( base < 4096 && "[xiao::x86_64::compute_frame] frames of 4096 bytes or more need stack probes" );
+
+        if ( frame.has_calls || base > 0 )
         {
             const auto     pushed = static_cast< uint32_t >( 8 * frame.saved.size( ) );
             const uint32_t pad    = ( 8 + pushed + base ) % 16 == 0 ? 0 : 8;
@@ -152,11 +168,7 @@ namespace xiao::x86_64
 
     inline void emit_prologue( MachBuffer< LabelUse >& buf, const FrameLayout& frame )
     {
-        for ( const auto pr : frame.saved )
-        {
-            if ( pr.hw( ) >= 8 ) buf.emit_u8( 0x41 );
-            buf.emit_u8( static_cast< uint8_t >( 0x50 + ( pr.hw( ) & 7 ) ) );
-        }
+        for ( const auto pr : frame.saved ) emit_push( buf, pr );
 
         if ( frame.stack_adjust ) emit_rsp_adjust( buf, 5, frame.stack_adjust );
     }
@@ -165,10 +177,6 @@ namespace xiao::x86_64
     {
         if ( frame.stack_adjust ) emit_rsp_adjust( buf, 0, frame.stack_adjust );
 
-        for ( auto iter = frame.saved.rbegin( ); iter != frame.saved.rend( ); ++iter )
-        {
-            if ( iter->hw( ) >= 8 ) buf.emit_u8( 0x41 );
-            buf.emit_u8( static_cast< uint8_t >( 0x58 + ( iter->hw( ) & 7 ) ) );
-        }
+        for ( const auto pr : std::views::reverse( frame.saved ) ) emit_pop( buf, pr );
     }
 } // namespace xiao::x86_64

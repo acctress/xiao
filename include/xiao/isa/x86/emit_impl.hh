@@ -10,7 +10,8 @@
 
 namespace xiao::x86_64
 {
-    inline void X86Inst::emit( MachBuffer< LabelUse >& buf, const std::span< const PReg > pregs ) const
+    inline void X86Inst::emit( MachBuffer< LabelUse >& buf, const std::span< const PReg > pregs,
+                               const std::span< const int32_t > slot_offsets ) const
     {
         uint32_t i { };
         auto     next = [ & ]( ) -> PReg
@@ -95,7 +96,7 @@ namespace xiao::x86_64
                 }
                 else if constexpr ( std::is_same_v< T, inst::AluImm > )
                 {
-                    const auto dst   = next( );
+                    const auto dst       = next( );
                     const bool short_imm = fits_i8( inst.imm );
 
                     if ( inst.op == AluOp::Mul )
@@ -152,6 +153,7 @@ namespace xiao::x86_64
                         case ShiftOp::Shl: ext = 4; break;
                         case ShiftOp::Shr: ext = 5; break;
                         case ShiftOp::Sar: ext = 7; break;
+                        default: break;
                     }
 
                     emit_rex( buf, true, PReg::invalid( ), dst );
@@ -189,6 +191,7 @@ namespace xiao::x86_64
                             emit_rex( buf, true, r, r );
                             buf.emit_u8( 0x85 );
                             break;
+                        default: break;
                     }
                     buf.emit_u8( modrm( 0b11, r.hw( ), r.hw( ) ) );
                 }
@@ -224,6 +227,7 @@ namespace xiao::x86_64
                             emit_rex_mem( buf, true, dst, base, index );
                             buf.emit_u8( 0x8B );
                             break;
+                        default: break;
                     }
                     emit_mem_operand( buf, dst.hw( ), base, index, inst.mem.scale, inst.mem.disp );
                 }
@@ -252,6 +256,7 @@ namespace xiao::x86_64
                             emit_rex_mem( buf, true, src, base, index );
                             buf.emit_u8( 0x89 );
                             break;
+                        default: break;
                     }
                     emit_mem_operand( buf, src.hw( ), base, index, inst.mem.scale, inst.mem.disp );
                 }
@@ -322,83 +327,29 @@ namespace xiao::x86_64
                     buf.emit_u8( 0xF7 );
                     buf.emit_u8( modrm( 0b11, 7, src.hw( ) ) );
                 }
-                else if constexpr ( std::is_same_v< T, inst::Push > )
+                else if constexpr ( std::is_same_v< T, inst::Push > ) { emit_push( buf, next( ) ); }
+                else if constexpr ( std::is_same_v< T, inst::Pop > ) { emit_pop( buf, next( ) ); }
+                else if constexpr ( std::is_same_v< T, inst::StackAddr > )
                 {
-                    const auto src = next( );
-                    if ( src.hw( ) >= 8 ) buf.emit_u8( 0x41 ); //! rex.b
-                    buf.emit_u8( static_cast< uint8_t >( 0x50 + ( src.hw( ) & 7 ) ) );
-                }
-                else if constexpr ( std::is_same_v< T, inst::Pop > )
-                {
+                    assert( inst.slot < slot_offsets.size( ) && "[xiao::x86_64::emit] stack slot without a frame offset" );
                     const auto dst = next( );
-                    if ( dst.hw( ) >= 8 ) buf.emit_u8( 0x41 ); //! rex.b
-                    buf.emit_u8( static_cast< uint8_t >( 0x58 + ( dst.hw( ) & 7 ) ) );
-                }
-                else if constexpr ( std::is_same_v< T, inst::LeaFrame > )
-                {
-                    //! lea dst, [rbp + offset]
-                    const auto dst = next( );
-                    emit_rex( buf, true, dst, RBP );
+                    emit_rex_mem( buf, true, dst, RSP, PReg::invalid( ) );
                     buf.emit_u8( 0x8D );
-                    if ( inst.offset >= -128 && inst.offset <= 127 )
-                    {
-                        buf.emit_u8( modrm( 0b01, dst.hw( ), 5 ) );
-                        buf.emit_u8( static_cast< uint8_t >( inst.offset ) );
-                    }
-                    else
-                    {
-                        buf.emit_u8( modrm( 0b10, dst.hw( ), 5 ) );
-                        buf.emit_i32( inst.offset );
-                    }
+                    emit_mem_operand( buf, dst.hw( ), RSP, PReg::invalid( ), 0, slot_offsets[ inst.slot ] + inst.offset );
                 }
                 else if constexpr ( std::is_same_v< T, inst::SetCC > )
                 {
                     const auto dst = next( );
-                    uint8_t    cc_code { };
-                    switch ( inst.cc )
-                    {
-                        case CC::E: cc_code = 0x94; break;
-                        case CC::NE: cc_code = 0x95; break;
-                        case CC::B: cc_code = 0x92; break;
-                        case CC::BE: cc_code = 0x96; break;
-                        case CC::A: cc_code = 0x97; break;
-                        case CC::AE: cc_code = 0x93; break;
-                        case CC::L: cc_code = 0x9C; break;
-                        case CC::LE: cc_code = 0x9E; break;
-                        case CC::G: cc_code = 0x9F; break;
-                        case CC::GE: cc_code = 0x9D; break;
-                    }
-                    if ( dst.hw( ) >= 8 ) buf.emit_u8( 0x41 );
-                    else if ( dst.hw( ) >= 4 )
-                        buf.emit_u8( 0x40 );
+                    emit_rex( buf, false, PReg::invalid( ), dst, true );
                     buf.emit_u8( 0x0F );
-                    buf.emit_u8( cc_code );
+                    buf.emit_u8( static_cast< uint8_t >( 0x90 | cc_nibble( inst.cc ) ) );
                     buf.emit_u8( modrm( 0b11, 0, dst.hw( ) ) );
                 }
-                else if constexpr ( std::is_same_v< T, inst::Jmp > )
-                {
-                    buf.emit_u8( 0xE9 );
-                    buf.emit_label_ref( inst.target.id, LabelUse { LabelUse::Kind::JmpRel32 } );
-                }
+                else if constexpr ( std::is_same_v< T, inst::Jmp > ) { emit_jmp( buf, inst.target.id ); }
                 else if constexpr ( std::is_same_v< T, inst::Jcc > )
                 {
-                    uint8_t cc_code { };
-                    switch ( inst.cc )
-                    {
-                        case CC::E: cc_code = 0x84; break;
-                        case CC::NE: cc_code = 0x85; break;
-                        case CC::B: cc_code = 0x82; break;
-                        case CC::BE: cc_code = 0x86; break;
-                        case CC::A: cc_code = 0x87; break;
-                        case CC::AE: cc_code = 0x83; break;
-                        case CC::L: cc_code = 0x8C; break;
-                        case CC::LE: cc_code = 0x8E; break;
-                        case CC::G: cc_code = 0x8F; break;
-                        case CC::GE: cc_code = 0x8D; break;
-                    }
-                    buf.emit_u8( 0x0F );
-                    buf.emit_u8( cc_code );
-                    buf.emit_label_ref( inst.target.id, LabelUse { LabelUse::Kind::JmpRel32 } );
+                    emit_jcc( buf, cc_nibble( inst.cc ), inst.taken.id);
+                    emit_jmp( buf, inst.not_taken.id );
                 }
                 else if constexpr ( std::is_same_v< T, inst::Call > )
                 {

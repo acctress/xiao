@@ -21,8 +21,12 @@ namespace xiao::ir
         [[nodiscard]] bool ok( ) const
         { return errs.empty( ); }
 
+        static constexpr uint8_t max_slot_align_shift = 4;
+
         void on_function( IRFunction& fn )
         {
+            verify_stack_slots( fn );
+
             if ( fn.blocks.empty( ) ) return;
 
             const auto& entry = fn.blocks[ 0 ];
@@ -94,6 +98,7 @@ namespace xiao::ir
                 case IROp::symbol_value: verify_symbol_value( fn, inst ); break;
                 case IROp::func_addr: verify_func_addr( fn, inst ); break;
                 case IROp::call_indirect: verify_call_indirect( fn, inst ); break;
+                case IROp::stack_addr: verify_stack_addr( fn, inst ); break;
                 default: break;
             }
         }
@@ -216,6 +221,36 @@ namespace xiao::ir
                 if ( const auto want = fn.ext_param_types[ sig.params_offset + i ]; got != want )
                     errs.push_back( { std::format( "call_indirect sig{}: arg {} is {}, expected {}", inst.imm, i, got, want ) } );
             }
+        }
+
+        void verify_stack_slots( const IRFunction& fn )
+        {
+            for ( auto i { 0uz }; i < fn.stack_slots.size( ); ++i )
+            {
+                const auto& [ size, align_shift ] = fn.stack_slots[ i ];
+                if ( size == 0 ) errs.push_back( { std::format( "ss{}: size is 0", i ) } );
+                if ( align_shift > max_slot_align_shift )
+                    errs.push_back( { std::format( "ss{}: align = {} is over the maximum of {}", i, 1ull << align_shift,
+                                                   1u << max_slot_align_shift ) } );
+            }
+        }
+
+        void verify_stack_addr( const IRFunction& fn, const IRInst& inst )
+        {
+            if ( !expect_operands( inst, 0 ) ) return;
+
+            const auto [ id ] = slot_of( inst );
+            const bool known  = id < fn.stack_slots.size( );
+            if ( !known ) errs.push_back( { std::format( "stack_addr: ss{} but only {} stack slots", id, fn.stack_slots.size( ) ) } );
+
+            if ( const auto ty = fn.values[ inst.result.id ].type; ty != Type::ptr )
+                errs.push_back( { std::format( "stack_addr.{}: result must be ptr", ty ) } );
+
+            if ( !known ) return;
+
+            const auto size = fn.stack_slots[ id ].size;
+            if ( const auto off = slot_offset( inst ); off < 0 || static_cast< uint32_t >( off ) > size )
+                errs.push_back( { std::format( "stack_addr: ss{}{:+} is outside the slot's {} bytes", id, off, size ) } );
         }
 
         void verify_symbol_value( const IRFunction& fn, const IRInst& inst )

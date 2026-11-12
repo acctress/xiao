@@ -35,7 +35,7 @@ namespace xiao::regalloc
 
         std::vector< CheckerError > errors;
 
-        const auto run_block = [ & ]( const uint32_t b, std::vector< uint32_t >& st, std::vector< uint32_t >& snap, const bool report )
+        const auto run_block = [ & ]( const uint32_t b, std::vector< uint32_t >& st, const bool report )
         {
             const auto& block = vc.blocks[ b ];
             auto        e     = std::ranges::lower_bound( edits, before( block.insts_offset ), { }, &Edit::point );
@@ -57,8 +57,6 @@ namespace xiao::regalloc
                     for ( auto iter = e; iter != group_end; ++iter ) st[ index( iter->to ) ] = values[ k++ ];
                     e = group_end;
                 }
-
-                if ( i == cfg.cond_branch[ b ] ) snap = st;
 
                 const auto [ off, cnt ] = vc.operand_ranges[ i ];
                 for ( auto o { off }; o < off + cnt; ++o )
@@ -89,18 +87,13 @@ namespace xiao::regalloc
             }
         };
 
-        const auto entry = forward_dataflow( vc, cfg, width,
-                                             [ & ]( const uint32_t b, auto& st, auto& snap )
-                                             {
-                                                 run_block( b, st, snap, false );
-                                             } );
+        const auto entry = forward_dataflow( vc, cfg, width, [ & ]( const uint32_t b, auto& st ) { run_block( b, st, false ); } );
 
         for ( uint32_t b { 0 }; b < vc.blocks.size( ); ++b )
         {
             if ( entry[ b ].size( ) != width ) continue;
-            auto st   = entry[ b ];
-            auto snap = st;
-            run_block( b, st, snap, true );
+            auto st = entry[ b ];
+            run_block( b, st, true );
         }
 
         return errors;

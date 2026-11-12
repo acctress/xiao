@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string_view>
 
 namespace xiao::codegen
 {
@@ -18,5 +19,15 @@ namespace xiao::codegen
 #else
         return CallConv::SystemV;
 #endif
+    }
+
+    [[nodiscard]] constexpr std::string_view to_string( const CallConv cc ) noexcept
+    {
+        switch ( cc )
+        {
+            case CallConv::SystemV: return "system_v";
+            case CallConv::WindowsFastcall: return "windows_fastcall";
+        }
+        return "<?>";
     }
 } // namespace xiao::codegen

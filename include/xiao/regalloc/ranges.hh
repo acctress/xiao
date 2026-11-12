@@ -245,7 +245,11 @@ namespace xiao::regalloc
                 const ProgPoint b_to   = before( block.insts_offset + block.insts_count );
                 const float     weight = depth_weight( depths[ b ] );
 
-                for ( const auto v : liveness.blocks[ b ].live_out ) lr.vregs[ v ].range.add( { b_from, b_to } );
+                liveness.blocks[ b ].live_out.for_each(
+                    [ & ]( const uint32_t value )
+                    {
+                        lr.vregs[ value ].range.add( { b_from, b_to } );
+                    } );
 
                 std::array< bool, codegen::Reg::pinned_count > pinned_open { };
 

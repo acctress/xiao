@@ -41,6 +41,7 @@ namespace xiao::ir
         symbol_value,
         func_addr,
         call_indirect,
+        stack_addr,
     };
 
     //! @brief Condition kinds for icmp.
@@ -74,6 +75,15 @@ namespace xiao::ir
     //! @brief Read the offset out of `inst.imm`
     [[nodiscard]] constexpr int32_t mem_offset( const IRInst& inst ) noexcept
     { return static_cast< int32_t >( static_cast< int64_t >( inst.imm ) ); }
+
+    [[nodiscard]] constexpr uint64_t slot_imm( const StackSlotRef ref, const int32_t offset ) noexcept
+    { return static_cast< uint64_t >( ref.id ) | static_cast< uint64_t >( static_cast< uint32_t >( offset ) ) << 32; }
+
+    [[nodiscard]] constexpr StackSlotRef slot_of( const IRInst& inst ) noexcept
+    { return StackSlotRef { static_cast< uint32_t >( inst.imm ) }; }
+
+    [[nodiscard]] constexpr int32_t slot_offset( const IRInst& inst ) noexcept
+    { return static_cast< int32_t >( static_cast< uint32_t >( inst.imm >> 32 ) ); }
 } // namespace xiao::ir
 
 template <>
@@ -117,6 +127,7 @@ struct std::formatter< xiao::ir::IROp >
             case symbol_value: return std::format_to( ctx.out( ), "symbol_value" );
             case func_addr: return std::format_to( ctx.out( ), "func_addr" );
             case call_indirect: return std::format_to( ctx.out( ), "call_indirect" );
+            case stack_addr: return std::format_to( ctx.out( ), "stack_addr" );
         }
         return ctx.out( );
     }

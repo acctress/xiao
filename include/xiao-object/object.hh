@@ -70,7 +70,7 @@ namespace xiao::object
             return static_cast< uint32_t >( m_sections.size( ) - 1 );
         }
 
-        void add_reloc( const uint32_t section, const Relocation rel )
+        void add_reloc( const uint32_t section, const Relocation& rel )
         {
             assert( m_sections[ section ].kind != SectionKind::UninitialisedData
                     && "[xiao::object::Object::add_reloc] bss has no bytes to relocate" );
