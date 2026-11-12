@@ -153,21 +153,21 @@ namespace xiao::x86_64
             BlockId                         target_id { };
         };
 
-        ir::IRFunction*            m_fn { nullptr };
-        const MachineEnv&          m_env;
-        const ABISpec&             m_abi;
-        ABISig                     m_sig { };
-        VCodeBuilder< X86Inst >    m_builder { };
-        std::vector< VReg >        m_value_regs { };
-        std::vector< BlockId >     m_block_map { };
-        std::vector< BlockId >     m_term_succs { };
-        std::vector< PendingEdge > m_pending_edges { };
+        ir::IRFunction*                                          m_fn { nullptr };
+        const MachineEnv&                                        m_env;
+        const ABISpec&                                           m_abi;
+        ABISig                                                   m_sig { };
+        VCodeBuilder< X86Inst >                                  m_builder { };
+        std::vector< VReg >                                      m_value_regs { };
+        std::vector< BlockId >                                   m_block_map { };
+        std::vector< BlockId >                                   m_term_succs { };
+        std::vector< PendingEdge >                               m_pending_edges { };
         std::vector< std::array< std::optional< BlockId >, 2 > > m_edges { };
-        std::vector< bool >        m_needs_reg { };
-        std::vector< bool >        m_fused { };
-        std::vector< uint32_t >    m_pred_count { };
-        uint32_t                   m_vreg_c { };
-        uint32_t                   m_cur_block { };
+        std::vector< bool >                                      m_needs_reg { };
+        std::vector< bool >                                      m_fused { };
+        std::vector< uint32_t >                                  m_pred_count { };
+        uint32_t                                                 m_vreg_c { };
+        uint32_t                                                 m_cur_block { };
 
         [[nodiscard]] VReg alloc_vreg( const ir::Type type ) noexcept
         {
@@ -602,7 +602,7 @@ namespace xiao::x86_64
             Reg                               reg { };
         };
 
-        void emit_call( const ir::IRInst& inst, const std::span< const ir::Type > params, const ir::Type ret, const codegen::CallConv cc,
+        void emit_call( const ir::IRInst& inst, const std::span< const ir::Type > params, const ir::Type ret, const CallConv cc,
                         const uint16_t first_arg, const CallTarget target )
         {
             std::vector< ir::Type > rets;
@@ -627,11 +627,17 @@ namespace xiao::x86_64
                 clobbers.insert( clobbers.end( ), cls.begin( ), cls.end( ) );
 
             if ( target.name )
-                m_builder.push(
-                    inst::Call { .name = *target.name, .args = std::move( args ), .ret = ret_preg, .clobbers = std::move( clobbers ) } );
+                m_builder.push( inst::Call { .name     = *target.name,
+                                             .args     = std::move( args ),
+                                             .ret      = ret_preg,
+                                             .clobbers = std::move( clobbers ),
+                                             .cc       = cc } );
             else
-                m_builder.push(
-                    inst::CallInd { .target = target.reg, .args = std::move( args ), .ret = ret_preg, .clobbers = std::move( clobbers ) } );
+                m_builder.push( inst::CallInd { .target   = target.reg,
+                                                .args     = std::move( args ),
+                                                .ret      = ret_preg,
+                                                .clobbers = std::move( clobbers ),
+                                                .cc       = cc } );
 
             if ( ret_preg.valid( ) ) m_builder.push( inst::Mov { .dst = reg_for( inst.result ), .src = Reg::from_preg( ret_preg ) } );
         }

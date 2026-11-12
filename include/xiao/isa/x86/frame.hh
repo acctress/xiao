@@ -34,8 +34,7 @@ namespace xiao::x86_64
     };
 
     [[nodiscard]] inline FrameLayout compute_frame( const VCode< X86Inst >& vcode, const regalloc::Allocations& allocs,
-                                                    const MachineEnv& env, const CallConv cc,
-                                                    const std::span< const ir::StackSlotData > slots = { } )
+                                                    const MachineEnv& env, const std::span< const ir::StackSlotData > slots = { } )
     {
         FrameLayout frame { };
 
@@ -65,7 +64,14 @@ namespace xiao::x86_64
                                                    return i.is_call( );
                                                } );
 
-        const uint32_t shadow = frame.has_calls && cc == CallConv::WindowsFastcall ? 32 : 0;
+        const auto calls_fc = []( const X86Inst& i )
+        {
+            if ( const auto* c = std::get_if< inst::Call >( &i.inner ) ) return c->cc == CallConv::WindowsFastcall;
+            if ( const auto* c = std::get_if< inst::CallInd >( &i.inner ) ) return c->cc == CallConv::WindowsFastcall;
+            return false;
+        };
+
+        const uint32_t shadow = std::ranges::any_of( vcode.insts, calls_fc ) ? 32 : 0;
         uint32_t       cursor = shadow + 8 * allocs.spill_slots;
 
         frame.slot_offsets.reserve( slots.size( ) );

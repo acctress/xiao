@@ -1,6 +1,7 @@
 #pragma once
 
 #include <xiao/codegen/machbuffer.hh>
+#include <xiao/codegen/call_conv.hh>
 #include <xiao/codegen/machinst.hh>
 #include <xiao/codegen/operand.hh>
 #include <xiao/codegen/vcode.hh>
@@ -292,6 +293,7 @@ namespace xiao::x86_64
             std::vector< PReg > args { };
             PReg                ret { };
             std::vector< PReg > clobbers { };
+            CallConv            cc { };
 
             void get_operands( std::vector< MachOperand >& ops ) const
             {
@@ -315,6 +317,7 @@ namespace xiao::x86_64
             std::vector< PReg > args { };
             PReg                ret { };
             std::vector< PReg > clobbers { };
+            CallConv            cc { };
 
             void get_operands( std::vector< MachOperand >& ops ) const
             {

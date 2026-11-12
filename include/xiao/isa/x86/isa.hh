@@ -28,7 +28,7 @@ namespace xiao::x86_64
             IRLowerer              lowerer { env, host_abi( ) };
             auto                   vcode  = lowerer.lower( fn );
             const auto             allocs = regalloc::allocate( vcode, env );
-            const auto             frame  = compute_frame( vcode, allocs, env, fn.sig.cc, fn.stack_slots );
+            const auto             frame  = compute_frame( vcode, allocs, env, fn.stack_slots );
             MachBuffer< LabelUse > buf;
             emit( vcode, allocs, frame, buf );
             return std::move( buf ).finish( );
