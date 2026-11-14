@@ -10,13 +10,11 @@
 
 namespace xiao::x86_64
 {
-    inline void X86Inst::emit( MachBuffer< LabelUse >& buf, const std::span< const PReg > pregs,
-                               const std::span< const int32_t > slot_offsets ) const
+    inline void X86Inst::emit( MachBuffer< LabelUse >& buf, const std::span< const int32_t > slot_offsets ) const
     {
-        uint32_t i { };
-        auto     next = [ & ]( ) -> PReg
+        const auto p = []( const Reg r ) noexcept
         {
-            return pregs[ i++ ];
+            return r.valid( ) ? r.as_preg( ) : PReg::invalid( );
         };
 
         std::visit(
@@ -24,15 +22,15 @@ namespace xiao::x86_64
             {
                 if constexpr ( std::is_same_v< T, inst::Mov > )
                 {
-                    const auto dst = next( );
-                    const auto src = next( );
+                    const auto dst = p( inst.dst );
+                    const auto src = p( inst.src );
                     emit_rex( buf, true, src, dst );
                     buf.emit_u8( 0x89 );
                     buf.emit_u8( modrm( 0b11, src.hw( ), dst.hw( ) ) );
                 }
                 else if constexpr ( std::is_same_v< T, inst::MovImm > )
                 {
-                    const auto dst = next( );
+                    const auto dst = p( inst.dst );
                     const auto imm = inst.imm;
 
                     if ( imm == 0 )
@@ -63,8 +61,8 @@ namespace xiao::x86_64
                 }
                 else if constexpr ( std::is_same_v< T, inst::Alu > )
                 {
-                    const auto dst = next( );
-                    const auto src = next( );
+                    const auto dst = p( inst.dst );
+                    const auto src = p( inst.src );
 
                     if ( inst.op == AluOp::Mul )
                     {
@@ -96,7 +94,7 @@ namespace xiao::x86_64
                 }
                 else if constexpr ( std::is_same_v< T, inst::AluImm > )
                 {
-                    const auto dst       = next( );
+                    const auto dst       = p( inst.dst );
                     const bool short_imm = fits_i8( inst.imm );
 
                     if ( inst.op == AluOp::Mul )
@@ -137,15 +135,14 @@ namespace xiao::x86_64
                 }
                 else if constexpr ( std::is_same_v< T, inst::Unary > )
                 {
-                    const auto dst = next( );
+                    const auto dst = p( inst.dst );
                     emit_rex( buf, true, PReg::invalid( ), dst );
                     buf.emit_u8( 0xF7 );
                     buf.emit_u8( modrm( 0b11, inst.op == UnaryOp::Not ? 2 : 3, dst.hw( ) ) );
                 }
                 else if constexpr ( std::is_same_v< T, inst::Shift > || std::is_same_v< T, inst::ShiftImm > )
                 {
-                    const auto dst = next( );
-                    if constexpr ( std::is_same_v< T, inst::Shift > ) ( void ) next( );
+                    const auto dst = p( inst.dst );
 
                     uint8_t ext { };
                     switch ( inst.op )
@@ -171,7 +168,7 @@ namespace xiao::x86_64
                 }
                 else if constexpr ( std::is_same_v< T, inst::TestReg > )
                 {
-                    const auto r = next( );
+                    const auto r = p( inst.reg );
                     switch ( inst.size )
                     {
                         case OperandSize::S8:
@@ -197,8 +194,8 @@ namespace xiao::x86_64
                 }
                 else if constexpr ( std::is_same_v< T, inst::CMov > )
                 {
-                    const auto dst = next( );
-                    const auto src = next( );
+                    const auto dst = p( inst.dst );
+                    const auto src = p( inst.src );
                     emit_rex( buf, true, dst, src );
                     buf.emit_u8( 0x0F );
                     buf.emit_u8( static_cast< uint8_t >( 0x40 | cc_nibble( inst.cc ) ) );
@@ -207,9 +204,9 @@ namespace xiao::x86_64
                 else if constexpr ( std::is_same_v< T, inst::MovLoad > )
                 {
                     //! mov dst, [base + index*scale + disp]
-                    const auto dst   = next( );
-                    const auto base  = next( );
-                    const auto index = inst.mem.index.valid( ) ? next( ) : PReg::invalid( );
+                    const auto dst   = p( inst.dst );
+                    const auto base  = p( inst.mem.base );
+                    const auto index = p( inst.mem.index );
 
                     switch ( inst.size )
                     {
@@ -233,9 +230,9 @@ namespace xiao::x86_64
                 }
                 else if constexpr ( std::is_same_v< T, inst::MovStore > )
                 {
-                    const auto base  = next( );
-                    const auto index = inst.mem.index.valid( ) ? next( ) : PReg::invalid( );
-                    const auto src   = next( );
+                    const auto base  = p( inst.mem.base );
+                    const auto index = p( inst.mem.index );
+                    const auto src   = p( inst.src );
 
                     switch ( inst.size )
                     {
@@ -262,8 +259,8 @@ namespace xiao::x86_64
                 }
                 else if constexpr ( std::is_same_v< T, inst::Movzx > )
                 {
-                    const auto dst = next( );
-                    const auto src = next( );
+                    const auto dst = p( inst.dst );
+                    const auto src = p( inst.src );
                     if ( inst.size == OperandSize::S32 )
                     {
                         emit_rex( buf, false, dst, src );
@@ -284,8 +281,8 @@ namespace xiao::x86_64
                 }
                 else if constexpr ( std::is_same_v< T, inst::Movsx > )
                 {
-                    const auto dst = next( );
-                    const auto src = next( );
+                    const auto dst = p( inst.dst );
+                    const auto src = p( inst.src );
                     emit_rex( buf, true, dst, src );
                     switch ( inst.size )
                     {
@@ -304,42 +301,36 @@ namespace xiao::x86_64
                 }
                 else if constexpr ( std::is_same_v< T, inst::Cdq > )
                 {
-                    ++i;                 //! rax
-                    ++i;                 //! rdx
                     buf.emit_u8( 0x48 ); //! rex.w
                     buf.emit_u8( 0x99 ); //! cqo
                 }
                 else if constexpr ( std::is_same_v< T, inst::Div > )
                 {
-                    const auto src = next( );
-                    ( void ) next( );
-                    ( void ) next( );
+                    const auto src = p( inst.src );
                     emit_rex( buf, true, PReg::invalid( ), src );
                     buf.emit_u8( 0xF7 );
                     buf.emit_u8( modrm( 0b11, 6, src.hw( ) ) );
                 }
                 else if constexpr ( std::is_same_v< T, inst::Idiv > )
                 {
-                    const auto src = next( );
-                    ++i; //! rax
-                    ++i; //! rdx
+                    const auto src = p( inst.src );
                     emit_rex( buf, true, PReg::invalid( ), src );
                     buf.emit_u8( 0xF7 );
                     buf.emit_u8( modrm( 0b11, 7, src.hw( ) ) );
                 }
-                else if constexpr ( std::is_same_v< T, inst::Push > ) { emit_push( buf, next( ) ); }
-                else if constexpr ( std::is_same_v< T, inst::Pop > ) { emit_pop( buf, next( ) ); }
+                else if constexpr ( std::is_same_v< T, inst::Push > ) { emit_push( buf, p( inst.src ) ); }
+                else if constexpr ( std::is_same_v< T, inst::Pop > ) { emit_pop( buf, p( inst.dst ) ); }
                 else if constexpr ( std::is_same_v< T, inst::StackAddr > )
                 {
                     assert( inst.slot < slot_offsets.size( ) && "[xiao::x86_64::emit] stack slot without a frame offset" );
-                    const auto dst = next( );
+                    const auto dst = p( inst.dst );
                     emit_rex_mem( buf, true, dst, RSP, PReg::invalid( ) );
                     buf.emit_u8( 0x8D );
                     emit_mem_operand( buf, dst.hw( ), RSP, PReg::invalid( ), 0, slot_offsets[ inst.slot ] + inst.offset );
                 }
                 else if constexpr ( std::is_same_v< T, inst::SetCC > )
                 {
-                    const auto dst = next( );
+                    const auto dst = p( inst.dst );
                     emit_rex( buf, false, PReg::invalid( ), dst, true );
                     buf.emit_u8( 0x0F );
                     buf.emit_u8( static_cast< uint8_t >( 0x90 | cc_nibble( inst.cc ) ) );
@@ -353,16 +344,13 @@ namespace xiao::x86_64
                 }
                 else if constexpr ( std::is_same_v< T, inst::Call > )
                 {
-                    for ( std::size_t a = 0; a < inst.args.size( ); ++a ) ( void ) next( );
-                    if ( inst.ret.valid( ) ) ( void ) next( );
-
                     buf.emit_u8( 0xE8 );
                     buf.add_reloc( codegen::RelocKind::X86CallPCRel4, inst.name, -4 );
                     buf.emit_u32( 0 );
                 }
                 else if constexpr ( std::is_same_v< T, inst::LoadExtName > )
                 {
-                    const auto dst = next( );
+                    const auto dst = p( inst.dst );
                     if ( inst.distance == RelocDistance::Near )
                     {
                         emit_rex( buf, true, dst, PReg::invalid( ) );
@@ -381,10 +369,7 @@ namespace xiao::x86_64
                 }
                 else if constexpr ( std::is_same_v< T, inst::CallInd > )
                 {
-                    const auto target = next( );
-                    for ( std::size_t a = 0; a < inst.args.size( ); ++a ) ( void ) next( );
-                    if ( inst.ret.valid( ) ) ( void ) next( );
-
+                    const auto target = p( inst.target );
                     if ( target.hw( ) >= 8 ) buf.emit_u8( 0x41 );
                     buf.emit_u8( 0xFF );
                     buf.emit_u8( modrm( 0b11, 2, target.hw( ) ) );
@@ -393,7 +378,5 @@ namespace xiao::x86_64
                 else if constexpr ( std::is_same_v< T, inst::DummyUse > ) { }
             },
             inner );
-
-        assert( i == pregs.size( ) && "operand count mismatch between get_operands and emit" );
     }
 } // namespace xiao::x86_64

@@ -22,9 +22,9 @@ namespace xiao::codegen
     //! @brief Describes how a block ends
     enum class MachTerminator : uint8_t
     {
-        None,       //! Not a terminator
-        Ret,        //! Return from function
-        Branch,     //! Branch to one or more blocks
+        None,   //! Not a terminator
+        Ret,    //! Return from function
+        Branch, //! Branch to one or more blocks
     };
 
     //! @brief CRTP base for a MachInst contract
@@ -35,8 +35,28 @@ namespace xiao::codegen
     {
     public:
         //! @brief Collect all register operands into `ops`
-        void get_operands( std::vector< MachOperand >& ops )
-        { self( ).get_operands( ops ); }
+        void get_operands( std::vector< MachOperand >& ops ) const
+        {
+            OperandVisitor vis { [ & ]( const Reg r, const OperandKind kind, const OperandPos pos, PReg fixed )
+                                 {
+                                     if ( !fixed.valid( ) && r.is_physical( ) ) fixed = r.as_preg( );
+                                     ops.push_back( fixed.valid( ) ? MachOperand::fixed( r.as_vreg( ), kind, pos, fixed )
+                                                                   : MachOperand::any( r.as_vreg( ), kind, pos ) );
+                                 } };
+
+            self( ).visit( vis );
+        }
+
+        void apply_alloc( const std::span< const PReg > pregs )
+        {
+            auto           iter = pregs.begin( );
+            OperandVisitor vis { [ & ]( Reg& r, OperandKind, OperandPos, PReg )
+                                 {
+                                     r = Reg::from_preg( *iter++ );
+                                 } };
+            self( ).visit( vis );
+            assert( iter == pregs.end( ) );
+        }
 
         //! @brief How this instruction ends its block.
         [[nodiscard]] MachTerminator is_term( ) const noexcept

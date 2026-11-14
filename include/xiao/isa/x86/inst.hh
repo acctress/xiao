@@ -17,29 +17,6 @@
 #include <variant>
 #include <vector>
 
-#define XIAO_OPERANDS( ... )                                   \
-    void get_operands( std::vector< MachOperand >& ops ) const \
-    { __VA_ARGS__ }
-
-#define XIAO_OPERAND( reg, kind, pos )                                                                                  \
-    if ( ( reg ).valid( ) )                                                                                             \
-        ops.push_back( ( reg ).is_physical( ) ? MachOperand::fixed( ( reg ).as_vreg( ), kind, pos, ( reg ).as_preg( ) ) \
-                                              : MachOperand::any( ( reg ).as_vreg( ), kind, pos ) );
-#define USE( reg )    XIAO_OPERAND( reg, OperandKind::Use, OperandPos::Before )
-#define DEF( reg )    XIAO_OPERAND( reg, OperandKind::Def, OperandPos::After )
-#define USEDEF( reg ) XIAO_OPERAND( reg, OperandKind::UseDef, OperandPos::After )
-#define FIXED_USE( reg, preg ) \
-    if ( ( reg ).valid( ) )    \
-        ops.push_back(         \
-            codegen::MachOperand::fixed( ( reg ).as_vreg( ), codegen::OperandKind::Use, codegen::OperandPos::Before, ( preg ) ) );
-#define FIXED_USEDEF( reg, preg ) \
-    if ( ( reg ).valid( ) )       \
-        ops.push_back(            \
-            codegen::MachOperand::fixed( ( reg ).as_vreg( ), codegen::OperandKind::UseDef, codegen::OperandPos::After, ( preg ) ) );
-#define FIXED_DEF( reg, preg ) \
-    if ( ( reg ).valid( ) )    \
-        ops.push_back( codegen::MachOperand::fixed( ( reg ).as_vreg( ), codegen::OperandKind::Def, codegen::OperandPos::After, ( preg ) ) );
-
 namespace xiao::x86_64
 {
     using namespace xiao::codegen;
@@ -105,6 +82,9 @@ namespace xiao::x86_64
         int32_t disp { };
     };
 
+    [[nodiscard]] constexpr bool writes_dst( const AluOp op ) noexcept
+    { return op != AluOp::Cmp && op != AluOp::Test; }
+
     namespace inst
     {
         struct Alu
@@ -113,13 +93,10 @@ namespace xiao::x86_64
             Reg   dst { };
             Reg   src { };
 
-            void get_operands( std::vector< MachOperand >& ops ) const
+            void visit( this auto& self, auto& v )
             {
-                const bool writes_dst = op != AluOp::Cmp && op != AluOp::Test;
-                if ( dst.valid( ) )
-                    ops.push_back( writes_dst ? MachOperand::any( dst.as_vreg( ), OperandKind::UseDef, OperandPos::After )
-                                              : MachOperand::any( dst.as_vreg( ), OperandKind::Use, OperandPos::Before ) );
-                if ( src.valid( ) ) ops.push_back( MachOperand::any( src.as_vreg( ), OperandKind::Use, OperandPos::Before ) );
+                writes_dst( self.op ) ? v.usedef( self.dst ) : v.use( self.dst );
+                v.use( self.src );
             }
         };
 
@@ -129,21 +106,17 @@ namespace xiao::x86_64
             Reg     dst { };
             int32_t imm { };
 
-            void get_operands( std::vector< MachOperand >& ops ) const
-            {
-                if ( op == AluOp::Cmp || op == AluOp::Test ) { USE( dst ) }
-                else
-                {
-                    USEDEF( dst )
-                }
-            }
+            void visit( this auto& self, auto& v )
+            { writes_dst( self.op ) ? v.usedef( self.dst ) : v.use( self.dst ); }
         };
 
         struct Unary
         {
             UnaryOp op { };
             Reg     dst { };
-            XIAO_OPERANDS( USEDEF( dst ) )
+
+            void visit( this auto& self, auto& v )
+            { v.usedef( self.dst ); }
         };
 
         struct Shift
@@ -151,7 +124,12 @@ namespace xiao::x86_64
             ShiftOp op { };
             Reg     dst { };
             Reg     count { };
-            XIAO_OPERANDS( USEDEF( dst ) USE( count ) )
+
+            void visit( this auto& self, auto& v )
+            {
+                v.usedef( self.dst );
+                v.use( self.count );
+            }
         };
 
         struct ShiftImm
@@ -159,14 +137,18 @@ namespace xiao::x86_64
             ShiftOp op { };
             Reg     dst { };
             uint8_t imm { };
-            XIAO_OPERANDS( USEDEF( dst ) )
+
+            void visit( this auto& self, auto& v )
+            { v.usedef( self.dst ); }
         };
 
         struct TestReg
         {
             Reg         reg { };
             OperandSize size { OperandSize::S64 };
-            XIAO_OPERANDS( USE( reg ) )
+
+            void visit( this auto& self, auto& v )
+            { v.use( self.reg ); }
         };
 
         struct CMov
@@ -174,21 +156,33 @@ namespace xiao::x86_64
             CC  cc { };
             Reg dst { };
             Reg src { };
-            XIAO_OPERANDS( USEDEF( dst ) USE( src ) )
+
+            void visit( this auto& self, auto& v )
+            {
+                v.usedef( self.dst );
+                v.use( self.src );
+            }
         };
 
         struct Mov
         {
             Reg dst { };
             Reg src { };
-            XIAO_OPERANDS( DEF( dst ) USE( src ) )
+
+            void visit( this auto& self, auto& v )
+            {
+                v.def( self.dst );
+                v.use( self.src );
+            }
         };
 
         struct MovImm
         {
             Reg     dst { };
             int64_t imm { };
-            XIAO_OPERANDS( DEF( dst ) )
+
+            void visit( this auto& self, auto& v )
+            { v.def( self.dst ); }
         };
 
         struct MovLoad
@@ -196,7 +190,13 @@ namespace xiao::x86_64
             Reg         dst { };
             AddressMode mem { };
             OperandSize size { OperandSize::S64 };
-            XIAO_OPERANDS( DEF( dst ) USE( mem.base ) USE( mem.index ) )
+
+            void visit( this auto& self, auto& v )
+            {
+                v.def( self.dst );
+                v.use( self.mem.base );
+                v.use( self.mem.index );
+            }
         };
 
         struct MovStore
@@ -204,7 +204,13 @@ namespace xiao::x86_64
             AddressMode mem { };
             Reg         src { };
             OperandSize size { OperandSize::S64 };
-            XIAO_OPERANDS( USE( mem.base ) USE( mem.index ) USE( src ) )
+
+            void visit( this auto& self, auto& v )
+            {
+                v.use( self.mem.base );
+                v.use( self.mem.index );
+                v.use( self.src );
+            }
         };
 
         struct Movzx
@@ -212,7 +218,12 @@ namespace xiao::x86_64
             Reg         dst { };
             Reg         src { };
             OperandSize size { };
-            XIAO_OPERANDS( DEF( dst ) USE( src ) )
+
+            void visit( this auto& self, auto& v )
+            {
+                v.def( self.dst );
+                v.use( self.src );
+            }
         };
 
         struct Movsx
@@ -220,14 +231,24 @@ namespace xiao::x86_64
             Reg         dst { };
             Reg         src { };
             OperandSize size { };
-            XIAO_OPERANDS( DEF( dst ) USE( src ) )
+
+            void visit( this auto& self, auto& v )
+            {
+                v.def( self.dst );
+                v.use( self.src );
+            }
         };
 
         struct Cdq
         {
             Reg rax { };
             Reg rdx { };
-            XIAO_OPERANDS( FIXED_USEDEF( rax, RAX ) FIXED_DEF( rdx, RDX ) )
+
+            void visit( this auto& self, auto& v )
+            {
+                v.usedef( self.rax, RAX );
+                v.def( self.rdx, RDX );
+            }
         };
 
         struct Div
@@ -235,7 +256,13 @@ namespace xiao::x86_64
             Reg src { };
             Reg rax { };
             Reg rdx { };
-            XIAO_OPERANDS( USE( src ) FIXED_USEDEF( rax, RAX ) FIXED_USEDEF( rdx, RDX ) )
+
+            void visit( this auto& self, auto& v )
+            {
+                v.use( self.src );
+                v.usedef( self.rax, RAX );
+                v.usedef( self.rdx, RDX );
+            }
         };
 
         struct Idiv
@@ -243,19 +270,29 @@ namespace xiao::x86_64
             Reg src { };
             Reg rax { };
             Reg rdx { };
-            XIAO_OPERANDS( USE( src ) FIXED_USEDEF( rax, RAX ) FIXED_USEDEF( rdx, RDX ) )
+
+            void visit( this auto& self, auto& v )
+            {
+                v.use( self.src );
+                v.usedef( self.rax, RAX );
+                v.usedef( self.rdx, RDX );
+            }
         };
 
         struct Push
         {
             Reg src { };
-            XIAO_OPERANDS( USE( src ) )
+
+            void visit( this auto& self, auto& v )
+            { v.use( self.src ); }
         };
 
         struct Pop
         {
             Reg dst { };
-            XIAO_OPERANDS( DEF( dst ) )
+
+            void visit( this auto& self, auto& v )
+            { v.def( self.dst ); }
         };
 
         struct StackAddr
@@ -263,20 +300,25 @@ namespace xiao::x86_64
             Reg      dst { };
             uint32_t slot { };
             int32_t  offset { };
-            XIAO_OPERANDS( DEF( dst ) )
+
+            void visit( this auto& self, auto& v )
+            { v.def( self.dst ); }
         };
 
         struct SetCC
         {
             CC  cc { };
             Reg dst { };
-            XIAO_OPERANDS( DEF( dst ) )
+
+            void visit( this auto& self, auto& v )
+            { v.def( self.dst ); }
         };
 
         struct Jmp
         {
             BlockId target { };
-            XIAO_OPERANDS( )
+
+            void visit( this auto&, auto& ) { }
         };
 
         struct Jcc
@@ -284,8 +326,23 @@ namespace xiao::x86_64
             CC      cc { };
             BlockId taken { };
             BlockId not_taken { };
-            XIAO_OPERANDS( )
+
+            void visit( this auto&, auto& ) { }
         };
+
+        template < typename V >
+        void visit_call( const std::span< const PReg > args, const PReg ret, V& v )
+        {
+            for ( const auto arg : args )
+            {
+                Reg r { Reg::from_preg( arg ) };
+                v.use( r );
+            }
+
+            if ( !ret.valid( ) ) return;
+            Reg r { Reg::from_preg( ret ) };
+            v.def( r );
+        }
 
         struct Call
         {
@@ -295,11 +352,8 @@ namespace xiao::x86_64
             std::vector< PReg > clobbers { };
             CallConv            cc { };
 
-            void get_operands( std::vector< MachOperand >& ops ) const
-            {
-                for ( const auto arg : args ) { FIXED_USE( Reg::from_preg( arg ), arg ) }
-                if ( ret.valid( ) ) { FIXED_DEF( Reg::from_preg( ret ), ret ) }
-            }
+            void visit( this auto& self, auto& v )
+            { visit_call( self.args, self.ret, v ); }
         };
 
         struct LoadExtName
@@ -308,7 +362,9 @@ namespace xiao::x86_64
             ir::ExternalName name { };
             int64_t          offset { };
             RelocDistance    distance { RelocDistance::Far };
-            XIAO_OPERANDS( DEF( dst ) )
+
+            void visit( this auto& self, auto& v )
+            { v.def( self.dst ); }
         };
 
         struct CallInd
@@ -319,23 +375,24 @@ namespace xiao::x86_64
             std::vector< PReg > clobbers { };
             CallConv            cc { };
 
-            void get_operands( std::vector< MachOperand >& ops ) const
+            void visit( this auto& self, auto& v )
             {
-                USE( target )
-                for ( const auto arg : args ) { FIXED_USE( Reg::from_preg( arg ), arg ) }
-                if ( ret.valid( ) ) { FIXED_DEF( Reg::from_preg( ret ), ret ) }
+                v.use( self.target );
+                visit_call( self.args, self.ret, v );
             }
         };
 
         struct Ret
         {
-            XIAO_OPERANDS( )
+            void visit( this auto&, auto& ) { }
         };
 
         struct DummyUse
         {
             Reg reg { };
-            XIAO_OPERANDS( USE( reg ) )
+
+            void visit( this auto& self, auto& v )
+            { v.use( self.reg ); }
         };
     } // namespace inst
 
@@ -441,14 +498,14 @@ namespace xiao::x86_64
         {
         }
 
-        void get_operands( std::vector< MachOperand >& ops ) const
+        void visit( this auto& self, auto& v )
         {
             std::visit(
-                [ & ]( const auto& i )
+                [ & ]( auto& i )
                 {
-                    i.get_operands( ops );
+                    i.visit( v );
                 },
-                inner );
+                self.inner );
         }
 
         [[nodiscard]] MachTerminator is_term( ) const noexcept
@@ -490,103 +547,7 @@ namespace xiao::x86_64
 
         [[nodiscard]] static constexpr uint32_t worst_case_island_growth( ) = delete;
 
-        void emit( MachBuffer< LabelUse >& buf, std::span< const PReg > pregs, std::span< const int32_t > slot_offsets = { } ) const;
-
-        void apply_alloc( const std::span< const PReg > pregs )
-        {
-            uint32_t i { };
-            auto     next = [ & ]
-            {
-                return Reg::from_preg( pregs[ i++ ] );
-            };
-
-            std::visit(
-                [ & ]< typename T >( T& inst )
-                {
-                    if constexpr ( std::is_same_v< T, inst::Alu > )
-                    {
-                        if ( inst.dst.valid( ) ) inst.dst = next( );
-                        if ( inst.src.valid( ) ) inst.src = next( );
-                    }
-                    else if constexpr ( std::is_same_v< T, inst::AluImm > || std::is_same_v< T, inst::Unary >
-                                        || std::is_same_v< T, inst::ShiftImm > )
-                    {
-                        if ( inst.dst.valid( ) ) inst.dst = next( );
-                    }
-                    else if constexpr ( std::is_same_v< T, inst::Shift > )
-                    {
-                        if ( inst.dst.valid( ) ) inst.dst = next( );
-                        if ( inst.count.valid( ) ) inst.count = next( );
-                    }
-                    else if constexpr ( std::is_same_v< T, inst::TestReg > )
-                    {
-                        if ( inst.reg.valid( ) ) inst.reg = next( );
-                    }
-                    else if constexpr ( std::is_same_v< T, inst::Mov > || std::is_same_v< T, inst::CMov > )
-                    {
-                        if ( inst.dst.valid( ) ) inst.dst = next( );
-                        if ( inst.src.valid( ) ) inst.src = next( );
-                    }
-                    else if constexpr ( std::is_same_v< T, inst::MovImm > )
-                    {
-                        if ( inst.dst.valid( ) ) inst.dst = next( );
-                    }
-                    else if constexpr ( std::is_same_v< T, inst::MovLoad > )
-                    {
-                        if ( inst.dst.valid( ) ) inst.dst = next( );
-                        if ( inst.mem.base.valid( ) ) inst.mem.base = next( );
-                        if ( inst.mem.index.valid( ) ) inst.mem.index = next( );
-                    }
-                    else if constexpr ( std::is_same_v< T, inst::MovStore > )
-                    {
-                        if ( inst.mem.base.valid( ) ) inst.mem.base = next( );
-                        if ( inst.mem.index.valid( ) ) inst.mem.index = next( );
-                        if ( inst.src.valid( ) ) inst.src = next( );
-                    }
-                    else if constexpr ( std::is_same_v< T, inst::Movzx > )
-                    {
-                        if ( inst.dst.valid( ) ) inst.dst = next( );
-                        if ( inst.src.valid( ) ) inst.src = next( );
-                    }
-                    else if constexpr ( std::is_same_v< T, inst::Movsx > )
-                    {
-                        if ( inst.dst.valid( ) ) inst.dst = next( );
-                        if ( inst.src.valid( ) ) inst.src = next( );
-                    }
-                    else if constexpr ( std::is_same_v< T, inst::Cdq > )
-                    {
-                        if ( inst.rax.valid( ) ) inst.rax = next( );
-                        if ( inst.rdx.valid( ) ) inst.rdx = next( );
-                    }
-                    else if constexpr ( std::is_same_v< T, inst::Div > || std::is_same_v< T, inst::Idiv > )
-                    {
-                        if ( inst.src.valid( ) ) inst.src = next( );
-                        if ( inst.rax.valid( ) ) inst.rax = next( );
-                        if ( inst.rdx.valid( ) ) inst.rdx = next( );
-                    }
-                    else if constexpr ( std::is_same_v< T, inst::Push > )
-                    {
-                        if ( inst.src.valid( ) ) inst.src = next( );
-                    }
-                    else if constexpr ( std::is_same_v< T, inst::Pop > )
-                    {
-                        if ( inst.dst.valid( ) ) inst.dst = next( );
-                    }
-                    else if constexpr ( std::is_same_v< T, inst::StackAddr > )
-                    {
-                        if ( inst.dst.valid( ) ) inst.dst = next( );
-                    }
-                    else if constexpr ( std::is_same_v< T, inst::SetCC > )
-                    {
-                        if ( inst.dst.valid( ) ) inst.dst = next( );
-                    }
-                    else if constexpr ( std::is_same_v< T, inst::DummyUse > )
-                    {
-                        if ( inst.reg.valid( ) ) inst.reg = next( );
-                    }
-                },
-                inner );
-        }
+        void emit( MachBuffer< LabelUse >& buf, std::span< const int32_t > slot_offsets = { } ) const;
 
         [[nodiscard]] std::string to_string( ) const
         {

@@ -13,7 +13,7 @@
 
 namespace xiao::x86_64
 {
-    inline void emit( const VCode< X86Inst >& vcode, const regalloc::Allocations& allocs, const FrameLayout& frame,
+    inline void emit( VCode< X86Inst >& vcode, const regalloc::Allocations& allocs, const FrameLayout& frame,
                       MachBuffer< LabelUse >& buf )
     {
         struct Spilled
@@ -105,7 +105,9 @@ namespace xiao::x86_64
                 for ( std::size_t s { 0 }; s < n_spills; ++s )
                     if ( spills[ s ].reload ) emit_spill_load( buf, spills[ s ].scratch, frame.spill_offset( spills[ s ].slot ) );
 
-                vcode.insts[ i_idx ].emit( buf, pregs, frame.slot_offsets );
+                auto& inst = vcode.insts[ i_idx ];
+                inst.apply_alloc( pregs );
+                inst.emit( buf, frame.slot_offsets );
 
                 for ( std::size_t s { 0 }; s < n_spills; ++s )
                     if ( spills[ s ].store ) emit_spill_store( buf, frame.spill_offset( spills[ s ].slot ), spills[ s ].scratch );
