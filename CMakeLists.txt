@@ -20,6 +20,36 @@ endif()
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/ISAGen.cmake")
+add_subdirectory(tools/xiao-isagen)
+
+set(XIAO_GEN_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")
+
+add_library(xiao_headers INTERFACE)
+add_library(xiao::xiao ALIAS xiao_headers)
+
+target_include_directories(xiao_headers INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${XIAO_GEN_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+)
+
+file(GLOB XIAO_X86_ISA CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/include/xiao/isa/x86/defs/*.isa")
+
+if (TARGET xiao-isagen AND XIAO_X86_ISA)
+    set(XIAO_X86_GEN_TESTS "${XIAO_GEN_DIR}/tests/x86_insts_test.cc")
+
+    xiao_isagen(xiao_x86_gen
+        HEADER "${XIAO_GEN_DIR}/include/xiao/isa/x86/gen/insts.hh"
+        TESTS  "${XIAO_X86_GEN_TESTS}"
+        INPUTS ${XIAO_X86_ISA}
+    )
+
+    add_dependencies(xiao_headers xiao_x86_gen)
+elseif (TARGET xiao-isagen)
+    message(STATUS "xiao-isagen: no .isa files in include/xiao/isa/x86/defs yet, x86 generation is off")
+endif()
+
 file(GLOB_RECURSE PROJ_HEADERS CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/*.hh"
@@ -34,10 +64,7 @@ file(GLOB_RECURSE PROJ_SOURCES CONFIGURE_DEPENDS
 
 add_executable(${PROJECT_NAME} ${PROJ_SOURCES} ${PROJ_HEADERS})
 
-target_include_directories(${PROJECT_NAME} PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
-)
+target_link_libraries(${PROJECT_NAME} PRIVATE xiao::xiao)
 
 if (XIAO_DISASM)
     include(FetchContent)
