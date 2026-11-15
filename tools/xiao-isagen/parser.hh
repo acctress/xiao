@@ -29,7 +29,7 @@ namespace isagen
     public:
         Lexer( std::string_view src, std::string_view file ) noexcept;
 
-        [[nodiscard]] Token next( ) const;
+        [[nodiscard]] Token next( );
 
     private:
         [[nodiscard]] char peek( ) const noexcept;

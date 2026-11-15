@@ -61,16 +61,78 @@ namespace isagen
         }
     }
 
-    Token Lexer::next( ) const
-    { return { TokenType::END, { }, m_loc }; }
+    Token Lexer::next( )
+    {
+        skip_trivia( );
+
+        const auto begin = m_pos;
+        const auto start = m_loc;
+
+        if ( m_pos >= m_src.length( ) ) return { TokenType::END, { }, start };
+
+        switch ( bump( ) )
+        {
+            case '(': return { TokenType::LParen, m_src.substr( begin, 1 ), start };
+            case ')': return { TokenType::RParen, m_src.substr( begin, 1 ), start };
+            case '"':
+            {
+                while ( peek( ) != '"' )
+                {
+                    if ( peek( ) == '\0' || peek( ) == '\n' ) fail( start, "unterminated string" );
+                    bump( );
+                }
+
+                bump( );
+
+                const auto lexeme = m_src.substr( begin + 1, m_pos - begin - 2 );
+                return { TokenType::String, lexeme, start };
+            }
+            default:
+            {
+                while ( is_atom_char( peek( ) ) ) bump( );
+                return { TokenType::Atom, m_src.substr( begin, m_pos - begin ), start };
+            }
+        }
+    }
 
     Parser::Parser( const std::string_view src, const std::string_view file ) noexcept : m_lexer { src, file } { }
 
     std::vector< SExp > Parser::parse( )
-    { return { }; }
+    {
+        std::vector< SExp > forms;
+        for ( auto t = m_lexer.next( ); t.type != TokenType::END; t = m_lexer.next( ) ) forms.push_back( parse_expr( t ) );
+        return forms;
+    }
 
     SExp Parser::parse_expr( const Token& tok )
-    { fail( tok.loc, "parse_expr is not implemented" ); }
+    {
+        switch ( tok.type )
+        {
+            case TokenType::LParen:
+            {
+                std::vector< SExp > items;
+                for ( auto t = m_lexer.next( ); t.type != TokenType::RParen; t = m_lexer.next( ) )
+                {
+                    if ( t.type == TokenType::END ) fail( tok.loc, "unclosed '('" );
+                    items.push_back( parse_expr( t ) );
+                }
+
+                return SExp { std::move( items ), tok.loc };
+            }
+
+            case TokenType::RParen: fail( tok.loc, "unexpected ')'" );
+            case TokenType::String: return SExp { String { std::string { tok.lexeme } }, tok.loc };
+            case TokenType::Atom:
+            {
+                if ( const auto n = parse_int( tok.lexeme ) ) return SExp { *n, tok.loc };
+                return SExp { Symbol { std::string { tok.lexeme } }, tok.loc };
+            }
+
+            case TokenType::END: std::unreachable( );
+        }
+
+        std::unreachable( );
+    }
 
     std::vector< SExp > read_source( const std::string_view src, const std::string_view file )
     { return Parser { src, file }.parse( ); }

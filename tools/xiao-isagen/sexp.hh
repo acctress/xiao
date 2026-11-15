@@ -8,6 +8,12 @@
 
 namespace isagen
 {
+    template < typename... Forms >
+    struct Overloaded : Forms...
+    {
+        using Forms::operator( )...;
+    };
+
     struct Location
     {
         std::string_view file { };
@@ -30,6 +36,8 @@ namespace isagen
         std::variant< Symbol, String, uint64_t, std::vector< SExp > > value;
         Location                                                      loc;
     };
+
+    using List = std::vector< SExp >;
 
     [[noreturn]] inline void fail( const Location& loc, const std::string_view msg )
     {
