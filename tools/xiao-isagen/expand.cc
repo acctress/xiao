@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <format>
-#include <iterator>
 #include <optional>
 #include <ranges>
 #include <string>
@@ -68,7 +67,6 @@ namespace isagen
                     using T = std::decay_t< Ty >;
                     if constexpr ( std::is_same_v< T, Symbol > ) { out += val.name; }
                     else if constexpr ( std::is_same_v< T, String > ) { out += val.value; }
-                    else if constexpr ( std::is_same_v< T, uint64_t > ) { std::format_to( std::back_inserter( out ), "{:X}", val ); }
                     else if constexpr ( std::is_same_v< T, List > )
                         fail( loc, "a list value cannot be used inside text" );
                 },
@@ -135,7 +133,6 @@ namespace isagen
                         out.push_back( SExp { Symbol { interpolate( sym.name, env, node.loc ) }, node.loc } );
                     },
                     [ & ]( const String& str ) { out.push_back( SExp { String { interpolate( str.value, env, node.loc ) }, node.loc } ); },
-                    [ & ]( const uint64_t ) { out.push_back( node ); },
                     [ & ]( const List& list )
                     {
                         List items;
@@ -158,11 +155,11 @@ namespace isagen
 
             std::vector< std::string_view > names;
             names.reserve( vars->size( ) );
-            for ( const auto& var : *vars )
+            for ( const auto& [ value, loc ] : *vars )
             {
-                const auto* sym = std::get_if< Symbol >( &var.value );
-                if ( !sym ) fail( var.loc, "for variable must be a symbol" );
-                if ( std::ranges::contains( names, sym->name ) ) fail( var.loc, std::format( "duplicate for variable '{}'", sym->name ) );
+                const auto* sym = std::get_if< Symbol >( & value );
+                if ( !sym ) fail( loc, "for variable must be a symbol" );
+                if ( std::ranges::contains( names, sym->name ) ) fail( loc, std::format( "duplicate for variable '{}'", sym->name ) );
                 names.push_back( sym->name );
             }
 
@@ -209,7 +206,6 @@ namespace isagen
                 Overloaded {
                     [ & ]( const Symbol& sym ) { check( sym.name ); },
                     [ & ]( const String& str ) { check( str.value ); },
-                    []( const uint64_t ) { },
                     []( const List& list )
                     {
                         for ( const auto& child : list ) check_unbound( child );

@@ -1,0 +1,29 @@
+(for (s pre        rm   one two imm)
+     ((b ""         rm8  D0  D2  C0)
+      (w "66 "      rm16 D1  D3  C1)
+      (l ""         rm32 D1  D3  C1)
+      (q "REX.W + " rm64 D1  D3  C1))
+
+  (for (op  ext)
+       ((rol 0)
+        (ror 1)
+        (rcl 2)
+        (rcr 3)
+        (shl 4)
+        (shr 5)
+        (sar 7))
+
+    (inst ${op}${s}_m1
+      (asm "$op")
+      (ops (rw dst $rm))
+      (enc M1 "${pre}$one /$ext"))
+
+    (inst ${op}${s}_mc
+      (asm "$op")
+      (ops (rw dst $rm) (r count r8 (fixed rcx)))
+      (enc MC "${pre}$two /$ext"))
+
+    (inst ${op}${s}_mi8
+      (asm "$op")
+      (ops (rw dst $rm) (imm imm8))
+      (enc MI "${pre}$imm /$ext ib"))))

@@ -111,9 +111,9 @@ namespace xiao::x86_64
             switch ( inst.op )
             {
                 case iconst: lower_iconst( inst ); break;
-                case iadd: lower_binop( inst, AluOp::Add ); break;
-                case isub: lower_binop( inst, AluOp::Sub ); break;
-                case imul: lower_binop( inst, AluOp::Mul ); break;
+                case iadd: lower_alu< inst::addq_mr, inst::addq_mi8, inst::addq_mi32 >( inst ); break;
+                case isub: lower_alu< inst::subq_mr, inst::subq_mi8, inst::subq_mi32 >( inst ); break;
+                case imul: lower_imul( inst ); break;
                 case ret: lower_ret( inst ); break;
                 case icmp: lower_icmp( inst ); break;
                 case br: lower_br( block, inst ); break;
@@ -125,14 +125,14 @@ namespace xiao::x86_64
                 case call: lower_call( inst ); break;
                 case load: lower_load( inst ); break;
                 case store: lower_store( inst ); break;
-                case band: lower_binop( inst, AluOp::And ); break;
-                case bor: lower_binop( inst, AluOp::Or ); break;
-                case bxor: lower_binop( inst, AluOp::Xor ); break;
-                case bnot: lower_unary( inst, UnaryOp::Not ); break;
-                case ineg: lower_unary( inst, UnaryOp::Neg ); break;
-                case ishl: lower_shift( inst, ShiftOp::Shl ); break;
-                case ushr: lower_shift( inst, ShiftOp::Shr ); break;
-                case sshr: lower_shift( inst, ShiftOp::Sar ); break;
+                case band: lower_alu< inst::andq_mr, inst::andq_mi8, inst::andq_mi32 >( inst ); break;
+                case bor: lower_alu< inst::orq_mr, inst::orq_mi8, inst::orq_mi32 >( inst ); break;
+                case bxor: lower_alu< inst::xorq_mr, inst::xorq_mi8, inst::xorq_mi32 >( inst ); break;
+                case bnot: lower_unary< inst::notq_m >( inst ); break;
+                case ineg: lower_unary< inst::negq_m >( inst ); break;
+                case ishl: lower_shift< inst::shlq_mc, inst::shlq_mi8 >( inst ); break;
+                case ushr: lower_shift< inst::shrq_mc, inst::shrq_mi8 >( inst ); break;
+                case sshr: lower_shift< inst::sarq_mc, inst::sarq_mi8 >( inst ); break;
                 case select: lower_select( inst ); break;
                 case uextend: lower_extend( inst, false ); break;
                 case sextend: lower_extend( inst, true ); break;
@@ -192,14 +192,25 @@ namespace xiao::x86_64
         [[nodiscard]] ir::Type type_of( const ir::ValueRef ref ) const noexcept
         { return m_fn->values[ ref.id ].type; }
 
-        [[nodiscard]] static OperandSize size_of( const ir::Type ty ) noexcept
+        void mov( const Reg dst, const Reg src )
+        { m_builder.push( inst::movq_mr { GprMem { dst }, src } ); }
+
+        template < typename Imm8, typename Imm32 >
+        void push_imm( const GprMem& dst, const int32_t imm )
+        {
+            if ( fits_i8( imm ) ) m_builder.push( Imm8 { dst, static_cast< int8_t >( imm ) } );
+            else
+                m_builder.push( Imm32 { dst, imm } );
+        }
+
+        void push_test( const Reg r, const ir::Type ty )
         {
             switch ( ir::bit_width( ty ) )
             {
-                case 8: return OperandSize::S8;
-                case 16: return OperandSize::S16;
-                case 32: return OperandSize::S32;
-                default: return OperandSize::S64;
+                case 8: m_builder.push( inst::testb_mr { GprMem { r }, r } ); break;
+                case 16: m_builder.push( inst::testw_mr { GprMem { r }, r } ); break;
+                case 32: m_builder.push( inst::testl_mr { GprMem { r }, r } ); break;
+                default: m_builder.push( inst::testq_mr { GprMem { r }, r } ); break;
             }
         }
 
@@ -213,7 +224,7 @@ namespace xiao::x86_64
                 assert( loc.is_reg( ) && "[xiao::lower::lower_params] stack passed params not support YET" );
 
                 const auto val = fn.block_params[ entry.params_offset + i ];
-                m_builder.push( inst::Mov { .dst = reg_for( val ), .src = Reg::from_preg( loc.reg( ) ) } );
+                mov( reg_for( val ), Reg::from_preg( loc.reg( ) ) );
             }
         }
 
@@ -287,17 +298,37 @@ namespace xiao::x86_64
             } );
         }
 
-        void lower_binop( const ir::IRInst& inst, AluOp op )
+        template < typename RegForm, typename Imm8Form, typename Imm32Form >
+        void lower_alu( const ir::IRInst& inst )
         {
             const auto     dst      = reg_for( inst.result );
             const auto     imm_rhs  = fold_operand( inst, 1 );
             const auto     imm_lhs  = imm_rhs ? std::nullopt : fold_operand( inst, 0 );
             const uint16_t reg_side = imm_lhs ? 1 : 0;
 
-            m_builder.push( inst::Mov { .dst = dst, .src = reg_for( operand( inst, reg_side ) ) } );
-            if ( const auto imm { imm_rhs ? imm_rhs : imm_lhs } ) m_builder.push( inst::AluImm { .op = op, .dst = dst, .imm = *imm } );
+            mov( dst, reg_for( operand( inst, reg_side ) ) );
+            if ( const auto imm { imm_rhs ? imm_rhs : imm_lhs } ) push_imm< Imm8Form, Imm32Form >( GprMem { dst }, *imm );
             else
-                m_builder.push( inst::Alu { .op = op, .dst = dst, .src = reg_for( operand( inst, 1 ) ) } );
+                m_builder.push( RegForm { GprMem { dst }, reg_for( operand( inst, 1 ) ) } );
+        }
+
+        void lower_imul( const ir::IRInst& inst )
+        {
+            const auto dst     = reg_for( inst.result );
+            const auto imm_rhs = fold_operand( inst, 1 );
+            const auto imm_lhs = imm_rhs ? std::nullopt : fold_operand( inst, 0 );
+
+            if ( const auto imm { imm_rhs ? imm_rhs : imm_lhs } )
+            {
+                const GprMem src { reg_for( operand( inst, imm_lhs ? 1 : 0 ) ) };
+                if ( fits_i8( *imm ) ) m_builder.push( inst::imulq_rmi8 { dst, src, static_cast< int8_t >( *imm ) } );
+                else
+                    m_builder.push( inst::imulq_rmi32 { dst, src, *imm } );
+                return;
+            }
+
+            mov( dst, reg_for( operand( inst, 0 ) ) );
+            m_builder.push( inst::imulq_rm { dst, GprMem { reg_for( operand( inst, 1 ) ) } } );
         }
 
         void lower_ret( const ir::IRInst& inst )
@@ -309,13 +340,10 @@ namespace xiao::x86_64
                 const auto src      = reg_for( m_fn->operands[ inst.ops_offset ] );
                 const auto ret_preg = m_sig.rets[ 0 ].reg( );
 
-                m_builder.push( inst::Mov {
-                    .dst = Reg::from_preg( ret_preg ),
-                    .src = src,
-                } );
+                mov( Reg::from_preg( ret_preg ), src );
             }
 
-            m_builder.push( inst::Ret { } );
+            m_builder.push( inst::ret { } );
         }
 
         void find_fused_compares( const ir::IRFunction& fn )
@@ -345,17 +373,17 @@ namespace xiao::x86_64
         {
             if ( const auto imm = fold_operand( inst, 1 ) )
             {
-                m_builder.push( inst::AluImm { .op = AluOp::Cmp, .dst = reg_for( operand( inst, 0 ) ), .imm = *imm } );
+                push_imm< inst::cmpq_mi8, inst::cmpq_mi32 >( GprMem { reg_for( operand( inst, 0 ) ) }, *imm );
                 return icmp_cc( inst.cc );
             }
 
             if ( const auto imm = fold_operand( inst, 0 ) )
             {
-                m_builder.push( inst::AluImm { .op = AluOp::Cmp, .dst = reg_for( operand( inst, 1 ) ), .imm = *imm } );
+                push_imm< inst::cmpq_mi8, inst::cmpq_mi32 >( GprMem { reg_for( operand( inst, 1 ) ) }, *imm );
                 return icmp_cc( swap_cc( inst.cc ) );
             }
 
-            m_builder.push( inst::Alu { .op = AluOp::Cmp, .dst = reg_for( operand( inst, 0 ) ), .src = reg_for( operand( inst, 1 ) ) } );
+            m_builder.push( inst::cmpq_mr { GprMem { reg_for( operand( inst, 0 ) ) }, reg_for( operand( inst, 1 ) ) } );
             return icmp_cc( inst.cc );
         }
 
@@ -365,8 +393,8 @@ namespace xiao::x86_64
 
             const auto dst = reg_for( inst.result );
             const auto cc  = emit_cmp( inst );
-            m_builder.push( inst::SetCC { .cc = cc, .dst = dst } );
-            m_builder.push( inst::Movzx { .dst = dst, .src = dst, .size = OperandSize::S8 } );
+            m_builder.push( inst::setcc_m8 { GprMem { dst }, cc } );
+            m_builder.push( inst::movzxq_rm8 { dst, GprMem { dst } } );
         }
 
         void lower_br( ir::IRBlock& block, const ir::IRInst& inst )
@@ -423,7 +451,7 @@ namespace xiao::x86_64
             auto cc = CC::NE;
             if ( m_fused[ cond.id ] ) cc = emit_cmp( m_fn->insts[ m_fn->values[ cond.id ].inst.id ] );
             else
-                m_builder.push( inst::TestReg { .reg = reg_for( cond ), .size = size_of( type_of( cond ) ) } );
+                push_test( reg_for( cond ), type_of( cond ) );
             m_builder.push( inst::Jcc { .cc = cc, .taken = targets[ 0 ], .not_taken = targets[ 1 ] } );
 
             m_term_succs.push_back( targets[ 0 ] );
@@ -462,20 +490,30 @@ namespace xiao::x86_64
 
         void lower_load( const ir::IRInst& inst )
         {
-            m_builder.push( inst::MovLoad {
-                .dst  = reg_for( inst.result ),
-                .mem  = { .base = reg_for( operand( inst, 0 ) ), .disp = ir::mem_offset( inst ) },
-                .size = size_of( type_of( inst.result ) ),
-            } );
+            const auto   dst = reg_for( inst.result );
+            const GprMem mem { AddressMode { .base = reg_for( operand( inst, 0 ) ), .disp = ir::mem_offset( inst ) } };
+
+            switch ( ir::bit_width( type_of( inst.result ) ) )
+            {
+                case 8: m_builder.push( inst::movzxq_rm8 { dst, mem } ); break;
+                case 16: m_builder.push( inst::movzxq_rm16 { dst, mem } ); break;
+                case 32: m_builder.push( inst::movl_rm { dst, mem } ); break;
+                default: m_builder.push( inst::movq_rm { dst, mem } ); break;
+            }
         }
 
         void lower_store( const ir::IRInst& inst )
         {
-            m_builder.push( inst::MovStore {
-                .mem  = { .base = reg_for( operand( inst, 1 ) ), .disp = ir::mem_offset( inst ) },
-                .src  = reg_for( operand( inst, 0 ) ),
-                .size = size_of( type_of( operand( inst, 0 ) ) ),
-            } );
+            const auto   src = reg_for( operand( inst, 0 ) );
+            const GprMem mem { AddressMode { .base = reg_for( operand( inst, 1 ) ), .disp = ir::mem_offset( inst ) } };
+
+            switch ( ir::bit_width( type_of( operand( inst, 0 ) ) ) )
+            {
+                case 8: m_builder.push( inst::movb_mr { mem, src } ); break;
+                case 16: m_builder.push( inst::movw_mr { mem, src } ); break;
+                case 32: m_builder.push( inst::movl_mr { mem, src } ); break;
+                default: m_builder.push( inst::movq_mr { mem, src } ); break;
+            }
         }
 
         void lower_div( const ir::IRInst& inst, const bool is_signed, const bool want_rem )
@@ -487,65 +525,83 @@ namespace xiao::x86_64
             constexpr auto rax = Reg::from_preg( RAX );
             constexpr auto rdx = Reg::from_preg( RDX );
 
-            m_builder.push( inst::Mov { .dst = rax, .src = lhs } );
+            mov( rax, lhs );
             if ( is_signed )
             {
-                m_builder.push( inst::Cdq { .rax = rax, .rdx = rdx } );
-                m_builder.push( inst::Idiv { .src = rhs, .rax = rax, .rdx = rdx } );
+                m_builder.push( inst::cqo { rax, rdx } );
+                m_builder.push( inst::idivq_m { GprMem { rhs }, rax, rdx } );
             }
             else
             {
                 m_builder.push( inst::MovImm { .dst = rdx, .imm = 0 } );
-                m_builder.push( inst::Div { .src = rhs, .rax = rax, .rdx = rdx } );
+                m_builder.push( inst::divq_m { GprMem { rhs }, rax, rdx } );
             }
-            m_builder.push( inst::Mov { .dst = res, .src = want_rem ? rdx : rax } );
+            mov( res, want_rem ? rdx : rax );
         }
 
-        void lower_unary( const ir::IRInst& inst, const UnaryOp op )
+        template < typename Op >
+        void lower_unary( const ir::IRInst& inst )
         {
             const auto dst = reg_for( inst.result );
-            m_builder.push( inst::Mov { .dst = dst, .src = reg_for( operand( inst, 0 ) ) } );
-            m_builder.push( inst::Unary { .op = op, .dst = dst } );
+            mov( dst, reg_for( operand( inst, 0 ) ) );
+            m_builder.push( Op { GprMem { dst } } );
         }
 
-        void lower_shift( const ir::IRInst& inst, const ShiftOp op )
+        template < typename ByCl, typename ByImm >
+        void lower_shift( const ir::IRInst& inst )
         {
             constexpr auto rcx = Reg::from_preg( RCX );
 
             const auto dst = reg_for( inst.result );
-            m_builder.push( inst::Mov { .dst = dst, .src = reg_for( operand( inst, 0 ) ) } );
+            mov( dst, reg_for( operand( inst, 0 ) ) );
 
             if ( const auto imm = fold_operand( inst, 1 ) )
             {
-                m_builder.push( inst::ShiftImm { .op = op, .dst = dst, .imm = static_cast< uint8_t >( *imm ) } );
+                m_builder.push( ByImm { GprMem { dst }, static_cast< int8_t >( *imm ) } );
                 return;
             }
 
-            m_builder.push( inst::Mov { .dst = rcx, .src = reg_for( operand( inst, 1 ) ) } );
-            m_builder.push( inst::Shift { .op = op, .dst = dst, .count = rcx } );
+            mov( rcx, reg_for( operand( inst, 1 ) ) );
+            m_builder.push( ByCl { GprMem { dst }, rcx } );
         }
 
         void lower_select( const ir::IRInst& inst )
         {
             const auto dst = reg_for( inst.result );
-            m_builder.push( inst::Mov { .dst = dst, .src = reg_for( operand( inst, 2 ) ) } );
-            m_builder.push( inst::TestReg { .reg = reg_for( operand( inst, 0 ) ), .size = size_of( type_of( operand( inst, 0 ) ) ) } );
-            m_builder.push( inst::CMov { .cc = CC::NE, .dst = dst, .src = reg_for( operand( inst, 1 ) ) } );
+            mov( dst, reg_for( operand( inst, 2 ) ) );
+            push_test( reg_for( operand( inst, 0 ) ), type_of( operand( inst, 0 ) ) );
+            m_builder.push( inst::cmovq_rm { dst, GprMem { reg_for( operand( inst, 1 ) ) }, CC::NE } );
         }
 
         void lower_extend( const ir::IRInst& inst, const bool is_signed )
         {
-            const auto dst  = reg_for( inst.result );
-            const auto src  = reg_for( operand( inst, 0 ) );
-            const auto size = size_of( type_of( operand( inst, 0 ) ) );
+            const auto   dst = reg_for( inst.result );
+            const auto   reg = reg_for( operand( inst, 0 ) );
+            const GprMem src { reg };
 
-            if ( is_signed ) m_builder.push( inst::Movsx { .dst = dst, .src = src, .size = size } );
-            else
-                m_builder.push( inst::Movzx { .dst = dst, .src = src, .size = size } );
+            switch ( ir::bit_width( type_of( operand( inst, 0 ) ) ) )
+            {
+                case 8:
+                    if ( is_signed ) m_builder.push( inst::movsxq_rm8 { dst, src } );
+                    else
+                        m_builder.push( inst::movzxq_rm8 { dst, src } );
+                    break;
+                case 16:
+                    if ( is_signed ) m_builder.push( inst::movsxq_rm16 { dst, src } );
+                    else
+                        m_builder.push( inst::movzxq_rm16 { dst, src } );
+                    break;
+                case 32:
+                    if ( is_signed ) m_builder.push( inst::movsxdq_rm32 { dst, src } );
+                    else
+                        m_builder.push( inst::movl_rm { dst, src } );
+                    break;
+                default: mov( dst, reg ); break;
+            }
         }
 
         void lower_ireduce( const ir::IRInst& inst )
-        { m_builder.push( inst::Mov { .dst = reg_for( inst.result ), .src = reg_for( operand( inst, 0 ) ) } ); }
+        { mov( reg_for( inst.result ), reg_for( operand( inst, 0 ) ) ); }
 
         void lower_block_args( const std::span< const ir::ValueRef > args, const ir::IRBlock& target )
         {
@@ -579,8 +635,7 @@ namespace xiao::x86_64
 
             if ( !overlaps )
             {
-                for ( const auto& c : copies )
-                    m_builder.push( inst::Mov { .dst = Reg::from_vreg( c.dst ), .src = Reg::from_vreg( c.src ) } );
+                for ( const auto& c : copies ) mov( Reg::from_vreg( c.dst ), Reg::from_vreg( c.src ) );
                 return;
             }
 
@@ -589,11 +644,11 @@ namespace xiao::x86_64
             for ( const auto& c : copies )
             {
                 temps.push_back( alloc_vreg( c.ty ) );
-                m_builder.push( inst::Mov { .dst = Reg::from_vreg( temps.back( ) ), .src = Reg::from_vreg( c.src ) } );
+                mov( Reg::from_vreg( temps.back( ) ), Reg::from_vreg( c.src ) );
             }
 
             for ( std::size_t i { 0 }; i < copies.size( ); ++i )
-                m_builder.push( inst::Mov { .dst = Reg::from_vreg( copies[ i ].dst ), .src = Reg::from_vreg( temps[ i ] ) } );
+                mov( Reg::from_vreg( copies[ i ].dst ), Reg::from_vreg( temps[ i ] ) );
         }
 
         struct CallTarget
@@ -616,8 +671,7 @@ namespace xiao::x86_64
             {
                 assert( csig.params[ i ].is_reg( ) && "[xiao::lower::emit_call] stack passed args not supported YET" );
                 args.push_back( csig.params[ i ].reg( ) );
-                m_builder.push( inst::Mov { .dst = Reg::from_preg( args.back( ) ),
-                                            .src = reg_for( m_fn->operands[ inst.ops_offset + first_arg + i ] ) } );
+                mov( Reg::from_preg( args.back( ) ), reg_for( m_fn->operands[ inst.ops_offset + first_arg + i ] ) );
             }
 
             const auto ret_preg = rets.empty( ) ? PReg::invalid( ) : csig.rets[ 0 ].reg( );
@@ -626,20 +680,12 @@ namespace xiao::x86_64
             for ( const auto callee_env = env_for( cc ); const auto& cls : callee_env.preferred )
                 clobbers.insert( clobbers.end( ), cls.begin( ), cls.end( ) );
 
-            if ( target.name )
-                m_builder.push( inst::Call { .name     = *target.name,
-                                             .args     = std::move( args ),
-                                             .ret      = ret_preg,
-                                             .clobbers = std::move( clobbers ),
-                                             .cc       = cc } );
+            support::Box info { inst::CallInfo { .args = std::move( args ), .ret = ret_preg, .clobbers = std::move( clobbers ), .cc = cc } };
+            if ( target.name ) m_builder.push( inst::Call { .name = *target.name, .info = std::move( info ) } );
             else
-                m_builder.push( inst::CallInd { .target   = target.reg,
-                                                .args     = std::move( args ),
-                                                .ret      = ret_preg,
-                                                .clobbers = std::move( clobbers ),
-                                                .cc       = cc } );
+                m_builder.push( inst::CallInd { .target = target.reg, .info = std::move( info ) } );
 
-            if ( ret_preg.valid( ) ) m_builder.push( inst::Mov { .dst = reg_for( inst.result ), .src = Reg::from_preg( ret_preg ) } );
+            if ( ret_preg.valid( ) ) mov( reg_for( inst.result ), Reg::from_preg( ret_preg ) );
         }
 
         void lower_call( const ir::IRInst& inst )

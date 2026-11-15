@@ -1,7 +1,5 @@
 #include "parser.hh"
 
-#include <charconv>
-#include <optional>
 #include <string>
 #include <utility>
 
@@ -12,22 +10,6 @@ namespace isagen
         [[nodiscard]] constexpr bool is_atom_char( const char c ) noexcept
         { return c > ' ' && c != '(' && c != ')' && c != '"' && c != ';'; }
 
-        [[nodiscard]] std::optional< uint64_t > parse_int( std::string_view text ) noexcept
-        {
-            int base = 10;
-            if ( text.starts_with( "0x" ) )
-            {
-                base = 16;
-                text.remove_prefix( 2 );
-            }
-
-            uint64_t          value { };
-            const auto* const last = text.data( ) + text.size( );
-            if ( const auto [ ptr, ec ] = std::from_chars( text.data( ), last, value, base );
-                 text.empty( ) || ec != std::errc { } || ptr != last )
-                return std::nullopt;
-            return value;
-        }
     } // namespace
 
     Lexer::Lexer( const std::string_view src, const std::string_view file ) noexcept : m_src { src }, m_loc { .file = file } { }
@@ -122,11 +104,7 @@ namespace isagen
 
             case TokenType::RParen: fail( tok.loc, "unexpected ')'" );
             case TokenType::String: return SExp { String { std::string { tok.lexeme } }, tok.loc };
-            case TokenType::Atom:
-            {
-                if ( const auto n = parse_int( tok.lexeme ) ) return SExp { *n, tok.loc };
-                return SExp { Symbol { std::string { tok.lexeme } }, tok.loc };
-            }
+            case TokenType::Atom: return SExp { Symbol { std::string { tok.lexeme } }, tok.loc };
 
             case TokenType::END: std::unreachable( );
         }

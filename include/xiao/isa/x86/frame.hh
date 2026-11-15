@@ -66,8 +66,8 @@ namespace xiao::x86_64
 
         const auto calls_fc = []( const X86Inst& i )
         {
-            if ( const auto* c = std::get_if< inst::Call >( &i.inner ) ) return c->cc == CallConv::WindowsFastcall;
-            if ( const auto* c = std::get_if< inst::CallInd >( &i.inner ) ) return c->cc == CallConv::WindowsFastcall;
+            if ( const auto* c = i.inner.get_if< inst::Call >( ) ) return c->info->cc == CallConv::WindowsFastcall;
+            if ( const auto* c = i.inner.get_if< inst::CallInd >( ) ) return c->info->cc == CallConv::WindowsFastcall;
             return false;
         };
 

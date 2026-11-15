@@ -1,0 +1,3 @@
+(header "xiao/isa/x86/pseudo.hh")
+
+(pseudo MovImm Jmp Jcc Call CallInd LoadExtName StackAddr DummyUse)

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+#include <cstdlib>
 #include <print>
 #include <string>
 #include <string_view>
@@ -33,8 +35,8 @@ namespace isagen
 
     struct SExp
     {
-        std::variant< Symbol, String, uint64_t, std::vector< SExp > > value;
-        Location                                                      loc;
+        std::variant< Symbol, String, std::vector< SExp > > value;
+        Location                                            loc;
     };
 
     using List = std::vector< SExp >;

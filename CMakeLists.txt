@@ -30,7 +30,6 @@ add_library(xiao::xiao ALIAS xiao_headers)
 
 target_include_directories(xiao_headers INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<BUILD_INTERFACE:${XIAO_GEN_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
 
@@ -40,7 +39,7 @@ if (TARGET xiao-isagen AND XIAO_X86_ISA)
     set(XIAO_X86_GEN_TESTS "${XIAO_GEN_DIR}/tests/x86_insts_test.cc")
 
     xiao_isagen(xiao_x86_gen
-        HEADER "${XIAO_GEN_DIR}/include/xiao/isa/x86/gen/insts.hh"
+        HEADER "${CMAKE_CURRENT_SOURCE_DIR}/include/xiao/isa/x86/gen/insts.hh"
         TESTS  "${XIAO_X86_GEN_TESTS}"
         INPUTS ${XIAO_X86_ISA}
     )

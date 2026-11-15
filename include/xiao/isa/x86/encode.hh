@@ -1,7 +1,7 @@
 #pragma once
 
 #include <xiao/codegen/machbuffer.hh>
-#include <xiao/isa/x86/inst.hh>
+#include <xiao/isa/x86/base.hh>
 #include <cassert>
 #include <cstdint>
 

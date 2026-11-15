@@ -2,7 +2,6 @@
 
 #include <xiao/regalloc/regalloc.hh>
 #include <xiao/codegen/machbuffer.hh>
-#include <xiao/isa/x86/emit_impl.hh>
 #include <xiao/isa/x86/frame.hh>
 #include <xiao/isa/x86/inst.hh>
 #include <array>
@@ -47,9 +46,9 @@ namespace xiao::x86_64
                 emit_edits( buf, frame, std::span< const regalloc::Edit > { edit, edits_end } );
                 edit = edits_end;
 
-                if ( const auto* jmp = std::get_if<inst::Jmp>(&vcode.insts[i_idx].inner); jmp && jmp->target.id == bi + 1) continue;
+                if ( const auto* jmp = vcode.insts[i_idx].inner.get_if< inst::Jmp >( ); jmp && jmp->target.id == bi + 1) continue;
 
-                if ( const auto* jcc = std::get_if<inst::Jcc>(&vcode.insts[i_idx].inner);
+                if ( const auto* jcc = vcode.insts[i_idx].inner.get_if< inst::Jcc >( );
                     jcc && (jcc->taken.id == bi + 1 || jcc->not_taken.id == bi + 1 )
                 )
                 {

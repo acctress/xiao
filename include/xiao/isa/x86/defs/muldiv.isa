@@ -1,0 +1,55 @@
+(for (s pre        rm   r    isz iz)
+     ((w "66 "      rm16 r16  16  iw)
+      (l ""         rm32 r32  32  id)
+      (q "REX.W + " rm64 r64  32  id))
+
+  (inst imul${s}_rm       (asm "imul") (ops (rw dst $r) (r src $rm))                   (enc RM "${pre}0F AF /r"))
+  (inst imul${s}_rmi8     (asm "imul") (ops (w dst $r) (r src $rm) (imm imm8))         (enc RMI "${pre}6B /r ib"))
+  (inst imul${s}_rmi$isz  (asm "imul") (ops (w dst $r) (r src $rm) (imm imm$isz))      (enc RMI "${pre}69 /r $iz"))
+
+  (for (op   ext)
+       ((mul  4)
+        (imul 5)
+        (div  6)
+        (idiv 7))
+    (inst ${op}${s}_m
+      (asm "$op")
+      (ops (r src $rm) (rw rax $r (fixed rax)) (rw rdx $r (fixed rdx)))
+      (enc M "${pre}F7 /$ext")))
+
+  (for (op  opc ext)
+       ((not F7 2)
+        (neg F7 3)
+        (inc FF 0)
+        (dec FF 1))
+    (inst ${op}${s}_m
+      (asm "$op")
+      (ops (rw dst $rm))
+      (enc M "${pre}$opc /$ext"))))
+
+(for (op   ext)
+     ((mul  4)
+      (imul 5)
+      (div  6)
+      (idiv 7))
+  (inst ${op}b_m
+    (asm "$op")
+    (ops (r src rm8) (rw rax r16 (fixed rax)))
+    (enc M "F6 /$ext")))
+
+(for (op  opc ext)
+     ((not F6 2)
+      (neg F6 3)
+      (inc FE 0)
+      (dec FE 1))
+  (inst ${op}b_m
+    (asm "$op")
+    (ops (rw dst rm8))
+    (enc M "$opc /$ext")))
+
+(inst cbw  (asm "cbw")  (ops (rw rax r16 (fixed rax)))                          (enc ZO "66 98"))
+(inst cwde (asm "cwde") (ops (rw rax r32 (fixed rax)))                          (enc ZO "98"))
+(inst cdqe (asm "cdqe") (ops (rw rax r64 (fixed rax)))                          (enc ZO "REX.W + 98"))
+(inst cwd  (asm "cwd")  (ops (r rax r16 (fixed rax)) (w rdx r16 (fixed rdx)))   (enc ZO "66 99"))
+(inst cdq  (asm "cdq")  (ops (r rax r32 (fixed rax)) (w rdx r32 (fixed rdx)))   (enc ZO "99"))
+(inst cqo  (asm "cqo")  (ops (r rax r64 (fixed rax)) (w rdx r64 (fixed rdx)))   (enc ZO "REX.W + 99"))
