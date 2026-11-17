@@ -1,0 +1,18 @@
+\doxysection{xiao::codegen::Mach\+InstC Concept Reference}
+\hypertarget{conceptxiao_1_1codegen_1_1MachInstC}{}\label{conceptxiao_1_1codegen_1_1MachInstC}\index{xiao::codegen::MachInstC@{xiao::codegen::MachInstC}}
+
+
+{\ttfamily \+\#include $<$machinst.\+hh$>$}
+
+\doxysubsection{Concept definition}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{\ \ \ \ \textcolor{keyword}{concept\ }\doxymbox{\hyperlink{conceptxiao_1_1codegen_1_1MachInstC}{MachInstC}}\ =\ \textcolor{keyword}{requires}(T\ inst,\ std::vector<MachOperand>\&\ ops)}
+\DoxyCodeLine{\ \ \ \ \{}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ inst.get\_operands(\ ops\ );}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \{\ inst.is\_term(\ )\ \ \ \ \ \ \ \}\ -\/>\ std::same\_as<MachTerminator>;}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \{\ inst.is\_mem\_access(\ )\ \}\ -\/>\ std::same\_as<bool>;}
+\DoxyCodeLine{\ \ \ \ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,11 @@
+PROJECT_NAME            = "xiao"
+FILE_PATTERNS           = *.cc *.hh
+INPUT                   = source include
+RECURSIVE               = YES
+OUTPUT_DIRECTORY        = docs/output
+GENERATE_HTML           = YES
+HTML_EXTRA_STYLESHEET   = docs/theme/doxygen-awesome.css
+HTML_COLORSTYLE         = DARK
+EXTRACT_ALL             = YES
+HAVE_DOT                = NO
+WARN_NO_PARAMDOC        = YES

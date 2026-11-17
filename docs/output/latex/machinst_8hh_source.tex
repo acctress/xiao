@@ -1,0 +1,83 @@
+\doxysection{machinst.\+hh}
+\hypertarget{machinst_8hh_source}{}\label{machinst_8hh_source}\index{include/xiao/codegen/machinst.hh@{include/xiao/codegen/machinst.hh}}
+\doxymbox{\hyperlink{machinst_8hh}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{//}}
+\DoxyCodeLine{00002\ \textcolor{comment}{//\ Created\ by\ griffith\ on\ 18/10/2026.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ <\doxymbox{\hyperlink{codegen_2reg_8hh}{xiao/codegen/reg.hh}}>}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ <\doxymbox{\hyperlink{operand_8hh}{xiao/codegen/operand.hh}}>}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ <\doxymbox{\hyperlink{types_8hh}{xiao/ir/types.hh}}>}}
+\DoxyCodeLine{00010\ }
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#include\ <cstdint>}}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#include\ <optional>}}
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{00014\ \textcolor{preprocessor}{\#include\ <utility>}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00016\ }
+\DoxyCodeLine{00017\ \textcolor{keyword}{namespace\ }\doxymbox{\hyperlink{namespacexiao_1_1codegen}{xiao::codegen}}}
+\DoxyCodeLine{00018\ \{}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00021\ \ \ \ \ \textcolor{keyword}{enum\ class}\ \doxymbox{\hyperlink{namespacexiao_1_1codegen_aa722ecb0ef0a99616802a913e5e3c008}{MachTerminator}}\ :\ uint8\_t}
+\DoxyCodeLine{00022\ \ \ \ \ \{}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{namespacexiao_1_1codegen_aa722ecb0ef0a99616802a913e5e3c008a6adf97f83acf6453d4a6a4b1070f3754}{None}},\ \ \ \ \ \ \ }
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{namespacexiao_1_1codegen_aa722ecb0ef0a99616802a913e5e3c008aa4228a09dd66155de8e93a39245768bd}{Ret}},\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{namespacexiao_1_1codegen_aa722ecb0ef0a99616802a913e5e3c008adacdb83ade6c4e8878717e206175dfd8}{Branch}},\ \ \ \ \ }
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{namespacexiao_1_1codegen_aa722ecb0ef0a99616802a913e5e3c008acf318911898d0b10b63adc173f49a595}{CondBranch}},\ }
+\DoxyCodeLine{00027\ \ \ \ \ \};}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00032\ \ \ \ \ \textcolor{keyword}{template}\ <\ \textcolor{keyword}{typename}\ Derived,\ \textcolor{keyword}{typename}\ LabelUse\ >}
+\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keyword}{class\ }\doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst}{MachInst}}}
+\DoxyCodeLine{00034\ \ \ \ \ \{}
+\DoxyCodeLine{00035\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst_a51b6f32e73f7f8b99fecd9b3d5cdbbdf}{get\_operands}}(\ std::vector<\ MachOperand\ >\ \&ops\ )}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \{\ self(\ ).get\_operands(\ ops\ );\ \}}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ [[nodiscard]]\ \doxymbox{\hyperlink{namespacexiao_1_1codegen_aa722ecb0ef0a99616802a913e5e3c008}{MachTerminator}}\ \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst_af6e8b9f5bcbf25332c1806f98cab4df4}{is\_term}}(\ )\ const\ noexcept}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \{\ \textcolor{keywordflow}{return}\ self(\ ).is\_term(\ );\ \}}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ [[nodiscard]]\ std::optional<\ std::pair<\ Reg,\ Reg\ >\ >\ \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst_a4740caa2f92e7f56a277901fbf95a3a5}{as\_move}}(\ )\ const\ noexcept}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \{\ \textcolor{keywordflow}{return}\ self(\ ).as\_move(\ );\ \}}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ [[nodiscard]]\ \textcolor{keywordtype}{bool}\ \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst_ab82e15ad7da93dc984c74aa93c0028f5}{is\_mem\_access}}(\ )\ const\ noexcept}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \{\ \textcolor{keywordflow}{return}\ self(\ ).is\_mem\_access(\ );\ \}}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ [[nodiscard]]\ \textcolor{keyword}{static}\ Derived\ \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst_ac37dab25054f1451edc9022bb38eadba}{gen\_move}}(\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg}{Reg}}\ dst,\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg}{Reg}}\ src,\ \doxymbox{\hyperlink{namespacexiao_1_1ir_a307713cf4121f80d62a84fb66835ef8f}{ir::Type}}\ ty\ )\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ [[nodiscard]]\ \textcolor{keyword}{static}\ Derived\ \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst_af741e85d07c49ca621c5b415e9fc4622}{gen\_dummy\_use}}(\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg}{Reg}}\ reg\ )\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ [[nodiscard]]\ \textcolor{keyword}{static}\ Derived\ \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst_ac02ecc42e201155b159150a9bb93541f}{gen\_jump}}(\ uint32\_t\ target\ )\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ [[nodiscard]]\ \textcolor{keyword}{static}\ Derived\ \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst_aed9f73229e4fd3c264157651e48579eb}{gen\_nop}}(\ std::size\_t\ preferred\_size\ )\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ [[nodiscard]]\ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ uint32\_t\ \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst_a125e4ee9087decb7366b6671530d5cda}{worst\_case\_size}}(\ )\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ [[nodiscard]]\ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ uint32\_t\ \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst_ad528741da5ee6ea95555d4265079d8bb}{worst\_case\_island\_growth}}(\ )\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\ \textcolor{keyword}{typename}\ State,\ \textcolor{keyword}{typename}\ Info\ >}
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst_af0fdc6d5c16c93ac26d84413048904d2}{emit}}(\ std::vector<\ uint8\_t\ >\ \&buf,\ \textcolor{keyword}{const}\ Info\ \&info,\ State\ \&state\ )\ \textcolor{keyword}{const}\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \textcolor{keyword}{template}\ <\ \textcolor{keyword}{typename}\ State\ >}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ [[nodiscard]]\ std::string\ \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst_a756d5504aee44cd1b8e02aef0eeb31a6}{fmt}}(\ State\ \&state\ )\ \textcolor{keyword}{const}\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ [[nodiscard]]\ Derived\ \&self(\ )\ noexcept}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\ Derived\ \&\ \textcolor{keyword}{>}(\ *this\ );\ \}}
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ [[nodiscard]]\ \textcolor{keyword}{const}\ Derived\ \&self(\ )\ const\ noexcept}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\ \textcolor{keyword}{const\ }Derived\ \&\ \textcolor{keyword}{>}(\ *this\ );\ \}}
+\DoxyCodeLine{00084\ \ \ \ \ \};}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00087\ \ \ \ \ \textcolor{keyword}{concept\ }\doxymbox{\hyperlink{conceptxiao_1_1codegen_1_1MachInstC}{MachInstC}}\ =\ \textcolor{keyword}{requires}(T\ inst,\ std::vector<MachOperand>\&\ ops)}
+\DoxyCodeLine{00088\ \ \ \ \ \{}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ inst.get\_operands(\ ops\ );}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \{\ inst.is\_term(\ )\ \ \ \ \ \ \ \}\ -\/>\ std::same\_as<MachTerminator>;}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \{\ inst.is\_mem\_access(\ )\ \}\ -\/>\ std::same\_as<bool>;}
+\DoxyCodeLine{00092\ \ \ \ \ \};}
+\DoxyCodeLine{00093\ \}\ \textcolor{comment}{//\ namespace\ xiao::codegen}}
+
+\end{DoxyCode}

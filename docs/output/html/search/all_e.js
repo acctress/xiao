@@ -1,0 +1,23 @@
+var searchData=
+[
+  ['offset_0',['offset',['../structxiao_1_1x86__64_1_1inst_1_1LeaFrame.html#a1d3034c4ba59ad8c6b4ac0e0b94b1009',1,'xiao::x86_64::inst::LeaFrame']]],
+  ['ok_1',['ok',['../structxiao_1_1ir_1_1IRVerifier.html#a1cf32d113bf21a8cc3d6e8b416e16797',1,'xiao::ir::IRVerifier']]],
+  ['on_5fblock_2',['on_block',['../classxiao_1_1ir_1_1IRVisitor.html#aff515c314227f3db115c989b966455e5',1,'xiao::ir::IRVisitor::on_block()'],['../classxiao_1_1x86__64_1_1IRLowerer.html#ad717ab79903c499a763e9c852ce7cd3f',1,'xiao::x86_64::IRLowerer::on_block()']]],
+  ['on_5fblock_5fend_3',['on_block_end',['../structxiao_1_1ir_1_1IRVerifier.html#a3dd30c5fc929dc13b40e6f756146daa9',1,'xiao::ir::IRVerifier::on_block_end()'],['../classxiao_1_1ir_1_1IRVisitor.html#adfb8005469c08a02f5531e44a5f41547',1,'xiao::ir::IRVisitor::on_block_end()'],['../classxiao_1_1x86__64_1_1IRLowerer.html#a716f5820416209297e9727649439a8c8',1,'xiao::x86_64::IRLowerer::on_block_end()']]],
+  ['on_5ffunction_4',['on_function',['../classxiao_1_1ir_1_1IRVisitor.html#a3900d24d9f70ba507d6bbcb2043cbe35',1,'xiao::ir::IRVisitor::on_function()'],['../classxiao_1_1x86__64_1_1IRLowerer.html#ad9908490e21c4289467416d39e7ba17e',1,'xiao::x86_64::IRLowerer::on_function()']]],
+  ['on_5ffunction_5fend_5',['on_function_end',['../classxiao_1_1ir_1_1IRVisitor.html#aecaf1739395feb1a71c9aef8f5223fd8',1,'xiao::ir::IRVisitor::on_function_end()'],['../classxiao_1_1x86__64_1_1IRLowerer.html#a7264e39e60500ad2c783f552db1f8e40',1,'xiao::x86_64::IRLowerer::on_function_end()']]],
+  ['on_5finst_6',['on_inst',['../classxiao_1_1ir_1_1IRVisitor.html#a7139b99390536e23dd17cb19ed3e75f4',1,'xiao::ir::IRVisitor::on_inst()'],['../classxiao_1_1x86__64_1_1IRLowerer.html#ae0c8011134ec6a87e0ce47a5a899fbd7',1,'xiao::x86_64::IRLowerer::on_inst()']]],
+  ['on_5foperand_7',['on_operand',['../classxiao_1_1ir_1_1IRVisitor.html#aa85cde68ca981bc68e158de7191d3453',1,'xiao::ir::IRVisitor']]],
+  ['op_8',['op',['../structxiao_1_1ir_1_1IRInst.html#aa0baa96499dcc50b34f33dc1b6d77586',1,'xiao::ir::IRInst::op'],['../structxiao_1_1x86__64_1_1inst_1_1Alu.html#a3a22fae4de977c109eb6a3213b497635',1,'xiao::x86_64::inst::Alu::op'],['../structxiao_1_1x86__64_1_1inst_1_1AluImm.html#a79d3508137b6e9bdc56c2e171b451353',1,'xiao::x86_64::inst::AluImm::op']]],
+  ['operand_2ehh_9',['operand.hh',['../operand_8hh.html',1,'']]],
+  ['operand_5franges_10',['operand_ranges',['../structxiao_1_1codegen_1_1VCode.html#a24b828fa6b93db064300badd1d10bbc1',1,'xiao::codegen::VCode']]],
+  ['operandkind_11',['OperandKind',['../namespacexiao_1_1codegen.html#a0ffda67b6b2c0f7317dd01cc4e986c7b',1,'xiao::codegen']]],
+  ['operandpos_12',['OperandPos',['../namespacexiao_1_1codegen.html#a318f5ddbbcd950f939a08d496ec90dfe',1,'xiao::codegen']]],
+  ['operands_13',['operands',['../structxiao_1_1codegen_1_1VCode.html#ad606751528c929a0e879c1418479a45f',1,'xiao::codegen::VCode::operands'],['../structxiao_1_1ir_1_1IRFunction.html#ad741be85ae6b8a367e78eeca7fdd41c4',1,'xiao::ir::IRFunction::operands']]],
+  ['operandsize_14',['OperandSize',['../namespacexiao_1_1x86__64.html#a03a42d43fecc5581e76692ee13316ebd',1,'xiao::x86_64']]],
+  ['operator_3d_15',['operator=',['../classxiao_1_1ir_1_1IRModule.html#a8df6baebb78c23b42502138cc3fe8fa7',1,'xiao::ir::IRModule::operator=(IRModule &amp;&amp;) noexcept=default'],['../classxiao_1_1ir_1_1IRModule.html#ad3ccb705703d1a7e3c85a735351cbd18',1,'xiao::ir::IRModule::operator=(const IRModule &amp;)=delete'],['../classxiao_1_1support_1_1Arena.html#a5ca009351d2d9bb4798bab7ee0e18458',1,'xiao::support::Arena::operator=(Arena &amp;&amp;) noexcept=default'],['../classxiao_1_1support_1_1Arena.html#a96d6aaf87f646f8240eab7d561afe8e9',1,'xiao::support::Arena::operator=(const Arena &amp;)=delete']]],
+  ['operator_3d_3d_16',['operator==',['../structxiao_1_1codegen_1_1MachOperand.html#a164854c9bdd2e8f561d2b698f1553dbc',1,'xiao::codegen::MachOperand::operator==()'],['../structxiao_1_1codegen_1_1PReg.html#a31132a458cfa25551a84b13251e313df',1,'xiao::codegen::PReg::operator==()'],['../structxiao_1_1codegen_1_1VReg.html#a94609ec941a0166ecb6910c003ebaa1f',1,'xiao::codegen::VReg::operator==()'],['../structxiao_1_1codegen_1_1Reg.html#a3d97049e35b24461f85f82ea7b0a453c',1,'xiao::codegen::Reg::operator==()'],['../structxiao_1_1x86__64_1_1PReg.html#a31132a458cfa25551a84b13251e313df',1,'xiao::x86_64::PReg::operator==()']]],
+  ['ops_5fcount_17',['ops_count',['../structxiao_1_1ir_1_1IRInst.html#a2b989dd604f18c2e9169d12b61568edc',1,'xiao::ir::IRInst']]],
+  ['ops_5foffset_18',['ops_offset',['../structxiao_1_1ir_1_1IRInst.html#a6b222f7ddbd624ea60b621793351a6cf',1,'xiao::ir::IRInst']]],
+  ['or_19',['Or',['../namespacexiao_1_1x86__64.html#a8da65268554e00220b5f0057e4b45145a3a2d5fe857d8f9541136a124c2edec6c',1,'xiao::x86_64']]]
+];

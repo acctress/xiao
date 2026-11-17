@@ -1,0 +1,26 @@
+(for (s pre        r)
+     ((w "66 "      r16)
+      (l ""         r32)
+      (q "REX.W + " r64))
+  (inst lea${s}_rm (asm "lea") (ops (w dst $r) (r src m)) (enc RM "${pre}8D /r")))
+
+(for (s pre        r   m)
+     ((l ""         r32 m32)
+      (q "REX.W + " r64 m64))
+  (inst movnti${s}_mr (asm "movnti") (ops (w dst $m) (r src $r)) (enc MR "${pre}0F C3 /r")))
+
+(for (op          ext)
+     ((prefetchnta 0)
+      (prefetcht0  1)
+      (prefetcht1  2)
+      (prefetcht2  3))
+  (inst ${op}_m8 (asm "$op") (ops (r src m8)) (enc M "0F 18 /$ext")))
+
+(inst clflush_m    (asm "clflush") (ops (r src m))   (enc M "0F AE /7"))
+(inst ldmxcsr_m32 (asm "ldmxcsr") (ops (r src m32)) (enc M "0F AE /2"))
+(inst stmxcsr_m32 (asm "stmxcsr") (ops (w dst m32)) (enc M "0F AE /3"))
+
+(inst cmpxchg8b_m64
+  (asm "cmpxchg8b")
+  (ops (rw dst m64) (rw rax r32 (fixed rax)) (rw rdx r32 (fixed rdx)) (r rbx r32 (fixed rbx)) (r rcx r32 (fixed rcx)))
+  (enc M "0F C7 /1"))

@@ -1,73 +1,95 @@
 cmake_minimum_required(VERSION 3.21)
 
 get_filename_component(PROJECT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-project(${PROJECT_NAME} VERSION 0.1.2 LANGUAGES CXX)
+
+project(${PROJECT_NAME} LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+option(XIAO_DISASM "fetch zydis and build the xiao-disasm code dumper into the example" ON)
+option(XIAO_TESTS "fetch catch2 and build the xiao test suite" ON)
+
+if (POLICY CMP0135)
+    cmake_policy(SET CMP0135 NEW)
+endif()
+
+if (MSVC)
+    add_compile_options(/MP)
+endif()
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-file(GLOB_RECURSE RASI_HEADERS CONFIGURE_DEPENDS
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/**/*.hh"
-)
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/ISAGen.cmake")
+add_subdirectory(tools/xiao-isagen)
 
-file(GLOB_RECURSE RASI_SOURCES CONFIGURE_DEPENDS
-    "${CMAKE_CURRENT_SOURCE_DIR}/lib/**/*.cc"
-)
+set(XIAO_GEN_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")
 
-add_library(rasi STATIC ${RASI_SOURCES} ${RASI_HEADERS})
+add_library(xiao_headers INTERFACE)
+add_library(xiao::xiao ALIAS xiao_headers)
 
-target_include_directories(rasi PUBLIC
+target_include_directories(xiao_headers INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
 
-target_compile_options(rasi PRIVATE
-    $<$<CXX_COMPILER_ID:GNU,Clang>:
-        -Wall -Wextra -Wpedantic
-        -Wno-unused-parameter
-        -fno-exceptions -fno-rtti
-    >
-    $<$<CXX_COMPILER_ID:MSVC>:
-        /W4 /WX /MP
-    >
-)
+file(GLOB XIAO_X86_ISA CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/include/xiao/isa/x86/defs/*.isa")
 
-set_target_properties(rasi PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin/lib"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin/lib"
-)
+if (TARGET xiao-isagen AND XIAO_X86_ISA)
+    set(XIAO_X86_GEN_TESTS "${XIAO_GEN_DIR}/tests/x86_insts_test.cc")
 
-if (RASIC_SOURCE)
-    add_executable(rasic ${RASIC_SOURCES})
-    target_link_libraries(rasic PRIVATE rasi)
-    set_target_properties(rasic PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin/exe"
+    xiao_isagen(xiao_x86_gen
+        HEADER "${CMAKE_CURRENT_SOURCE_DIR}/include/xiao/isa/x86/gen/insts.hh"
+        TESTS  "${XIAO_X86_GEN_TESTS}"
+        INPUTS ${XIAO_X86_ISA}
     )
+
+    add_dependencies(xiao_headers xiao_x86_gen)
+elseif (TARGET xiao-isagen)
+    message(STATUS "xiao-isagen: no .isa files in include/xiao/isa/x86/defs yet, x86 generation is off")
 endif()
 
-option(RASI_BUILD_TESTS "build tests" ON)
-
-include(FetchContent)
-
-FetchContent_Declare(
-        Catch2
-        GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-        GIT_TAG        v3.6.0
+file(GLOB_RECURSE PROJ_HEADERS CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/*.hh"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"
 )
 
-FetchContent_MakeAvailable(Catch2)
+file(GLOB_RECURSE PROJ_SOURCES CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cxx"
+)
 
-if (RASI_BUILD_TESTS)
-    file(GLOB_RECURSE TEST_SOURCES CONFIGURE_DEPENDS
-            "${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cc"
+add_executable(${PROJECT_NAME} ${PROJ_SOURCES} ${PROJ_HEADERS})
+
+target_link_libraries(${PROJECT_NAME} PRIVATE xiao::xiao)
+
+if (XIAO_DISASM)
+    include(FetchContent)
+
+    FetchContent_Declare(zydis
+        URL      https://github.com/zyantific/zydis/releases/download/v4.1.0/zydis-amalgamated.tar.gz
+        URL_HASH SHA256=aa9b82be3a37a2998bd8e16cf583bbf2b6c3d80e97dc20504169dc32ca1ced59
     )
-    add_executable(rasi_tests ${TEST_SOURCES})
-    target_link_libraries(rasi_tests PRIVATE rasi Catch2::Catch2WithMain)
-    set_target_properties(rasi_tests PROPERTIES
-            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin/exe"
-    )
+    FetchContent_MakeAvailable(zydis)
+
+    add_library(zydis STATIC "${zydis_SOURCE_DIR}/Zydis.c")
+    target_include_directories(zydis PUBLIC "${zydis_SOURCE_DIR}")
+    target_compile_definitions(zydis PUBLIC ZYDIS_STATIC_BUILD ZYCORE_STATIC_BUILD)
+    set_target_properties(zydis PROPERTIES C_STANDARD 11 C_STANDARD_REQUIRED ON)
+
+    target_link_libraries(${PROJECT_NAME} PRIVATE zydis)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE XIAO_HAS_ZYDIS)
+endif()
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin/exe"    
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin/lib"    
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin/lib"    
+)
+
+if (XIAO_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
 endif()

@@ -1,0 +1,80 @@
+\doxysection{xiao::support::Slab Struct Reference}
+\hypertarget{structxiao_1_1support_1_1Slab}{}\label{structxiao_1_1support_1_1Slab}\index{xiao::support::Slab@{xiao::support::Slab}}
+
+
+Heap allocated slab of memory, tracked bump pointer.  
+
+
+
+
+{\ttfamily \+\#include $<$arena.\+hh$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{structxiao_1_1support_1_1Slab_aba142a93c614654478ab575cc175f350}{Slab}} (const std::\+size\+\_\+t size)
+\item 
+std::\+size\+\_\+t \doxymbox{\hyperlink{structxiao_1_1support_1_1Slab_afb613e22113ca09ad7c1d09facc9044a}{remaining}} () const noexcept
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std::\+unique\+\_\+ptr$<$ std::\+byte\+[$\,$]\+$>$ \doxymbox{\hyperlink{structxiao_1_1support_1_1Slab_abff8d0d8aeab173ff5ee5748a858e61c}{data}}
+\item 
+std::\+byte \texorpdfstring{$\ast$}{*} \doxymbox{\hyperlink{structxiao_1_1support_1_1Slab_ad47e466b2b212eb23ee32b2fa61da38b}{cursor}}
+\item 
+std::\+byte \texorpdfstring{$\ast$}{*} \doxymbox{\hyperlink{structxiao_1_1support_1_1Slab_a0c1580973dcc00c1c5150798de3a7f97}{end}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Heap allocated slab of memory, tracked bump pointer. 
+
+\label{structxiao_1_1support_1_1Slab_doc-constructors}
+\Hypertarget{structxiao_1_1support_1_1Slab_doc-constructors}
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structxiao_1_1support_1_1Slab_aba142a93c614654478ab575cc175f350}\index{xiao::support::Slab@{xiao::support::Slab}!Slab@{Slab}}
+\index{Slab@{Slab}!xiao::support::Slab@{xiao::support::Slab}}
+\doxysubsubsection{\texorpdfstring{Slab()}{Slab()}}
+{\footnotesize\ttfamily \label{structxiao_1_1support_1_1Slab_aba142a93c614654478ab575cc175f350} 
+xiao::\+support::\+\+Slab::\+\+Slab (\begin{DoxyParamCaption}\item[{const std::\+size\+\_\+t}]{size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+\label{structxiao_1_1support_1_1Slab_doc-func-members}
+\Hypertarget{structxiao_1_1support_1_1Slab_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structxiao_1_1support_1_1Slab_afb613e22113ca09ad7c1d09facc9044a}\index{xiao::support::Slab@{xiao::support::Slab}!remaining@{remaining}}
+\index{remaining@{remaining}!xiao::support::Slab@{xiao::support::Slab}}
+\doxysubsubsection{\texorpdfstring{remaining()}{remaining()}}
+{\footnotesize\ttfamily \label{structxiao_1_1support_1_1Slab_afb613e22113ca09ad7c1d09facc9044a} 
+std::\+size\+\_\+t xiao::\+support::\+\+Slab::\+remaining (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}, {\ttfamily [noexcept]}}
+
+
+
+\label{structxiao_1_1support_1_1Slab_doc-variable-members}
+\Hypertarget{structxiao_1_1support_1_1Slab_doc-variable-members}
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structxiao_1_1support_1_1Slab_ad47e466b2b212eb23ee32b2fa61da38b}\index{xiao::support::Slab@{xiao::support::Slab}!cursor@{cursor}}
+\index{cursor@{cursor}!xiao::support::Slab@{xiao::support::Slab}}
+\doxysubsubsection{\texorpdfstring{cursor}{cursor}}
+{\footnotesize\ttfamily \label{structxiao_1_1support_1_1Slab_ad47e466b2b212eb23ee32b2fa61da38b} 
+std::\+byte\texorpdfstring{$\ast$}{*} xiao::\+support::\+\+Slab::\+cursor}
+
+\Hypertarget{structxiao_1_1support_1_1Slab_abff8d0d8aeab173ff5ee5748a858e61c}\index{xiao::support::Slab@{xiao::support::Slab}!data@{data}}
+\index{data@{data}!xiao::support::Slab@{xiao::support::Slab}}
+\doxysubsubsection{\texorpdfstring{data}{data}}
+{\footnotesize\ttfamily \label{structxiao_1_1support_1_1Slab_abff8d0d8aeab173ff5ee5748a858e61c} 
+std::\+unique\+\_\+ptr$<$std::\+byte\+[$\,$]\+$>$ xiao::\+support::\+\+Slab::\+data}
+
+\Hypertarget{structxiao_1_1support_1_1Slab_a0c1580973dcc00c1c5150798de3a7f97}\index{xiao::support::Slab@{xiao::support::Slab}!end@{end}}
+\index{end@{end}!xiao::support::Slab@{xiao::support::Slab}}
+\doxysubsubsection{\texorpdfstring{end}{end}}
+{\footnotesize\ttfamily \label{structxiao_1_1support_1_1Slab_a0c1580973dcc00c1c5150798de3a7f97} 
+std::\+byte\texorpdfstring{$\ast$}{*} xiao::\+support::\+\+Slab::\+end}
+
+
+
+The documentation for this struct was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+include/\+xiao/\+support/\doxymbox{\hyperlink{arena_8hh}{arena.\+hh}}\end{DoxyCompactItemize}

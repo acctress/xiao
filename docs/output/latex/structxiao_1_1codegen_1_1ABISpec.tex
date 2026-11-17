@@ -1,0 +1,58 @@
+\doxysection{xiao::codegen::ABISpec Struct Reference}
+\hypertarget{structxiao_1_1codegen_1_1ABISpec}{}\label{structxiao_1_1codegen_1_1ABISpec}\index{xiao::codegen::ABISpec@{xiao::codegen::ABISpec}}
+
+
+Interface for ABI resolution.  
+
+
+
+
+{\ttfamily \+\#include $<$abi.\+hh$>$}
+
+Inheritance diagram for xiao::codegen::ABISpec:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{structxiao_1_1codegen_1_1ABISpec}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual \doxymbox{\hyperlink{structxiao_1_1codegen_1_1ABISpec_ae6bcfaf5e900c032136e43dcc6350424}{\texorpdfstring{$\sim$}{\string~}\+ABISpec}} ()=default
+\item 
+virtual \doxymbox{\hyperlink{structxiao_1_1codegen_1_1ABISig}{ABISig}} \doxymbox{\hyperlink{structxiao_1_1codegen_1_1ABISpec_a80135e06d1f9a8ff3e806473dd61e632}{compute}} (\doxymbox{\hyperlink{namespacexiao_1_1codegen_af1ef83d221f63efda2cdf4265f9db8c8}{Call\+Conv}} cc, std::\+span$<$ const \doxymbox{\hyperlink{namespacexiao_1_1ir_a307713cf4121f80d62a84fb66835ef8f}{ir::\+\+Type}} $>$ params, std::\+span$<$ const \doxymbox{\hyperlink{namespacexiao_1_1ir_a307713cf4121f80d62a84fb66835ef8f}{ir::\+\+Type}} $>$ rets) const =0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Interface for ABI resolution. 
+
+\label{structxiao_1_1codegen_1_1ABISpec_doc-constructors}
+\Hypertarget{structxiao_1_1codegen_1_1ABISpec_doc-constructors}
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structxiao_1_1codegen_1_1ABISpec_ae6bcfaf5e900c032136e43dcc6350424}\index{xiao::codegen::ABISpec@{xiao::codegen::ABISpec}!````~ABISpec@{\texorpdfstring{$\sim$}{\string~}ABISpec}}
+\index{````~ABISpec@{\texorpdfstring{$\sim$}{\string~}ABISpec}!xiao::codegen::ABISpec@{xiao::codegen::ABISpec}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}ABISpec()}{\string~ABISpec()}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1ABISpec_ae6bcfaf5e900c032136e43dcc6350424} 
+virtual xiao::\+codegen::\+\+ABISpec::\+\texorpdfstring{$\sim$}{\string~}\+ABISpec (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}, {\ttfamily [default]}}
+
+
+
+\label{structxiao_1_1codegen_1_1ABISpec_doc-func-members}
+\Hypertarget{structxiao_1_1codegen_1_1ABISpec_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structxiao_1_1codegen_1_1ABISpec_a80135e06d1f9a8ff3e806473dd61e632}\index{xiao::codegen::ABISpec@{xiao::codegen::ABISpec}!compute@{compute}}
+\index{compute@{compute}!xiao::codegen::ABISpec@{xiao::codegen::ABISpec}}
+\doxysubsubsection{\texorpdfstring{compute()}{compute()}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1ABISpec_a80135e06d1f9a8ff3e806473dd61e632} 
+virtual \doxymbox{\hyperlink{structxiao_1_1codegen_1_1ABISig}{ABISig}} xiao::\+codegen::\+\+ABISpec::\+compute (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{namespacexiao_1_1codegen_af1ef83d221f63efda2cdf4265f9db8c8}{Call\+Conv}}}]{cc}{, }\item[{std::\+span$<$ const \doxymbox{\hyperlink{namespacexiao_1_1ir_a307713cf4121f80d62a84fb66835ef8f}{ir::\+\+Type}} $>$}]{params}{, }\item[{std::\+span$<$ const \doxymbox{\hyperlink{namespacexiao_1_1ir_a307713cf4121f80d62a84fb66835ef8f}{ir::\+\+Type}} $>$}]{rets}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [nodiscard]}, {\ttfamily [pure virtual]}}
+
+
+
+Implemented in \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1X86ABISpec_a05e894c0693e8b1a0444c7c7d5a923c5}{xiao::\+x86\+\_\+64::\+\+X86\+ABISpec}}.
+
+
+
+The documentation for this struct was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+include/\+xiao/\+codegen/\doxymbox{\hyperlink{codegen_2abi_8hh}{abi.\+hh}}\end{DoxyCompactItemize}

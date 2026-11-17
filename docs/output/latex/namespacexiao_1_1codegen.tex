@@ -1,0 +1,205 @@
+\doxysection{xiao::codegen Namespace Reference}
+\hypertarget{namespacexiao_1_1codegen}{}\label{namespacexiao_1_1codegen}\index{xiao::codegen@{xiao::codegen}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \doxymbox{\hyperlink{structxiao_1_1codegen_1_1ABISig}{ABISig}}
+\begin{DoxyCompactList}\small\item\em Resolved ABI assignment for one function signature. \end{DoxyCompactList}\item 
+struct \doxymbox{\hyperlink{structxiao_1_1codegen_1_1ABISpec}{ABISpec}}
+\begin{DoxyCompactList}\small\item\em Interface for ABI resolution. \end{DoxyCompactList}\item 
+struct \doxymbox{\hyperlink{structxiao_1_1codegen_1_1ArgLoc}{Arg\+Loc}}
+\begin{DoxyCompactList}\small\item\em A single solved argument or return location. \end{DoxyCompactList}\item 
+struct \doxymbox{\hyperlink{structxiao_1_1codegen_1_1BlockId}{Block\+Id}}
+\begin{DoxyCompactList}\small\item\em An opaque index into a \doxylink{structxiao_1_1codegen_1_1VCode}{VCode} block table. \end{DoxyCompactList}\item 
+struct \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachineEnv}{Machine\+Env}}
+\begin{DoxyCompactList}\small\item\em Register environment for a target ISA, register allocation facing Describes which registers the allocator may use and in what order. \end{DoxyCompactList}\item 
+class \doxymbox{\hyperlink{classxiao_1_1codegen_1_1MachInst}{Mach\+Inst}}
+\begin{DoxyCompactList}\small\item\em CRTP base for a \doxylink{classxiao_1_1codegen_1_1MachInst}{Mach\+Inst} contract. \end{DoxyCompactList}\item 
+struct \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand}{Mach\+Operand}}
+\begin{DoxyCompactList}\small\item\em A packed register operand for a \doxylink{classxiao_1_1codegen_1_1MachInst}{Mach\+Inst}. Layout: bits 63:43 -\/ vreg index bit 42 -\/ vreg class bits 41:40 -\/ \doxylink{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7b}{Operand\+Kind} bit 39 -\/ \doxylink{namespacexiao_1_1codegen_a318f5ddbbcd950f939a08d496ec90dfe}{Operand\+Pos} bit 38 -\/ constraint kind bits 37:8 -\/ reserved bits 7:0 -\/ \doxylink{structxiao_1_1codegen_1_1PReg}{PReg} bits if Fixed, else 0. \end{DoxyCompactList}\item 
+struct \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}}
+\begin{DoxyCompactList}\small\item\em A physical register Hardware encoding and register class packed into a single byte (6 bits, 1 bit). Layout: bit 0 -\/ \doxylink{namespacexiao_1_1codegen_a5bdfce66bc89d50cd7def0cda69899c6}{Reg\+Class} bits 6:1 -\/ hardware encoding bit 7 -\/ reserved. \end{DoxyCompactList}\item 
+struct \doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg}{Reg}}
+\begin{DoxyCompactList}\small\item\em A register, either physical or virtual. \end{DoxyCompactList}\item 
+struct \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCode}{VCode}}
+\begin{DoxyCompactList}\small\item\em Immutable virtual register code for one function. \end{DoxyCompactList}\item 
+struct \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VCodeBlock}{VCode\+Block}}
+\begin{DoxyCompactList}\small\item\em Metadata for a basic block in \doxylink{structxiao_1_1codegen_1_1VCode}{VCode}. \end{DoxyCompactList}\item 
+class \doxymbox{\hyperlink{classxiao_1_1codegen_1_1VCodeBuilder}{VCode\+Builder}}
+\begin{DoxyCompactList}\small\item\em Builder for \doxylink{structxiao_1_1codegen_1_1VCode}{VCode}{\itshape . }\end{DoxyCompactList}\item 
+struct \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VReg}{VReg}}
+\begin{DoxyCompactList}\small\item\em A virtual register Layout: bit 0 -\/ \doxylink{namespacexiao_1_1codegen_a5bdfce66bc89d50cd7def0cda69899c6}{Reg\+Class} bits 31:1 -\/ vreg index. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Concepts}
+\begin{DoxyCompactItemize}
+\item 
+concept \doxymbox{\hyperlink{conceptxiao_1_1codegen_1_1MachInstC}{Mach\+InstC}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum class \doxymbox{\hyperlink{namespacexiao_1_1codegen_af1ef83d221f63efda2cdf4265f9db8c8}{Call\+Conv}} : uint8\+\_\+t \{ \doxymbox{\hyperlink{namespacexiao_1_1codegen_af1ef83d221f63efda2cdf4265f9db8c8aeb14adeab2b36e2cc3d5066e7751a54c}{SystemV}}
+, \doxymbox{\hyperlink{namespacexiao_1_1codegen_af1ef83d221f63efda2cdf4265f9db8c8a9e6b89719d014d3efc5ca28505d29484}{Windows\+Fastcall}}
+ \}
+\begin{DoxyCompactList}\small\item\em Calling convention tag. \end{DoxyCompactList}\item 
+enum class \doxymbox{\hyperlink{namespacexiao_1_1codegen_aa722ecb0ef0a99616802a913e5e3c008}{Mach\+Terminator}} : uint8\+\_\+t \{ \doxymbox{\hyperlink{namespacexiao_1_1codegen_aa722ecb0ef0a99616802a913e5e3c008a6adf97f83acf6453d4a6a4b1070f3754}{None}}
+, \doxymbox{\hyperlink{namespacexiao_1_1codegen_aa722ecb0ef0a99616802a913e5e3c008aa4228a09dd66155de8e93a39245768bd}{Ret}}
+, \doxymbox{\hyperlink{namespacexiao_1_1codegen_aa722ecb0ef0a99616802a913e5e3c008adacdb83ade6c4e8878717e206175dfd8}{Branch}}
+, \doxymbox{\hyperlink{namespacexiao_1_1codegen_aa722ecb0ef0a99616802a913e5e3c008acf318911898d0b10b63adc173f49a595}{Cond\+Branch}}
+ \}
+\begin{DoxyCompactList}\small\item\em Describes how a block ends. \end{DoxyCompactList}\item 
+enum class \doxymbox{\hyperlink{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7b}{Operand\+Kind}} : uint8\+\_\+t \{ \doxymbox{\hyperlink{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7baad8783089f828b927473fb61d51940ec}{Use}} = 0
+, \doxymbox{\hyperlink{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7badde5c8d4149c5072d2cb798706663e78}{Def}} = 1
+, \doxymbox{\hyperlink{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7baf4cf2b0ec494cef0ef13b854a249ad13}{Use\+Def}} = 2
+ \}
+\begin{DoxyCompactList}\small\item\em The kind of operand an instruction will be using. \end{DoxyCompactList}\item 
+enum class \doxymbox{\hyperlink{namespacexiao_1_1codegen_a318f5ddbbcd950f939a08d496ec90dfe}{Operand\+Pos}} : uint8\+\_\+t \{ \doxymbox{\hyperlink{namespacexiao_1_1codegen_a318f5ddbbcd950f939a08d496ec90dfea9060587edeb01a63e3d3edc959678d1e}{Before}} = 0
+, \doxymbox{\hyperlink{namespacexiao_1_1codegen_a318f5ddbbcd950f939a08d496ec90dfea7bfcadb5535fe8aad5032762b7bfe159}{After}} = 1
+ \}
+\begin{DoxyCompactList}\small\item\em Whether the operand is live before or after the instruction. \end{DoxyCompactList}\item 
+enum class \doxymbox{\hyperlink{namespacexiao_1_1codegen_a5bdfce66bc89d50cd7def0cda69899c6}{Reg\+Class}} : uint8\+\_\+t \{ \doxymbox{\hyperlink{namespacexiao_1_1codegen_a5bdfce66bc89d50cd7def0cda69899c6a1686a6c336b71b36d77354cea19a8b52}{Int}} = 0
+, \doxymbox{\hyperlink{namespacexiao_1_1codegen_a5bdfce66bc89d50cd7def0cda69899c6a22ae0e2b89e5e3d477f988cc36d3272b}{Float}} = 1
+ \}
+\begin{DoxyCompactList}\small\item\em Register class. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\label{namespacexiao_1_1codegen_doc-enum-members}
+\Hypertarget{namespacexiao_1_1codegen_doc-enum-members}
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{namespacexiao_1_1codegen_af1ef83d221f63efda2cdf4265f9db8c8}\index{xiao::codegen@{xiao::codegen}!CallConv@{CallConv}}
+\index{CallConv@{CallConv}!xiao::codegen@{xiao::codegen}}
+\doxysubsubsection{\texorpdfstring{CallConv}{CallConv}}
+{\footnotesize\ttfamily \label{namespacexiao_1_1codegen_af1ef83d221f63efda2cdf4265f9db8c8} 
+enum class \doxymbox{\hyperlink{namespacexiao_1_1codegen_af1ef83d221f63efda2cdf4265f9db8c8}{xiao::\+codegen::\+\+Call\+Conv}} :\+ uint8\+\_\+t\hspace{0.3cm}{\ttfamily [strong]}}
+
+
+
+Calling convention tag. 
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SystemV@{SystemV}!xiao::codegen@{xiao::codegen}}
+\index{xiao::codegen@{xiao::codegen}!SystemV@{SystemV}}
+}\Hypertarget{namespacexiao_1_1codegen_af1ef83d221f63efda2cdf4265f9db8c8aeb14adeab2b36e2cc3d5066e7751a54c}\label{namespacexiao_1_1codegen_af1ef83d221f63efda2cdf4265f9db8c8aeb14adeab2b36e2cc3d5066e7751a54c} 
+SystemV&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{WindowsFastcall@{WindowsFastcall}!xiao::codegen@{xiao::codegen}}
+\index{xiao::codegen@{xiao::codegen}!WindowsFastcall@{WindowsFastcall}}
+}\Hypertarget{namespacexiao_1_1codegen_af1ef83d221f63efda2cdf4265f9db8c8a9e6b89719d014d3efc5ca28505d29484}\label{namespacexiao_1_1codegen_af1ef83d221f63efda2cdf4265f9db8c8a9e6b89719d014d3efc5ca28505d29484} 
+Windows\+Fastcall&\\
+\hline
+
+\end{DoxyEnumFields}
+\Hypertarget{namespacexiao_1_1codegen_aa722ecb0ef0a99616802a913e5e3c008}\index{xiao::codegen@{xiao::codegen}!MachTerminator@{MachTerminator}}
+\index{MachTerminator@{MachTerminator}!xiao::codegen@{xiao::codegen}}
+\doxysubsubsection{\texorpdfstring{MachTerminator}{MachTerminator}}
+{\footnotesize\ttfamily \label{namespacexiao_1_1codegen_aa722ecb0ef0a99616802a913e5e3c008} 
+enum class \doxymbox{\hyperlink{namespacexiao_1_1codegen_aa722ecb0ef0a99616802a913e5e3c008}{xiao::\+codegen::\+\+Mach\+Terminator}} :\+ uint8\+\_\+t\hspace{0.3cm}{\ttfamily [strong]}}
+
+
+
+Describes how a block ends. 
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{None@{None}!xiao::codegen@{xiao::codegen}}
+\index{xiao::codegen@{xiao::codegen}!None@{None}}
+}\Hypertarget{namespacexiao_1_1codegen_aa722ecb0ef0a99616802a913e5e3c008a6adf97f83acf6453d4a6a4b1070f3754}\label{namespacexiao_1_1codegen_aa722ecb0ef0a99616802a913e5e3c008a6adf97f83acf6453d4a6a4b1070f3754} 
+None&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Ret@{Ret}!xiao::codegen@{xiao::codegen}}
+\index{xiao::codegen@{xiao::codegen}!Ret@{Ret}}
+}\Hypertarget{namespacexiao_1_1codegen_aa722ecb0ef0a99616802a913e5e3c008aa4228a09dd66155de8e93a39245768bd}\label{namespacexiao_1_1codegen_aa722ecb0ef0a99616802a913e5e3c008aa4228a09dd66155de8e93a39245768bd} 
+Ret&Not a terminator. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Branch@{Branch}!xiao::codegen@{xiao::codegen}}
+\index{xiao::codegen@{xiao::codegen}!Branch@{Branch}}
+}\Hypertarget{namespacexiao_1_1codegen_aa722ecb0ef0a99616802a913e5e3c008adacdb83ade6c4e8878717e206175dfd8}\label{namespacexiao_1_1codegen_aa722ecb0ef0a99616802a913e5e3c008adacdb83ade6c4e8878717e206175dfd8} 
+Branch&Return from function. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{CondBranch@{CondBranch}!xiao::codegen@{xiao::codegen}}
+\index{xiao::codegen@{xiao::codegen}!CondBranch@{CondBranch}}
+}\Hypertarget{namespacexiao_1_1codegen_aa722ecb0ef0a99616802a913e5e3c008acf318911898d0b10b63adc173f49a595}\label{namespacexiao_1_1codegen_aa722ecb0ef0a99616802a913e5e3c008acf318911898d0b10b63adc173f49a595} 
+Cond\+Branch&Unconditional branch. \\
+\hline
+
+\end{DoxyEnumFields}
+\Hypertarget{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7b}\index{xiao::codegen@{xiao::codegen}!OperandKind@{OperandKind}}
+\index{OperandKind@{OperandKind}!xiao::codegen@{xiao::codegen}}
+\doxysubsubsection{\texorpdfstring{OperandKind}{OperandKind}}
+{\footnotesize\ttfamily \label{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7b} 
+enum class \doxymbox{\hyperlink{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7b}{xiao::\+codegen::\+\+Operand\+Kind}} :\+ uint8\+\_\+t\hspace{0.3cm}{\ttfamily [strong]}}
+
+
+
+The kind of operand an instruction will be using. 
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Use@{Use}!xiao::codegen@{xiao::codegen}}
+\index{xiao::codegen@{xiao::codegen}!Use@{Use}}
+}\Hypertarget{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7baad8783089f828b927473fb61d51940ec}\label{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7baad8783089f828b927473fb61d51940ec} 
+Use&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Def@{Def}!xiao::codegen@{xiao::codegen}}
+\index{xiao::codegen@{xiao::codegen}!Def@{Def}}
+}\Hypertarget{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7badde5c8d4149c5072d2cb798706663e78}\label{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7badde5c8d4149c5072d2cb798706663e78} 
+Def&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{UseDef@{UseDef}!xiao::codegen@{xiao::codegen}}
+\index{xiao::codegen@{xiao::codegen}!UseDef@{UseDef}}
+}\Hypertarget{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7baf4cf2b0ec494cef0ef13b854a249ad13}\label{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7baf4cf2b0ec494cef0ef13b854a249ad13} 
+Use\+Def&\\
+\hline
+
+\end{DoxyEnumFields}
+\Hypertarget{namespacexiao_1_1codegen_a318f5ddbbcd950f939a08d496ec90dfe}\index{xiao::codegen@{xiao::codegen}!OperandPos@{OperandPos}}
+\index{OperandPos@{OperandPos}!xiao::codegen@{xiao::codegen}}
+\doxysubsubsection{\texorpdfstring{OperandPos}{OperandPos}}
+{\footnotesize\ttfamily \label{namespacexiao_1_1codegen_a318f5ddbbcd950f939a08d496ec90dfe} 
+enum class \doxymbox{\hyperlink{namespacexiao_1_1codegen_a318f5ddbbcd950f939a08d496ec90dfe}{xiao::\+codegen::\+\+Operand\+Pos}} :\+ uint8\+\_\+t\hspace{0.3cm}{\ttfamily [strong]}}
+
+
+
+Whether the operand is live before or after the instruction. 
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Before@{Before}!xiao::codegen@{xiao::codegen}}
+\index{xiao::codegen@{xiao::codegen}!Before@{Before}}
+}\Hypertarget{namespacexiao_1_1codegen_a318f5ddbbcd950f939a08d496ec90dfea9060587edeb01a63e3d3edc959678d1e}\label{namespacexiao_1_1codegen_a318f5ddbbcd950f939a08d496ec90dfea9060587edeb01a63e3d3edc959678d1e} 
+Before&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{After@{After}!xiao::codegen@{xiao::codegen}}
+\index{xiao::codegen@{xiao::codegen}!After@{After}}
+}\Hypertarget{namespacexiao_1_1codegen_a318f5ddbbcd950f939a08d496ec90dfea7bfcadb5535fe8aad5032762b7bfe159}\label{namespacexiao_1_1codegen_a318f5ddbbcd950f939a08d496ec90dfea7bfcadb5535fe8aad5032762b7bfe159} 
+After&\\
+\hline
+
+\end{DoxyEnumFields}
+\Hypertarget{namespacexiao_1_1codegen_a5bdfce66bc89d50cd7def0cda69899c6}\index{xiao::codegen@{xiao::codegen}!RegClass@{RegClass}}
+\index{RegClass@{RegClass}!xiao::codegen@{xiao::codegen}}
+\doxysubsubsection{\texorpdfstring{RegClass}{RegClass}}
+{\footnotesize\ttfamily \label{namespacexiao_1_1codegen_a5bdfce66bc89d50cd7def0cda69899c6} 
+enum class \doxymbox{\hyperlink{namespacexiao_1_1codegen_a5bdfce66bc89d50cd7def0cda69899c6}{xiao::\+codegen::\+\+Reg\+Class}} :\+ uint8\+\_\+t\hspace{0.3cm}{\ttfamily [strong]}}
+
+
+
+Register class. 
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Int@{Int}!xiao::codegen@{xiao::codegen}}
+\index{xiao::codegen@{xiao::codegen}!Int@{Int}}
+}\Hypertarget{namespacexiao_1_1codegen_a5bdfce66bc89d50cd7def0cda69899c6a1686a6c336b71b36d77354cea19a8b52}\label{namespacexiao_1_1codegen_a5bdfce66bc89d50cd7def0cda69899c6a1686a6c336b71b36d77354cea19a8b52} 
+Int&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Float@{Float}!xiao::codegen@{xiao::codegen}}
+\index{xiao::codegen@{xiao::codegen}!Float@{Float}}
+}\Hypertarget{namespacexiao_1_1codegen_a5bdfce66bc89d50cd7def0cda69899c6a22ae0e2b89e5e3d477f988cc36d3272b}\label{namespacexiao_1_1codegen_a5bdfce66bc89d50cd7def0cda69899c6a22ae0e2b89e5e3d477f988cc36d3272b} 
+Float&\\
+\hline
+
+\end{DoxyEnumFields}

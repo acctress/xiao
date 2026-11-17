@@ -1,0 +1,117 @@
+\doxysection{operand.\+hh}
+\hypertarget{operand_8hh_source}{}\label{operand_8hh_source}\index{include/xiao/codegen/operand.hh@{include/xiao/codegen/operand.hh}}
+\doxymbox{\hyperlink{operand_8hh}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{//}}
+\DoxyCodeLine{00002\ \textcolor{comment}{//\ Created\ by\ griffith\ on\ 18/10/2026.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ <\doxymbox{\hyperlink{codegen_2reg_8hh}{xiao/codegen/reg.hh}}>}}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \textcolor{keyword}{namespace\ }\doxymbox{\hyperlink{namespacexiao_1_1codegen}{xiao::codegen}}\ \{}
+\DoxyCodeLine{00011\ \ \ \ \ \textcolor{keyword}{enum\ class}\ \doxymbox{\hyperlink{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7b}{OperandKind}}\ :\ uint8\_t\ \{}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7baad8783089f828b927473fb61d51940ec}{Use}}\ \ \ \ \ =\ 0,}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7badde5c8d4149c5072d2cb798706663e78}{Def}}\ \ \ \ \ =\ 1,}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7baf4cf2b0ec494cef0ef13b854a249ad13}{UseDef}}\ \ =\ 2,}
+\DoxyCodeLine{00015\ \ \ \ \ \};}
+\DoxyCodeLine{00016\ }
+\DoxyCodeLine{00018\ \ \ \ \ \textcolor{keyword}{enum\ class}\ \doxymbox{\hyperlink{namespacexiao_1_1codegen_a318f5ddbbcd950f939a08d496ec90dfe}{OperandPos}}\ :\ uint8\_t\ \{}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{namespacexiao_1_1codegen_a318f5ddbbcd950f939a08d496ec90dfea9060587edeb01a63e3d3edc959678d1e}{Before}}\ =\ 0,}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{namespacexiao_1_1codegen_a318f5ddbbcd950f939a08d496ec90dfea7bfcadb5535fe8aad5032762b7bfe159}{After}}\ \ =\ 1,}
+\DoxyCodeLine{00021\ \ \ \ \ \};}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00032\ \ \ \ \ \textcolor{keyword}{struct\ }\doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand}{MachOperand}}\ \{}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ uint64\_t\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a943b98da3bb40e392ac186d577ed4f7d}{bits}}\ \{\};}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ [[nodiscard]]\ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand}{MachOperand}}\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a90a2656197f506c0bc643f06cc238916}{any}}(}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VReg}{VReg}}\ \ \ \ \ \ \ \ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a1d3216ccd9dc3721ae6321bc2762e5b9}{vreg}},}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \doxymbox{\hyperlink{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7b}{OperandKind}}\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a1d83e9fa1ee446dd0e9b19aeb0561a60}{kind}},}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \doxymbox{\hyperlink{namespacexiao_1_1codegen_a318f5ddbbcd950f939a08d496ec90dfe}{OperandPos}}\ \ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a73c4642aa986decdd01bf91ce85ad5aa}{pos}}}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ )\ \textcolor{keyword}{noexcept}\ \{}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand}{MachOperand}}\ op;}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \ \ \ \ op.\doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a943b98da3bb40e392ac186d577ed4f7d}{bits}}\ =\ (\textcolor{keyword}{static\_cast<}uint64\_t\textcolor{keyword}{>}(\doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a1d3216ccd9dc3721ae6321bc2762e5b9}{vreg}}.\doxymbox{\hyperlink{structxiao_1_1codegen_1_1VReg_a2ecf3f8401cf9ad7c1a7c6f6ab254a5a}{index}}())\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ vreg\_index\_shift)}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ (\textcolor{keyword}{static\_cast<}uint64\_t\textcolor{keyword}{>}(\doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a1d3216ccd9dc3721ae6321bc2762e5b9}{vreg}}.\doxymbox{\hyperlink{structxiao_1_1codegen_1_1VReg_a691b1868b1ded8e4f609827a4f7afc82}{rc}}())\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ vreg\_class\_shift)}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ (\textcolor{keyword}{static\_cast<}uint64\_t\textcolor{keyword}{>}(\doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a1d83e9fa1ee446dd0e9b19aeb0561a60}{kind}})\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ kind\_shift)}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ (\textcolor{keyword}{static\_cast<}uint64\_t\textcolor{keyword}{>}(\doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a73c4642aa986decdd01bf91ce85ad5aa}{pos}})\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ pos\_shift);}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ op;}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ [[nodiscard]]\ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand}{MachOperand}}\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a230c5d280fd33274ba4850d2fbd7633f}{fixed}}(}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VReg}{VReg}}\ \ \ \ \ \ \ \ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a1d3216ccd9dc3721ae6321bc2762e5b9}{vreg}},}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \doxymbox{\hyperlink{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7b}{OperandKind}}\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a1d83e9fa1ee446dd0e9b19aeb0561a60}{kind}},}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \doxymbox{\hyperlink{namespacexiao_1_1codegen_a318f5ddbbcd950f939a08d496ec90dfe}{OperandPos}}\ \ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a73c4642aa986decdd01bf91ce85ad5aa}{pos}},}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}}\ \ \ \ \ \ \ \ preg}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ )\ \textcolor{keyword}{noexcept}\ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \ \ \ \ assert(preg.valid());}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand}{MachOperand}}\ op\ =\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a90a2656197f506c0bc643f06cc238916}{any}}(\doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a1d3216ccd9dc3721ae6321bc2762e5b9}{vreg}},\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a1d83e9fa1ee446dd0e9b19aeb0561a60}{kind}},\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a73c4642aa986decdd01bf91ce85ad5aa}{pos}});}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ op.\doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a943b98da3bb40e392ac186d577ed4f7d}{bits}}\ |=\ (1ull\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ fixed\_flag\_shift)}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ (\textcolor{keyword}{static\_cast<}uint64\_t\textcolor{keyword}{>}(preg.bits)\ \ \ <<\ preg\_shift);}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ op;}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ [[nodiscard]]\ \textcolor{keyword}{constexpr}\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VReg}{VReg}}\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a1d3216ccd9dc3721ae6321bc2762e5b9}{vreg}}()\ const\ noexcept\ \{}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VReg}{VReg}}\ r;}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \ \ \ \ r.\doxymbox{\hyperlink{structxiao_1_1codegen_1_1VReg_a321c264ff5c493c62e6c45638f62f1c8}{bits}}\ =\ \textcolor{keyword}{static\_cast<}uint32\_t\textcolor{keyword}{>}(}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((\doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a943b98da3bb40e392ac186d577ed4f7d}{bits}}\ \&\ vreg\_index\_mask)\ >>\ vreg\_index\_shift)\ <<\ 1\ |}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ((\doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a943b98da3bb40e392ac186d577ed4f7d}{bits}}\ \&\ vreg\_class\_mask)\ >>\ vreg\_class\_shift)}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ r;}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ [[nodiscard]]\ \textcolor{keyword}{constexpr}\ \doxymbox{\hyperlink{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7b}{OperandKind}}\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a1d83e9fa1ee446dd0e9b19aeb0561a60}{kind}}()\ const\ noexcept\ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\doxymbox{\hyperlink{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7b}{OperandKind}}\textcolor{keyword}{>}((\doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a943b98da3bb40e392ac186d577ed4f7d}{bits}}\ \&\ kind\_mask)\ >>\ kind\_shift);}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ [[nodiscard]]\ \textcolor{keyword}{constexpr}\ \doxymbox{\hyperlink{namespacexiao_1_1codegen_a318f5ddbbcd950f939a08d496ec90dfe}{OperandPos}}\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a73c4642aa986decdd01bf91ce85ad5aa}{pos}}()\ const\ noexcept\ \{}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}\doxymbox{\hyperlink{namespacexiao_1_1codegen_a318f5ddbbcd950f939a08d496ec90dfe}{OperandPos}}\textcolor{keyword}{>}((\doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a943b98da3bb40e392ac186d577ed4f7d}{bits}}\ \&\ pos\_mask)\ >>\ pos\_shift);}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ [[nodiscard]]\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{bool}\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a3f71a54b39e0a2ec403f20a224e358ad}{is\_fixed}}()\ const\ noexcept\ \{}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ (\doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a943b98da3bb40e392ac186d577ed4f7d}{bits}}\ \&\ fixed\_flag\_mask)\ !=\ 0;}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ [[nodiscard]]\ \textcolor{keyword}{constexpr}\ std::optional<PReg>\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_af8e3b61b7f7a63fb2eeb717c1661cb46}{fixed\_preg}}()\ const\ noexcept\ \{}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!\doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a3f71a54b39e0a2ec403f20a224e358ad}{is\_fixed}}())\ \textcolor{keywordflow}{return}\ std::nullopt;}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ \ \ \ \ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}}\ r;}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ r.\doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg_a345bceac0c8b123819babc7bbd387f58}{bits}}\ =\ \textcolor{keyword}{static\_cast<}uint8\_t\textcolor{keyword}{>}((\doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a943b98da3bb40e392ac186d577ed4f7d}{bits}}\ \&\ preg\_mask)\ >>\ preg\_shift);}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ r;}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ [[nodiscard]]\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{bool}\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a164854c9bdd2e8f561d2b698f1553dbc}{operator==}}(\textcolor{keyword}{const}\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand}{MachOperand}}\ \&)\ \textcolor{keyword}{const}\ \textcolor{keyword}{noexcept}\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{00093\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ vreg\_index\_shift\ =\ 43;}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ vreg\_class\_shift\ =\ 42;}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ kind\_shift\ \ \ \ \ \ \ \ =\ 40;}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ pos\_shift\ \ \ \ \ \ \ \ \ =\ 39;}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ fixed\_flag\_shift\ \ =\ 38;}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ preg\_shift\ \ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ uint64\_t\ vreg\_index\_mask\ =\ ((1ull\ <<\ 21)\ -\/\ 1)\ <<\ vreg\_index\_shift;}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ uint64\_t\ vreg\_class\_mask\ =\ 1ull\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ vreg\_class\_shift;}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ uint64\_t\ kind\_mask\ \ \ \ \ \ \ \ =\ 0b11ull\ \ \ \ \ \ \ \ \ \ \ \ <<\ kind\_shift;}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ uint64\_t\ pos\_mask\ \ \ \ \ \ \ \ \ =\ 1ull\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ pos\_shift;}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ uint64\_t\ fixed\_flag\_mask\ \ =\ 1ull\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ fixed\_flag\_shift;}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ uint64\_t\ preg\_mask\ \ \ \ \ \ \ \ =\ 0xFFull\ \ \ \ \ \ \ \ \ \ \ \ <<\ preg\_shift;}
+\DoxyCodeLine{00106\ \ \ \ \ \};}
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00108\ \ \ \ \ \textcolor{keyword}{static\_assert}(\textcolor{keyword}{sizeof}(\doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand}{MachOperand}})\ ==\ 8,\ \textcolor{stringliteral}{"{}MachOperand\ must\ be\ 8\ bytes!!!"{}});}
+\DoxyCodeLine{00109\ \}}
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00112\ \textcolor{keyword}{struct\ }std::formatter<\doxymbox{\hyperlink{namespacexiao}{xiao}}::codegen::MachOperand>\ \{}
+\DoxyCodeLine{00113\ \ \ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{auto}\ \doxymbox{\hyperlink{structstd_1_1formatter_3_01xiao_1_1codegen_1_1MachOperand_01_4_aa379381b38bc4e72bc596352bc73d0d4}{parse}}(\textcolor{keyword}{auto}\&\ ctx)\ \{\ \textcolor{keywordflow}{return}\ ctx.begin();\ \}}
+\DoxyCodeLine{00114\ \ \ \ \ \textcolor{keyword}{auto}\ \doxymbox{\hyperlink{structstd_1_1formatter_3_01xiao_1_1codegen_1_1MachOperand_01_4_abc6870921a8b6460b0914825197cfe88}{format}}(\textcolor{keyword}{const}\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand}{xiao::codegen::MachOperand}}\&\ op,\ \textcolor{keyword}{auto}\&\ ctx)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ kind\_str\ =\ op.\doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a1d83e9fa1ee446dd0e9b19aeb0561a60}{kind}}()\ ==\ \doxymbox{\hyperlink{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7baad8783089f828b927473fb61d51940ec}{xiao::codegen::OperandKind::Use}}\ \ \ \ ?\ \textcolor{stringliteral}{"{}use"{}}}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ op.\doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a1d83e9fa1ee446dd0e9b19aeb0561a60}{kind}}()\ ==\ \doxymbox{\hyperlink{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7badde5c8d4149c5072d2cb798706663e78}{xiao::codegen::OperandKind::Def}}\ \ \ \ ?\ \textcolor{stringliteral}{"{}def"{}}}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}usedef"{}};}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ pos\_str\ \ =\ op.\doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a73c4642aa986decdd01bf91ce85ad5aa}{pos}}()\ ==\ \doxymbox{\hyperlink{namespacexiao_1_1codegen_a318f5ddbbcd950f939a08d496ec90dfea9060587edeb01a63e3d3edc959678d1e}{xiao::codegen::OperandPos::Before}}\ \ \ ?\ \textcolor{stringliteral}{"{}before"{}}}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ \textcolor{stringliteral}{"{}after"{}};}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (op.\doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a3f71a54b39e0a2ec403f20a224e358ad}{is\_fixed}}())}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::format\_to(ctx.out(),\ \textcolor{stringliteral}{"{}\{\}(\{\},\ fixed=\{\},\ \{\})"{}},}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ kind\_str,\ op.\doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a1d3216ccd9dc3721ae6321bc2762e5b9}{vreg}}(),\ *op.\doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_af8e3b61b7f7a63fb2eeb717c1661cb46}{fixed\_preg}}(),\ pos\_str);}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::format\_to(ctx.out(),\ \textcolor{stringliteral}{"{}\{\}(\{\},\ \{\})"{}},\ kind\_str,\ op.\doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a1d3216ccd9dc3721ae6321bc2762e5b9}{vreg}}(),\ pos\_str);}
+\DoxyCodeLine{00124\ \ \ \ \ \}}
+\DoxyCodeLine{00125\ \};}
+
+\end{DoxyCode}

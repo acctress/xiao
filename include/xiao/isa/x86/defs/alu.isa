@@ -1,0 +1,73 @@
+(for (s pre        rm   r    isz iz)
+     ((w "66 "      rm16 r16  16  iw)
+      (l ""         rm32 r32  32  id)
+      (q "REX.W + " rm64 r64  32  id))
+
+  (for (op  role mr rmop acc ext)
+       ((add rw   01 03   05  0)
+        (or  rw   09 0B   0D  1)
+        (adc rw   11 13   15  2)
+        (sbb rw   19 1B   1D  3)
+        (and rw   21 23   25  4)
+        (sub rw   29 2B   2D  5)
+        (xor rw   31 33   35  6)
+        (cmp r    39 3B   3D  7))
+
+    (inst ${op}${s}_mr
+      (asm "$op")
+      (ops ($role dst $rm) (r src $r))
+      (enc MR "${pre}$mr /r"))
+
+    (inst ${op}${s}_rm
+      (asm "$op")
+      (ops ($role dst $r) (r src $rm))
+      (enc RM "${pre}$rmop /r"))
+
+    (inst ${op}${s}_mi8
+      (asm "$op")
+      (ops ($role dst $rm) (imm imm8))
+      (enc MI "${pre}83 /$ext ib"))
+
+    (inst ${op}${s}_mi$isz
+      (asm "$op")
+      (ops ($role dst $rm) (imm imm$isz))
+      (enc MI "${pre}81 /$ext $iz"))
+
+    (inst ${op}${s}_i$isz
+      (asm "$op")
+      (ops ($role acc $r (fixed rax)) (imm imm$isz))
+      (enc I "${pre}$acc $iz")))
+
+  (inst test${s}_mr
+    (asm "test")
+    (ops (r dst $rm) (r src $r))
+    (enc MR "${pre}85 /r"))
+
+  (inst test${s}_mi$isz
+    (asm "test")
+    (ops (r dst $rm) (imm imm$isz))
+    (enc MI "${pre}F7 /0 $iz"))
+
+  (inst test${s}_i$isz
+    (asm "test")
+    (ops (r acc $r (fixed rax)) (imm imm$isz))
+    (enc I "${pre}A9 $iz")))
+
+(for (op  role mr rmop acc ext)
+     ((add rw   00 02   04  0)
+      (or  rw   08 0A   0C  1)
+      (adc rw   10 12   14  2)
+      (sbb rw   18 1A   1C  3)
+      (and rw   20 22   24  4)
+      (sub rw   28 2A   2C  5)
+      (xor rw   30 32   34  6)
+      (cmp r    38 3A   3C  7))
+
+  (inst ${op}b_mr  (asm "$op") (ops ($role dst rm8) (r src r8))           (enc MR "$mr /r"))
+  (inst ${op}b_rm  (asm "$op") (ops ($role dst r8) (r src rm8))           (enc RM "$rmop /r"))
+  (inst ${op}b_mi8 (asm "$op") (ops ($role dst rm8) (imm imm8))           (enc MI "80 /$ext ib"))
+  (inst ${op}b_i8  (asm "$op") (ops ($role acc r8 (fixed rax)) (imm imm8)) (enc I "$acc ib")))
+
+(inst testb_mr  (asm "test") (ops (r dst rm8) (r src r8))            (enc MR "84 /r"))
+(inst testb_mi8 (asm "test") (ops (r dst rm8) (imm imm8))            (enc MI "F6 /0 ib"))
+(inst testb_i8  (asm "test") (ops (r acc r8 (fixed rax)) (imm imm8)) (enc I "A8 ib"))

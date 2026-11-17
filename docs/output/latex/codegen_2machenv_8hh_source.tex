@@ -1,0 +1,23 @@
+\doxysection{machenv.\+hh}
+\hypertarget{codegen_2machenv_8hh_source}{}\label{codegen_2machenv_8hh_source}\index{include/xiao/codegen/machenv.hh@{include/xiao/codegen/machenv.hh}}
+\doxymbox{\hyperlink{codegen_2machenv_8hh}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{//}}
+\DoxyCodeLine{00002\ \textcolor{comment}{//\ Created\ by\ griffith\ on\ 19/10/2026.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ <\doxymbox{\hyperlink{codegen_2reg_8hh}{xiao/codegen/reg.hh}}>}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ <array>}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ <span>}}
+\DoxyCodeLine{00010\ }
+\DoxyCodeLine{00011\ \textcolor{keyword}{namespace\ }\doxymbox{\hyperlink{namespacexiao_1_1codegen}{xiao::codegen}}\ \{}
+\DoxyCodeLine{00014\ \ \ \ \ \textcolor{keyword}{struct\ }\doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachineEnv}{MachineEnv}}\ \{}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ std::array<std::span<const\ PReg>,\ 2>\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachineEnv_a060fff6b902f9b2156d8f316e577e35f}{preferred}};}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ std::array<std::span<const\ PReg>,\ 2>\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachineEnv_a8e73695d6cfb27ae0490fa0a05ef2ef3}{non\_preferred}};}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ std::array<PReg,\ 2>\ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachineEnv_a848a1670b134280024056f8ad5108250}{scratch}};}
+\DoxyCodeLine{00021\ \ \ \ \ \};}
+\DoxyCodeLine{00022\ \}}
+
+\end{DoxyCode}

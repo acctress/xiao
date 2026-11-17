@@ -1,0 +1,164 @@
+\doxysection{xiao::ir::IRBuilder Class Reference}
+\hypertarget{classxiao_1_1ir_1_1IRBuilder}{}\label{classxiao_1_1ir_1_1IRBuilder}\index{xiao::ir::IRBuilder@{xiao::ir::IRBuilder}}
+
+
+{\ttfamily \+\#include $<$builder.\+hh$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{classxiao_1_1ir_1_1IRBuilder_afe839c038e07f83df441e3d78afa7179}{IRBuilder}} (\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}} \&fn)
+\item 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_adce27e1b92f31de91f837887cf466a61}{Block\+Ref}} \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRBuilder_ab9b49eca7c53e0c99f5f59ea12fd76ee}{add\+\_\+block}} (std::\+span$<$ const \doxymbox{\hyperlink{namespacexiao_1_1ir_a307713cf4121f80d62a84fb66835ef8f}{Type}} $>$ param\+\_\+types=\{\})
+\item 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_adce27e1b92f31de91f837887cf466a61}{Block\+Ref}} \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRBuilder_a4364e9d23ad290374861ed6354ba67f3}{add\+\_\+block}} (std::\+initializer\+\_\+list$<$ const \doxymbox{\hyperlink{namespacexiao_1_1ir_a307713cf4121f80d62a84fb66835ef8f}{Type}} $>$ param\+\_\+types=\{\})
+\item 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRBuilder_aa8473dc704d2f2e955bd59d196c7ed52}{block\+\_\+param}} (const \doxymbox{\hyperlink{namespacexiao_1_1ir_adce27e1b92f31de91f837887cf466a61}{Block\+Ref}} block, const uint16\+\_\+t n) const
+\item 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRBuilder_a807d0c258e05228b773954f5742684ba}{param}} (const uint16\+\_\+t n) const
+\begin{DoxyCompactList}\small\item\em Get the n-\/th parameter of the entry block. \end{DoxyCompactList}\item 
+void \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRBuilder_a5a49e65da3cf05ea50309c4878c52fc2}{set\+\_\+block}} (const \doxymbox{\hyperlink{namespacexiao_1_1ir_adce27e1b92f31de91f837887cf466a61}{Block\+Ref}} block)
+\item 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRBuilder_ad28091788f52649dbd0cf9c81c727a0d}{iconst}} (const \doxymbox{\hyperlink{namespacexiao_1_1ir_a307713cf4121f80d62a84fb66835ef8f}{Type}} ty, const uint64\+\_\+t imm)
+\item 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRBuilder_af622037c89911779a538360ad511aad3}{iadd}} (const \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} a, const \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} b)
+\item 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRBuilder_a9a217beaf1e98e04e6874b9629f5dc62}{isub}} (const \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} a, const \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} b)
+\item 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRBuilder_aa83c0d71bf0524c525fafb7a57e25a14}{imul}} (const \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} a, const \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} b)
+\item 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRBuilder_a5e81ca38dc35ba496342df6f62c6a10e}{idiv}} (const \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} a, const \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} b)
+\item 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRBuilder_a7c150604927e8cb1a6a669c3f192198a}{icmp}} (const \doxymbox{\hyperlink{namespacexiao_1_1ir_a10f95311f5e810a4750779f5bbc45395}{ICmp\+CC}} cc, const \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} a, const \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} b)
+\item 
+void \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRBuilder_ab4bc620047ebbce22cd1e0e6756b0ec0}{br}} (const \doxymbox{\hyperlink{namespacexiao_1_1ir_adce27e1b92f31de91f837887cf466a61}{Block\+Ref}} target, const std::\+span$<$ const \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} $>$ args=\{\})
+\item 
+void \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRBuilder_a42fedd2b14ddeb5d23fa2f20117ae249}{brif}} (const \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} cond, const \doxymbox{\hyperlink{namespacexiao_1_1ir_adce27e1b92f31de91f837887cf466a61}{Block\+Ref}} then\+\_\+block, const std::\+span$<$ const \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} $>$ then\+\_\+args, const \doxymbox{\hyperlink{namespacexiao_1_1ir_adce27e1b92f31de91f837887cf466a61}{Block\+Ref}} else\+\_\+block, const std::\+span$<$ const \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} $>$ else\+\_\+args)
+\item 
+void \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRBuilder_a6ca2e8455627d0f1cebc7e517ccf5d52}{ret}} (const \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} val=\doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}}\{ \texorpdfstring{$\sim$}{\string~}0u \})
+\item 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRBuilder_af3c7b5f79188d693c5dcce4a105d961a}{call}} (const \doxymbox{\hyperlink{namespacexiao_1_1ir_af797d8e76ccbec59a5ae9bd140381361}{Function\+Ref}} callee, const std::\+span$<$ const \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} $>$ args, const \doxymbox{\hyperlink{namespacexiao_1_1ir_a307713cf4121f80d62a84fb66835ef8f}{Type}} ret\+\_\+ty)
+\item 
+void \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRBuilder_a298fab70eb966945013b960c3ddd15bc}{finalise}} ()
+\end{DoxyCompactItemize}
+
+
+\label{classxiao_1_1ir_1_1IRBuilder_doc-constructors}
+\Hypertarget{classxiao_1_1ir_1_1IRBuilder_doc-constructors}
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classxiao_1_1ir_1_1IRBuilder_afe839c038e07f83df441e3d78afa7179}\index{xiao::ir::IRBuilder@{xiao::ir::IRBuilder}!IRBuilder@{IRBuilder}}
+\index{IRBuilder@{IRBuilder}!xiao::ir::IRBuilder@{xiao::ir::IRBuilder}}
+\doxysubsubsection{\texorpdfstring{IRBuilder()}{IRBuilder()}}
+{\footnotesize\ttfamily \label{classxiao_1_1ir_1_1IRBuilder_afe839c038e07f83df441e3d78afa7179} 
+xiao::\+ir::\+\+IRBuilder::\+\+IRBuilder (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}} \&}]{fn}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+\label{classxiao_1_1ir_1_1IRBuilder_doc-func-members}
+\Hypertarget{classxiao_1_1ir_1_1IRBuilder_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classxiao_1_1ir_1_1IRBuilder_a4364e9d23ad290374861ed6354ba67f3}\index{xiao::ir::IRBuilder@{xiao::ir::IRBuilder}!add\_block@{add\_block}}
+\index{add\_block@{add\_block}!xiao::ir::IRBuilder@{xiao::ir::IRBuilder}}
+\doxysubsubsection{\texorpdfstring{add\_block()}{add\_block()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classxiao_1_1ir_1_1IRBuilder_a4364e9d23ad290374861ed6354ba67f3} 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_adce27e1b92f31de91f837887cf466a61}{Block\+Ref}} xiao::\+ir::\+\+IRBuilder::\+add\+\_\+block (\begin{DoxyParamCaption}\item[{std::\+initializer\+\_\+list$<$ const \doxymbox{\hyperlink{namespacexiao_1_1ir_a307713cf4121f80d62a84fb66835ef8f}{Type}} $>$}]{param\+\_\+types}{ = {\ttfamily \{\}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}}
+
+\Hypertarget{classxiao_1_1ir_1_1IRBuilder_ab9b49eca7c53e0c99f5f59ea12fd76ee}\index{xiao::ir::IRBuilder@{xiao::ir::IRBuilder}!add\_block@{add\_block}}
+\index{add\_block@{add\_block}!xiao::ir::IRBuilder@{xiao::ir::IRBuilder}}
+\doxysubsubsection{\texorpdfstring{add\_block()}{add\_block()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classxiao_1_1ir_1_1IRBuilder_ab9b49eca7c53e0c99f5f59ea12fd76ee} 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_adce27e1b92f31de91f837887cf466a61}{Block\+Ref}} xiao::\+ir::\+\+IRBuilder::\+add\+\_\+block (\begin{DoxyParamCaption}\item[{std::\+span$<$ const \doxymbox{\hyperlink{namespacexiao_1_1ir_a307713cf4121f80d62a84fb66835ef8f}{Type}} $>$}]{param\+\_\+types}{ = {\ttfamily \{\}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}}
+
+\Hypertarget{classxiao_1_1ir_1_1IRBuilder_aa8473dc704d2f2e955bd59d196c7ed52}\index{xiao::ir::IRBuilder@{xiao::ir::IRBuilder}!block\_param@{block\_param}}
+\index{block\_param@{block\_param}!xiao::ir::IRBuilder@{xiao::ir::IRBuilder}}
+\doxysubsubsection{\texorpdfstring{block\_param()}{block\_param()}}
+{\footnotesize\ttfamily \label{classxiao_1_1ir_1_1IRBuilder_aa8473dc704d2f2e955bd59d196c7ed52} 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} xiao::\+ir::\+\+IRBuilder::\+block\+\_\+param (\begin{DoxyParamCaption}\item[{const \doxymbox{\hyperlink{namespacexiao_1_1ir_adce27e1b92f31de91f837887cf466a61}{Block\+Ref}}}]{block}{, }\item[{const uint16\+\_\+t}]{n}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}}
+
+\Hypertarget{classxiao_1_1ir_1_1IRBuilder_ab4bc620047ebbce22cd1e0e6756b0ec0}\index{xiao::ir::IRBuilder@{xiao::ir::IRBuilder}!br@{br}}
+\index{br@{br}!xiao::ir::IRBuilder@{xiao::ir::IRBuilder}}
+\doxysubsubsection{\texorpdfstring{br()}{br()}}
+{\footnotesize\ttfamily \label{classxiao_1_1ir_1_1IRBuilder_ab4bc620047ebbce22cd1e0e6756b0ec0} 
+void xiao::\+ir::\+\+IRBuilder::\+br (\begin{DoxyParamCaption}\item[{const \doxymbox{\hyperlink{namespacexiao_1_1ir_adce27e1b92f31de91f837887cf466a61}{Block\+Ref}}}]{target}{, }\item[{const std::\+span$<$ const \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} $>$}]{args}{ = {\ttfamily \{\}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\Hypertarget{classxiao_1_1ir_1_1IRBuilder_a42fedd2b14ddeb5d23fa2f20117ae249}\index{xiao::ir::IRBuilder@{xiao::ir::IRBuilder}!brif@{brif}}
+\index{brif@{brif}!xiao::ir::IRBuilder@{xiao::ir::IRBuilder}}
+\doxysubsubsection{\texorpdfstring{brif()}{brif()}}
+{\footnotesize\ttfamily \label{classxiao_1_1ir_1_1IRBuilder_a42fedd2b14ddeb5d23fa2f20117ae249} 
+void xiao::\+ir::\+\+IRBuilder::\+brif (\begin{DoxyParamCaption}\item[{const \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}}}]{cond}{, }\item[{const \doxymbox{\hyperlink{namespacexiao_1_1ir_adce27e1b92f31de91f837887cf466a61}{Block\+Ref}}}]{then\+\_\+block}{, }\item[{const std::\+span$<$ const \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} $>$}]{then\+\_\+args}{, }\item[{const \doxymbox{\hyperlink{namespacexiao_1_1ir_adce27e1b92f31de91f837887cf466a61}{Block\+Ref}}}]{else\+\_\+block}{, }\item[{const std::\+span$<$ const \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} $>$}]{else\+\_\+args}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\Hypertarget{classxiao_1_1ir_1_1IRBuilder_af3c7b5f79188d693c5dcce4a105d961a}\index{xiao::ir::IRBuilder@{xiao::ir::IRBuilder}!call@{call}}
+\index{call@{call}!xiao::ir::IRBuilder@{xiao::ir::IRBuilder}}
+\doxysubsubsection{\texorpdfstring{call()}{call()}}
+{\footnotesize\ttfamily \label{classxiao_1_1ir_1_1IRBuilder_af3c7b5f79188d693c5dcce4a105d961a} 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} xiao::\+ir::\+\+IRBuilder::\+call (\begin{DoxyParamCaption}\item[{const \doxymbox{\hyperlink{namespacexiao_1_1ir_af797d8e76ccbec59a5ae9bd140381361}{Function\+Ref}}}]{callee}{, }\item[{const std::\+span$<$ const \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} $>$}]{args}{, }\item[{const \doxymbox{\hyperlink{namespacexiao_1_1ir_a307713cf4121f80d62a84fb66835ef8f}{Type}}}]{ret\+\_\+ty}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}}
+
+\Hypertarget{classxiao_1_1ir_1_1IRBuilder_a298fab70eb966945013b960c3ddd15bc}\index{xiao::ir::IRBuilder@{xiao::ir::IRBuilder}!finalise@{finalise}}
+\index{finalise@{finalise}!xiao::ir::IRBuilder@{xiao::ir::IRBuilder}}
+\doxysubsubsection{\texorpdfstring{finalise()}{finalise()}}
+{\footnotesize\ttfamily \label{classxiao_1_1ir_1_1IRBuilder_a298fab70eb966945013b960c3ddd15bc} 
+void xiao::\+ir::\+\+IRBuilder::\+finalise (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\Hypertarget{classxiao_1_1ir_1_1IRBuilder_af622037c89911779a538360ad511aad3}\index{xiao::ir::IRBuilder@{xiao::ir::IRBuilder}!iadd@{iadd}}
+\index{iadd@{iadd}!xiao::ir::IRBuilder@{xiao::ir::IRBuilder}}
+\doxysubsubsection{\texorpdfstring{iadd()}{iadd()}}
+{\footnotesize\ttfamily \label{classxiao_1_1ir_1_1IRBuilder_af622037c89911779a538360ad511aad3} 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} xiao::\+ir::\+\+IRBuilder::\+iadd (\begin{DoxyParamCaption}\item[{const \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}}}]{a}{, }\item[{const \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}}}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}}
+
+\Hypertarget{classxiao_1_1ir_1_1IRBuilder_a7c150604927e8cb1a6a669c3f192198a}\index{xiao::ir::IRBuilder@{xiao::ir::IRBuilder}!icmp@{icmp}}
+\index{icmp@{icmp}!xiao::ir::IRBuilder@{xiao::ir::IRBuilder}}
+\doxysubsubsection{\texorpdfstring{icmp()}{icmp()}}
+{\footnotesize\ttfamily \label{classxiao_1_1ir_1_1IRBuilder_a7c150604927e8cb1a6a669c3f192198a} 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} xiao::\+ir::\+\+IRBuilder::\+icmp (\begin{DoxyParamCaption}\item[{const \doxymbox{\hyperlink{namespacexiao_1_1ir_a10f95311f5e810a4750779f5bbc45395}{ICmp\+CC}}}]{cc}{, }\item[{const \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}}}]{a}{, }\item[{const \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}}}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}}
+
+\Hypertarget{classxiao_1_1ir_1_1IRBuilder_ad28091788f52649dbd0cf9c81c727a0d}\index{xiao::ir::IRBuilder@{xiao::ir::IRBuilder}!iconst@{iconst}}
+\index{iconst@{iconst}!xiao::ir::IRBuilder@{xiao::ir::IRBuilder}}
+\doxysubsubsection{\texorpdfstring{iconst()}{iconst()}}
+{\footnotesize\ttfamily \label{classxiao_1_1ir_1_1IRBuilder_ad28091788f52649dbd0cf9c81c727a0d} 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} xiao::\+ir::\+\+IRBuilder::\+iconst (\begin{DoxyParamCaption}\item[{const \doxymbox{\hyperlink{namespacexiao_1_1ir_a307713cf4121f80d62a84fb66835ef8f}{Type}}}]{ty}{, }\item[{const uint64\+\_\+t}]{imm}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}}
+
+\Hypertarget{classxiao_1_1ir_1_1IRBuilder_a5e81ca38dc35ba496342df6f62c6a10e}\index{xiao::ir::IRBuilder@{xiao::ir::IRBuilder}!idiv@{idiv}}
+\index{idiv@{idiv}!xiao::ir::IRBuilder@{xiao::ir::IRBuilder}}
+\doxysubsubsection{\texorpdfstring{idiv()}{idiv()}}
+{\footnotesize\ttfamily \label{classxiao_1_1ir_1_1IRBuilder_a5e81ca38dc35ba496342df6f62c6a10e} 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} xiao::\+ir::\+\+IRBuilder::\+idiv (\begin{DoxyParamCaption}\item[{const \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}}}]{a}{, }\item[{const \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}}}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}}
+
+\Hypertarget{classxiao_1_1ir_1_1IRBuilder_aa83c0d71bf0524c525fafb7a57e25a14}\index{xiao::ir::IRBuilder@{xiao::ir::IRBuilder}!imul@{imul}}
+\index{imul@{imul}!xiao::ir::IRBuilder@{xiao::ir::IRBuilder}}
+\doxysubsubsection{\texorpdfstring{imul()}{imul()}}
+{\footnotesize\ttfamily \label{classxiao_1_1ir_1_1IRBuilder_aa83c0d71bf0524c525fafb7a57e25a14} 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} xiao::\+ir::\+\+IRBuilder::\+imul (\begin{DoxyParamCaption}\item[{const \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}}}]{a}{, }\item[{const \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}}}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}}
+
+\Hypertarget{classxiao_1_1ir_1_1IRBuilder_a9a217beaf1e98e04e6874b9629f5dc62}\index{xiao::ir::IRBuilder@{xiao::ir::IRBuilder}!isub@{isub}}
+\index{isub@{isub}!xiao::ir::IRBuilder@{xiao::ir::IRBuilder}}
+\doxysubsubsection{\texorpdfstring{isub()}{isub()}}
+{\footnotesize\ttfamily \label{classxiao_1_1ir_1_1IRBuilder_a9a217beaf1e98e04e6874b9629f5dc62} 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} xiao::\+ir::\+\+IRBuilder::\+isub (\begin{DoxyParamCaption}\item[{const \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}}}]{a}{, }\item[{const \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}}}]{b}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}}
+
+\Hypertarget{classxiao_1_1ir_1_1IRBuilder_a807d0c258e05228b773954f5742684ba}\index{xiao::ir::IRBuilder@{xiao::ir::IRBuilder}!param@{param}}
+\index{param@{param}!xiao::ir::IRBuilder@{xiao::ir::IRBuilder}}
+\doxysubsubsection{\texorpdfstring{param()}{param()}}
+{\footnotesize\ttfamily \label{classxiao_1_1ir_1_1IRBuilder_a807d0c258e05228b773954f5742684ba} 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} xiao::\+ir::\+\+IRBuilder::\+param (\begin{DoxyParamCaption}\item[{const uint16\+\_\+t}]{n}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}}
+
+
+
+Get the n-\/th parameter of the entry block. 
+
+\Hypertarget{classxiao_1_1ir_1_1IRBuilder_a6ca2e8455627d0f1cebc7e517ccf5d52}\index{xiao::ir::IRBuilder@{xiao::ir::IRBuilder}!ret@{ret}}
+\index{ret@{ret}!xiao::ir::IRBuilder@{xiao::ir::IRBuilder}}
+\doxysubsubsection{\texorpdfstring{ret()}{ret()}}
+{\footnotesize\ttfamily \label{classxiao_1_1ir_1_1IRBuilder_a6ca2e8455627d0f1cebc7e517ccf5d52} 
+void xiao::\+ir::\+\+IRBuilder::\+ret (\begin{DoxyParamCaption}\item[{const \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}}}]{val}{ = {\ttfamily \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}}\{~\texorpdfstring{$\sim$}{\string~}0u~\}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\Hypertarget{classxiao_1_1ir_1_1IRBuilder_a5a49e65da3cf05ea50309c4878c52fc2}\index{xiao::ir::IRBuilder@{xiao::ir::IRBuilder}!set\_block@{set\_block}}
+\index{set\_block@{set\_block}!xiao::ir::IRBuilder@{xiao::ir::IRBuilder}}
+\doxysubsubsection{\texorpdfstring{set\_block()}{set\_block()}}
+{\footnotesize\ttfamily \label{classxiao_1_1ir_1_1IRBuilder_a5a49e65da3cf05ea50309c4878c52fc2} 
+void xiao::\+ir::\+\+IRBuilder::\+set\+\_\+block (\begin{DoxyParamCaption}\item[{const \doxymbox{\hyperlink{namespacexiao_1_1ir_adce27e1b92f31de91f837887cf466a61}{Block\+Ref}}}]{block}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+The documentation for this class was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+include/\+xiao/\+ir/\doxymbox{\hyperlink{builder_8hh}{builder.\+hh}}\end{DoxyCompactItemize}

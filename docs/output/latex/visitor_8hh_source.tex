@@ -1,0 +1,51 @@
+\doxysection{visitor.\+hh}
+\hypertarget{visitor_8hh_source}{}\label{visitor_8hh_source}\index{include/xiao/ir/visitor.hh@{include/xiao/ir/visitor.hh}}
+\doxymbox{\hyperlink{visitor_8hh}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{//}}
+\DoxyCodeLine{00002\ \textcolor{comment}{//\ Created\ by\ griffith\ on\ 18/10/2026.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ <\doxymbox{\hyperlink{module_8hh}{xiao/ir/module.hh}}>}}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \textcolor{keyword}{namespace\ }\doxymbox{\hyperlink{namespacexiao_1_1ir}{xiao::ir}}\ \{}
+\DoxyCodeLine{00014\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ Derived>}
+\DoxyCodeLine{00015\ \ \ \ \ \textcolor{keyword}{class\ }\doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor}{IRVisitor}}\ \{}
+\DoxyCodeLine{00016\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor_aa0a700b980666b2489c5454f51b27141}{visit\_module}}(\doxymbox{\hyperlink{classxiao_1_1ir_1_1IRModule}{IRModule}}\&\ m)\ \{}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}*\ fn\ :\ m.\doxymbox{\hyperlink{classxiao_1_1ir_1_1IRModule_a4f0e8fd98fbc858b667b74d4004002a7}{functions}}())\ \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor_aa8639d203569aeb25c365867b68948ee}{visit\_function}}(*fn);}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor_aa8639d203569aeb25c365867b68948ee}{visit\_function}}(\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}}\&\ fn)\ \{}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ self().on\_function(fn);}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\&\ b\ :\ fn.\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction_a4a31d9fead66da79f595a7a382daa5a5}{blocks}})\ \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor_ae897e9754387e47e8439b40808461572}{visit\_block}}(fn,\ b);}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ self().on\_function\_end(fn);}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor_ae897e9754387e47e8439b40808461572}{visit\_block}}(\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}}\&\ fn,\ \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock}{IRBlock}}\&\ b)\ \{}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \ \ \ \ self().on\_block(fn,\ b);}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\&\ i\ :\ fn.\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction_a9b3350a1b06230af1f6943a3d192966f}{insts}}.subspan(b.\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock_aa86fb675610af17513433f1606a8244d}{insts\_offset}},\ b.\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock_a6f163dc9f4f3461a945b9cfc813a84ee}{insts\_count}}))\ \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor_a5157733789493abfddbab99a0e3c353c}{visit\_inst}}(fn,\ b,\ i);}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ self().on\_block\_end(fn,\ b);}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor_a5157733789493abfddbab99a0e3c353c}{visit\_inst}}(\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}}\&\ fn,\ \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock}{IRBlock}}\&\ b,\ \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRInst}{IRInst}}\&\ in)\ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ self().on\_inst(fn,\ b,\ in);}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ i\ \{\ 0u\ \};\ i\ <\ in.\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRInst_a2b989dd604f18c2e9169d12b61568edc}{ops\_count}};\ ++i)}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ self().on\_operand(fn,\ b,\ in,\ fn.\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction_ad741be85ae6b8a367e78eeca7fdd41c4}{operands}}[in.\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRInst_a6b222f7ddbd624ea60b621793351a6cf}{ops\_offset}}\ +\ i]);}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor_a3900d24d9f70ba507d6bbcb2043cbe35}{on\_function}}(\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}}\&)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor_aecaf1739395feb1a71c9aef8f5223fd8}{on\_function\_end}}(\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}}\&)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor_aff515c314227f3db115c989b966455e5}{on\_block}}(\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}}\&,\ \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock}{IRBlock}}\&)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor_adfb8005469c08a02f5531e44a5f41547}{on\_block\_end}}(\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}}\&,\ \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock}{IRBlock}}\&)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor_a7139b99390536e23dd17cb19ed3e75f4}{on\_inst}}(\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}}\&,\ \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock}{IRBlock}}\&,\ \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRInst}{IRInst}}\&)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \{\}}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor_aa85cde68ca981bc68e158de7191d3453}{on\_operand}}(\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}}\&,\ \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock}{IRBlock}}\&,\ \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRInst}{IRInst}}\&,\ \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{ValueRef}})\ \ \ \{\}}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ Derived\&\ self()\ \{\ \textcolor{keywordflow}{return}\ \textcolor{keyword}{static\_cast<}Derived\&\textcolor{keyword}{>}(*this);\ \}}
+\DoxyCodeLine{00058\ \ \ \ \ \};}
+\DoxyCodeLine{00059\ \}}
+
+\end{DoxyCode}

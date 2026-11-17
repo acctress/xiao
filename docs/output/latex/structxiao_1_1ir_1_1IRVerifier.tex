@@ -1,0 +1,93 @@
+\doxysection{xiao::ir::IRVerifier Struct Reference}
+\hypertarget{structxiao_1_1ir_1_1IRVerifier}{}\label{structxiao_1_1ir_1_1IRVerifier}\index{xiao::ir::IRVerifier@{xiao::ir::IRVerifier}}
+
+
+Validates invariants structural of finalised IR.  
+
+
+
+
+{\ttfamily \+\#include $<$verifier.\+hh$>$}
+
+Inheritance diagram for xiao::ir::IRVerifier:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{structxiao_1_1ir_1_1IRVerifier}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRVerifier_1_1Err}{Err}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRVerifier_a1cf32d113bf21a8cc3d6e8b416e16797}{ok}} () const
+\item 
+void \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRVerifier_a3dd30c5fc929dc13b40e6f756146daa9}{on\+\_\+block\+\_\+end}} (\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}} \&fn, \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock}{IRBlock}} \&block)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor}{xiao::\+ir::\+\+IRVisitor$<$ IRVerifier $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+void \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor_aa0a700b980666b2489c5454f51b27141}{visit\+\_\+module}} (\doxymbox{\hyperlink{classxiao_1_1ir_1_1IRModule}{IRModule}} \&m)
+\begin{DoxyCompactList}\small\item\em Visit all functions in a module. \end{DoxyCompactList}\item 
+void \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor_aa8639d203569aeb25c365867b68948ee}{visit\+\_\+function}} (\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}} \&fn)
+\begin{DoxyCompactList}\small\item\em Visit a function and all of its blocks. \end{DoxyCompactList}\item 
+void \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor_ae897e9754387e47e8439b40808461572}{visit\+\_\+block}} (\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}} \&fn, \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock}{IRBlock}} \&b)
+\begin{DoxyCompactList}\small\item\em Visit a block and all of its instructions. \end{DoxyCompactList}\item 
+void \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor_a5157733789493abfddbab99a0e3c353c}{visit\+\_\+inst}} (\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}} \&fn, \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock}{IRBlock}} \&b, \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRInst}{IRInst}} \&in)
+\begin{DoxyCompactList}\small\item\em Visit an instructions and all of its operands. \end{DoxyCompactList}\item 
+void \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor_a3900d24d9f70ba507d6bbcb2043cbe35}{on\+\_\+function}} (\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}} \&)
+\begin{DoxyCompactList}\small\item\em Hook called on entry to each function. \end{DoxyCompactList}\item 
+void \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor_aecaf1739395feb1a71c9aef8f5223fd8}{on\+\_\+function\+\_\+end}} (\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}} \&)
+\begin{DoxyCompactList}\small\item\em Hook called on exit of each function. \end{DoxyCompactList}\item 
+void \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor_aff515c314227f3db115c989b966455e5}{on\+\_\+block}} (\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}} \&, \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock}{IRBlock}} \&)
+\begin{DoxyCompactList}\small\item\em Hook called on entry to each block. \end{DoxyCompactList}\item 
+void \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor_adfb8005469c08a02f5531e44a5f41547}{on\+\_\+block\+\_\+end}} (\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}} \&, \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock}{IRBlock}} \&)
+\begin{DoxyCompactList}\small\item\em Hook called on exit of each block. \end{DoxyCompactList}\item 
+void \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor_a7139b99390536e23dd17cb19ed3e75f4}{on\+\_\+inst}} (\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}} \&, \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock}{IRBlock}} \&, \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRInst}{IRInst}} \&)
+\begin{DoxyCompactList}\small\item\em Hook called for each instruction before its operands. \end{DoxyCompactList}\item 
+void \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRVisitor_aa85cde68ca981bc68e158de7191d3453}{on\+\_\+operand}} (\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}} \&, \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock}{IRBlock}} \&, \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRInst}{IRInst}} \&, \doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}})
+\begin{DoxyCompactList}\small\item\em Hook called for each operand of an instruction. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std::\+vector$<$ \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRVerifier_1_1Err}{Err}} $>$ \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRVerifier_a53b7218a8f92d8627f370aa6ae64569c}{errs}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Validates invariants structural of finalised IR. 
+
+\label{structxiao_1_1ir_1_1IRVerifier_doc-func-members}
+\Hypertarget{structxiao_1_1ir_1_1IRVerifier_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structxiao_1_1ir_1_1IRVerifier_a1cf32d113bf21a8cc3d6e8b416e16797}\index{xiao::ir::IRVerifier@{xiao::ir::IRVerifier}!ok@{ok}}
+\index{ok@{ok}!xiao::ir::IRVerifier@{xiao::ir::IRVerifier}}
+\doxysubsubsection{\texorpdfstring{ok()}{ok()}}
+{\footnotesize\ttfamily \label{structxiao_1_1ir_1_1IRVerifier_a1cf32d113bf21a8cc3d6e8b416e16797} 
+bool xiao::\+ir::\+\+IRVerifier::\+ok (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}}
+
+\Hypertarget{structxiao_1_1ir_1_1IRVerifier_a3dd30c5fc929dc13b40e6f756146daa9}\index{xiao::ir::IRVerifier@{xiao::ir::IRVerifier}!on\_block\_end@{on\_block\_end}}
+\index{on\_block\_end@{on\_block\_end}!xiao::ir::IRVerifier@{xiao::ir::IRVerifier}}
+\doxysubsubsection{\texorpdfstring{on\_block\_end()}{on\_block\_end()}}
+{\footnotesize\ttfamily \label{structxiao_1_1ir_1_1IRVerifier_a3dd30c5fc929dc13b40e6f756146daa9} 
+void xiao::\+ir::\+\+IRVerifier::\+on\+\_\+block\+\_\+end (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}} \&}]{fn}{, }\item[{\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRBlock}{IRBlock}} \&}]{block}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\label{structxiao_1_1ir_1_1IRVerifier_doc-variable-members}
+\Hypertarget{structxiao_1_1ir_1_1IRVerifier_doc-variable-members}
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structxiao_1_1ir_1_1IRVerifier_a53b7218a8f92d8627f370aa6ae64569c}\index{xiao::ir::IRVerifier@{xiao::ir::IRVerifier}!errs@{errs}}
+\index{errs@{errs}!xiao::ir::IRVerifier@{xiao::ir::IRVerifier}}
+\doxysubsubsection{\texorpdfstring{errs}{errs}}
+{\footnotesize\ttfamily \label{structxiao_1_1ir_1_1IRVerifier_a53b7218a8f92d8627f370aa6ae64569c} 
+std::\+vector$<$\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRVerifier_1_1Err}{Err}}$>$ xiao::\+ir::\+\+IRVerifier::\+errs}
+
+
+
+The documentation for this struct was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+include/\+xiao/\+ir/\doxymbox{\hyperlink{verifier_8hh}{verifier.\+hh}}\end{DoxyCompactItemize}

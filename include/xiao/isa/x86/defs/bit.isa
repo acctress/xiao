@@ -1,0 +1,23 @@
+(for (s pre        rm   r)
+     ((w "66 "      rm16 r16)
+      (l ""         rm32 r32)
+      (q "REX.W + " rm64 r64))
+
+  (for (op  role mr ext)
+       ((bt  r    A3 4)
+        (bts rw   AB 5)
+        (btr rw   B3 6)
+        (btc rw   BB 7))
+
+    (inst ${op}${s}_mr
+      (asm "$op")
+      (ops ($role dst $rm) (r src $r))
+      (enc MR "${pre}0F $mr /r"))
+
+    (inst ${op}${s}_mi8
+      (asm "$op")
+      (ops ($role dst $rm) (imm imm8))
+      (enc MI "${pre}0F BA /$ext ib")))
+
+  (inst bsf${s}_rm (asm "bsf") (ops (w dst $r) (r src $rm)) (enc RM "${pre}0F BC /r"))
+  (inst bsr${s}_rm (asm "bsr") (ops (w dst $r) (r src $rm)) (enc RM "${pre}0F BD /r")))

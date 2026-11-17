@@ -1,0 +1,137 @@
+\doxysection{xiao::codegen::Reg Struct Reference}
+\hypertarget{structxiao_1_1codegen_1_1Reg}{}\label{structxiao_1_1codegen_1_1Reg}\index{xiao::codegen::Reg@{xiao::codegen::Reg}}
+
+
+A register, either physical or virtual.  
+
+
+
+
+{\ttfamily \+\#include $<$reg.\+hh$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+constexpr bool \doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg_a8eb8e5a691ae8a6697a163f953a10f5d}{is\+\_\+physical}} () const noexcept
+\item 
+constexpr bool \doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg_a12321c61e508d8f301a579bf64fa00bf}{is\+\_\+virtual}} () const noexcept
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VReg}{VReg}} \doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg_a03e582c774b23db178a615959c6e4934}{as\+\_\+vreg}} () const noexcept
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg_a68dda0eb144f4666a40a13cfdac78010}{as\+\_\+preg}} () const noexcept
+\item 
+constexpr \doxymbox{\hyperlink{namespacexiao_1_1codegen_a5bdfce66bc89d50cd7def0cda69899c6}{Reg\+Class}} \doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg_abf0b6858a002a7fc01e5b1c31ffb99df}{rc}} () const noexcept
+\item 
+constexpr bool \doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg_a102d14d8126e5a15764acce9f5687bf6}{valid}} () const noexcept
+\item 
+constexpr bool \doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg_a3d97049e35b24461f85f82ea7b0a453c}{operator==}} (const \doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg}{Reg}} \&) const noexcept=default
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg}{Reg}} \doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg_a20b34fb7e4c6b90bd1408f3fd631b53e}{from\+\_\+vreg}} (const \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VReg}{VReg}} vreg) noexcept
+\item 
+static constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg}{Reg}} \doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg_ab9893e57c4cfc535b5ad4899414a2533}{from\+\_\+preg}} (const \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} preg) noexcept
+\item 
+static constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg}{Reg}} \doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg_a98a63f52d046a8816649f5d4a663479f}{invalid}} () noexcept
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+uint32\+\_\+t \doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg_ad421127afbd9a586d9f453105ac89352}{bits}} \{ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VReg_ae03e239f49fad23cf5c8544589464299}{VReg::\+invalid\+\_\+bits}} \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr uint32\+\_\+t \doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg_a85f3996cba304320bfd9dbbdca0a7784}{pinned\+\_\+count}} = 128
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+A register, either physical or virtual. 
+
+\label{structxiao_1_1codegen_1_1Reg_doc-func-members}
+\Hypertarget{structxiao_1_1codegen_1_1Reg_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structxiao_1_1codegen_1_1Reg_a68dda0eb144f4666a40a13cfdac78010}\index{xiao::codegen::Reg@{xiao::codegen::Reg}!as\_preg@{as\_preg}}
+\index{as\_preg@{as\_preg}!xiao::codegen::Reg@{xiao::codegen::Reg}}
+\doxysubsubsection{\texorpdfstring{as\_preg()}{as\_preg()}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1Reg_a68dda0eb144f4666a40a13cfdac78010} 
+\doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} xiao::\+codegen::\+\+Reg::\+as\+\_\+preg (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+\Hypertarget{structxiao_1_1codegen_1_1Reg_a03e582c774b23db178a615959c6e4934}\index{xiao::codegen::Reg@{xiao::codegen::Reg}!as\_vreg@{as\_vreg}}
+\index{as\_vreg@{as\_vreg}!xiao::codegen::Reg@{xiao::codegen::Reg}}
+\doxysubsubsection{\texorpdfstring{as\_vreg()}{as\_vreg()}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1Reg_a03e582c774b23db178a615959c6e4934} 
+\doxymbox{\hyperlink{structxiao_1_1codegen_1_1VReg}{VReg}} xiao::\+codegen::\+\+Reg::\+as\+\_\+vreg (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+\Hypertarget{structxiao_1_1codegen_1_1Reg_ab9893e57c4cfc535b5ad4899414a2533}\index{xiao::codegen::Reg@{xiao::codegen::Reg}!from\_preg@{from\_preg}}
+\index{from\_preg@{from\_preg}!xiao::codegen::Reg@{xiao::codegen::Reg}}
+\doxysubsubsection{\texorpdfstring{from\_preg()}{from\_preg()}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1Reg_ab9893e57c4cfc535b5ad4899414a2533} 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg}{Reg}} xiao::\+codegen::\+\+Reg::\+from\+\_\+preg (\begin{DoxyParamCaption}\item[{const \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}}}]{preg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}, {\ttfamily [nodiscard]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+\Hypertarget{structxiao_1_1codegen_1_1Reg_a20b34fb7e4c6b90bd1408f3fd631b53e}\index{xiao::codegen::Reg@{xiao::codegen::Reg}!from\_vreg@{from\_vreg}}
+\index{from\_vreg@{from\_vreg}!xiao::codegen::Reg@{xiao::codegen::Reg}}
+\doxysubsubsection{\texorpdfstring{from\_vreg()}{from\_vreg()}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1Reg_a20b34fb7e4c6b90bd1408f3fd631b53e} 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg}{Reg}} xiao::\+codegen::\+\+Reg::\+from\+\_\+vreg (\begin{DoxyParamCaption}\item[{const \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VReg}{VReg}}}]{vreg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}, {\ttfamily [nodiscard]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+\Hypertarget{structxiao_1_1codegen_1_1Reg_a98a63f52d046a8816649f5d4a663479f}\index{xiao::codegen::Reg@{xiao::codegen::Reg}!invalid@{invalid}}
+\index{invalid@{invalid}!xiao::codegen::Reg@{xiao::codegen::Reg}}
+\doxysubsubsection{\texorpdfstring{invalid()}{invalid()}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1Reg_a98a63f52d046a8816649f5d4a663479f} 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg}{Reg}} xiao::\+codegen::\+\+Reg::\+invalid (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}, {\ttfamily [nodiscard]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+\Hypertarget{structxiao_1_1codegen_1_1Reg_a8eb8e5a691ae8a6697a163f953a10f5d}\index{xiao::codegen::Reg@{xiao::codegen::Reg}!is\_physical@{is\_physical}}
+\index{is\_physical@{is\_physical}!xiao::codegen::Reg@{xiao::codegen::Reg}}
+\doxysubsubsection{\texorpdfstring{is\_physical()}{is\_physical()}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1Reg_a8eb8e5a691ae8a6697a163f953a10f5d} 
+bool xiao::\+codegen::\+\+Reg::\+is\+\_\+physical (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+\Hypertarget{structxiao_1_1codegen_1_1Reg_a12321c61e508d8f301a579bf64fa00bf}\index{xiao::codegen::Reg@{xiao::codegen::Reg}!is\_virtual@{is\_virtual}}
+\index{is\_virtual@{is\_virtual}!xiao::codegen::Reg@{xiao::codegen::Reg}}
+\doxysubsubsection{\texorpdfstring{is\_virtual()}{is\_virtual()}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1Reg_a12321c61e508d8f301a579bf64fa00bf} 
+bool xiao::\+codegen::\+\+Reg::\+is\+\_\+virtual (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+\Hypertarget{structxiao_1_1codegen_1_1Reg_a3d97049e35b24461f85f82ea7b0a453c}\index{xiao::codegen::Reg@{xiao::codegen::Reg}!operator==@{operator==}}
+\index{operator==@{operator==}!xiao::codegen::Reg@{xiao::codegen::Reg}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1Reg_a3d97049e35b24461f85f82ea7b0a453c} 
+bool xiao::\+codegen::\+\+Reg::\+operator== (\begin{DoxyParamCaption}\item[{const \doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg}{Reg}} \&}]{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [nodiscard]}, {\ttfamily [constexpr]}, {\ttfamily [default]}, {\ttfamily [noexcept]}}
+
+\Hypertarget{structxiao_1_1codegen_1_1Reg_abf0b6858a002a7fc01e5b1c31ffb99df}\index{xiao::codegen::Reg@{xiao::codegen::Reg}!rc@{rc}}
+\index{rc@{rc}!xiao::codegen::Reg@{xiao::codegen::Reg}}
+\doxysubsubsection{\texorpdfstring{rc()}{rc()}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1Reg_abf0b6858a002a7fc01e5b1c31ffb99df} 
+\doxymbox{\hyperlink{namespacexiao_1_1codegen_a5bdfce66bc89d50cd7def0cda69899c6}{Reg\+Class}} xiao::\+codegen::\+\+Reg::\+rc (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+\Hypertarget{structxiao_1_1codegen_1_1Reg_a102d14d8126e5a15764acce9f5687bf6}\index{xiao::codegen::Reg@{xiao::codegen::Reg}!valid@{valid}}
+\index{valid@{valid}!xiao::codegen::Reg@{xiao::codegen::Reg}}
+\doxysubsubsection{\texorpdfstring{valid()}{valid()}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1Reg_a102d14d8126e5a15764acce9f5687bf6} 
+bool xiao::\+codegen::\+\+Reg::\+valid (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+\label{structxiao_1_1codegen_1_1Reg_doc-variable-members}
+\Hypertarget{structxiao_1_1codegen_1_1Reg_doc-variable-members}
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structxiao_1_1codegen_1_1Reg_ad421127afbd9a586d9f453105ac89352}\index{xiao::codegen::Reg@{xiao::codegen::Reg}!bits@{bits}}
+\index{bits@{bits}!xiao::codegen::Reg@{xiao::codegen::Reg}}
+\doxysubsubsection{\texorpdfstring{bits}{bits}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1Reg_ad421127afbd9a586d9f453105ac89352} 
+uint32\+\_\+t xiao::\+codegen::\+\+Reg::\+bits \{ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VReg_ae03e239f49fad23cf5c8544589464299}{VReg::\+invalid\+\_\+bits}} \}}
+
+\Hypertarget{structxiao_1_1codegen_1_1Reg_a85f3996cba304320bfd9dbbdca0a7784}\index{xiao::codegen::Reg@{xiao::codegen::Reg}!pinned\_count@{pinned\_count}}
+\index{pinned\_count@{pinned\_count}!xiao::codegen::Reg@{xiao::codegen::Reg}}
+\doxysubsubsection{\texorpdfstring{pinned\_count}{pinned\_count}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1Reg_a85f3996cba304320bfd9dbbdca0a7784} 
+uint32\+\_\+t xiao::\+codegen::\+\+Reg::\+pinned\+\_\+count = 128\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+The documentation for this struct was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+include/\+xiao/\+codegen/\doxymbox{\hyperlink{codegen_2reg_8hh}{reg.\+hh}}\end{DoxyCompactItemize}

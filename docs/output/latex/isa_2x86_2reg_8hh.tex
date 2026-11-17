@@ -1,0 +1,87 @@
+\doxysection{include/\+xiao/\+isa/\+x86/\+reg.hh File Reference}
+\hypertarget{isa_2x86_2reg_8hh}{}\label{isa_2x86_2reg_8hh}\index{include/xiao/isa/x86/reg.hh@{include/xiao/isa/x86/reg.hh}}
+{\ttfamily \+\#include $<$xiao/\+codegen/\+operand.\+hh$>$}\newline
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg}{xiao::\+x86\+\_\+64::\+\+PReg}}
+\begin{DoxyCompactList}\small\item\em A physical register Hardware encoding and register class packed into a single byte (6 bits, 1 bit). Layout: bit 0 -\/ \doxylink{namespacexiao_1_1codegen_a5bdfce66bc89d50cd7def0cda69899c6}{Reg\+Class} bits 6:1 -\/ hardware encoding bit 7 -\/ reserved. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \doxymbox{\hyperlink{namespacexiao}{xiao}}
+\item 
+namespace \doxymbox{\hyperlink{namespacexiao_1_1x86__64}{xiao::\+x86\+\_\+64}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum class \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a5bdfce66bc89d50cd7def0cda69899c6}{xiao::\+x86\+\_\+64::\+\+Reg\+Class}} 
+\begin{DoxyCompactList}\small\item\em Register class. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{namespacexiao_1_1x86__64_abbdce0d6d6dccfbefb321e6bfaf0cbf7}{xiao::\+x86\+\_\+64::\+\+RAX}} = \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{PReg::\+make}}(0, Reg\+Class::\+\+Int)
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a62d790f2b2c1dc9f417ebcfb841bdfc7}{xiao::\+x86\+\_\+64::\+\+RCX}} = \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{PReg::\+make}}(1, Reg\+Class::\+\+Int)
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{namespacexiao_1_1x86__64_aeb5089e7100d0888ddbdd273dfdada38}{xiao::\+x86\+\_\+64::\+\+RDX}} = \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{PReg::\+make}}(2, Reg\+Class::\+\+Int)
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{namespacexiao_1_1x86__64_abdf4c5db6c5e980a49dbafc0120b7c94}{xiao::\+x86\+\_\+64::\+\+RBX}} = \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{PReg::\+make}}(3, Reg\+Class::\+\+Int)
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{namespacexiao_1_1x86__64_ac1438ce908f9f0f7fd4169a91ceb0762}{xiao::\+x86\+\_\+64::\+\+RSP}} = \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{PReg::\+make}}(4, Reg\+Class::\+\+Int)
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{namespacexiao_1_1x86__64_aab9be1dd17065f006d7a59cfa7d667df}{xiao::\+x86\+\_\+64::\+\+RBP}} = \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{PReg::\+make}}(5, Reg\+Class::\+\+Int)
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{namespacexiao_1_1x86__64_ab6907731f0c0708833c6d1a22d8e6d66}{xiao::\+x86\+\_\+64::\+\+RSI}} = \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{PReg::\+make}}(6, Reg\+Class::\+\+Int)
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{namespacexiao_1_1x86__64_adf7f0bb517995b1be09bd97b39a63b32}{xiao::\+x86\+\_\+64::\+\+RDI}} = \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{PReg::\+make}}(7, Reg\+Class::\+\+Int)
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{namespacexiao_1_1x86__64_ab85c30963553d2c2f83bd750cec5bcbe}{xiao::\+x86\+\_\+64::\+\+R8}} = \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{PReg::\+make}}(8, Reg\+Class::\+\+Int)
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{namespacexiao_1_1x86__64_ab71935065058d27aa144313cecf3b88f}{xiao::\+x86\+\_\+64::\+\+R9}} = \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{PReg::\+make}}(9, Reg\+Class::\+\+Int)
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a096e8af795e247ccc04a4758a53581fe}{xiao::\+x86\+\_\+64::\+\+R10}} = \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{PReg::\+make}}(10, Reg\+Class::\+\+Int)
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a6bad661dc1fdfd9bda14fe58614492fc}{xiao::\+x86\+\_\+64::\+\+R11}} = \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{PReg::\+make}}(11, Reg\+Class::\+\+Int)
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a235f876a69779badef59835dcaeb514a}{xiao::\+x86\+\_\+64::\+\+R12}} = \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{PReg::\+make}}(12, Reg\+Class::\+\+Int)
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a685304743c74980aa149f46c79a45133}{xiao::\+x86\+\_\+64::\+\+R13}} = \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{PReg::\+make}}(13, Reg\+Class::\+\+Int)
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a009896c55b28cbeaa6da0b580974b49b}{xiao::\+x86\+\_\+64::\+\+R14}} = \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{PReg::\+make}}(14, Reg\+Class::\+\+Int)
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a1c8ecedc53c8afa437e21f8f8454ceee}{xiao::\+x86\+\_\+64::\+\+R15}} = \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{PReg::\+make}}(15, Reg\+Class::\+\+Int)
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a69614015cfc805ba8e8f99883e521b21}{xiao::\+x86\+\_\+64::\+\+XMM0}} = \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{PReg::\+make}}(0, Reg\+Class::\+\+Float)
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a6f6bbf1201fcb10e4d0066c28b4aea33}{xiao::\+x86\+\_\+64::\+\+XMM1}} = \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{PReg::\+make}}(1, Reg\+Class::\+\+Float)
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{namespacexiao_1_1x86__64_aadd70c5b0abf2af5b6443de0fb0d12bc}{xiao::\+x86\+\_\+64::\+\+XMM2}} = \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{PReg::\+make}}(2, Reg\+Class::\+\+Float)
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a972321e8589eb95e70d163f7f2b35bf9}{xiao::\+x86\+\_\+64::\+\+XMM3}} = \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{PReg::\+make}}(3, Reg\+Class::\+\+Float)
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a91b50e095a72d4de8711e18540339e04}{xiao::\+x86\+\_\+64::\+\+XMM4}} = \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{PReg::\+make}}(4, Reg\+Class::\+\+Float)
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a173da9b07c485d2beaeee67f6386b9c4}{xiao::\+x86\+\_\+64::\+\+XMM5}} = \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{PReg::\+make}}(5, Reg\+Class::\+\+Float)
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a70c6f13560ccdd784abae0253f7f79a0}{xiao::\+x86\+\_\+64::\+\+XMM6}} = \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{PReg::\+make}}(6, Reg\+Class::\+\+Float)
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{namespacexiao_1_1x86__64_abfa9d542b3addae94d8a13ee548f8608}{xiao::\+x86\+\_\+64::\+\+XMM7}} = \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{PReg::\+make}}(7, Reg\+Class::\+\+Float)
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{namespacexiao_1_1x86__64_af0fb34ac6d1cd033accf8a5dec494772}{xiao::\+x86\+\_\+64::\+\+XMM8}} = \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{PReg::\+make}}(8, Reg\+Class::\+\+Float)
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a9f6e7ce7e0001b1a51f6e33330744d20}{xiao::\+x86\+\_\+64::\+\+XMM9}} = \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{PReg::\+make}}(9, Reg\+Class::\+\+Float)
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{namespacexiao_1_1x86__64_af105f1d7520f66ba36b1e60a7e77151b}{xiao::\+x86\+\_\+64::\+\+XMM10}} = \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{PReg::\+make}}(10, Reg\+Class::\+\+Float)
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a48fda4f4ac9922d14654eca6140c18f7}{xiao::\+x86\+\_\+64::\+\+XMM11}} = \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{PReg::\+make}}(11, Reg\+Class::\+\+Float)
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{namespacexiao_1_1x86__64_ae6e7b0ba4ef9a8293a16e9279d01466d}{xiao::\+x86\+\_\+64::\+\+XMM12}} = \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{PReg::\+make}}(12, Reg\+Class::\+\+Float)
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a3f29b0ce917d58757699975a925d5c11}{xiao::\+x86\+\_\+64::\+\+XMM13}} = \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{PReg::\+make}}(13, Reg\+Class::\+\+Float)
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{namespacexiao_1_1x86__64_aa8d44e0122bb81b2308cc714b26880b2}{xiao::\+x86\+\_\+64::\+\+XMM14}} = \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{PReg::\+make}}(14, Reg\+Class::\+\+Float)
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{namespacexiao_1_1x86__64_a085ee31ad48e7e030e69c6ed9a287daa}{xiao::\+x86\+\_\+64::\+\+XMM15}} = \doxymbox{\hyperlink{structxiao_1_1x86__64_1_1PReg_af76347b0f1a604cbab26372fd7e60b21}{PReg::\+make}}(15, Reg\+Class::\+\+Float)
+\end{DoxyCompactItemize}

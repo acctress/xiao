@@ -1,0 +1,80 @@
+\doxysection{xiao::ir::IRInst Struct Reference}
+\hypertarget{structxiao_1_1ir_1_1IRInst}{}\label{structxiao_1_1ir_1_1IRInst}\index{xiao::ir::IRInst@{xiao::ir::IRInst}}
+
+
+A single IR instruction in SSA form.  
+
+
+
+
+{\ttfamily \+\#include $<$inst.\+hh$>$}
+
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_ac329aef04cbbc2fe87693b471e87edf4}{IROp}} \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRInst_aa0baa96499dcc50b34f33dc1b6d77586}{op}} \{\}
+\item 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_a10f95311f5e810a4750779f5bbc45395}{ICmp\+CC}} \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRInst_ae3c0cc0c138abbeb2b522c05efbae327}{cc}} \{\}
+\item 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRInst_a6e2b8ae52cf6647e821d5f392adbbca2}{result}} \{\}
+\item 
+uint32\+\_\+t \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRInst_a6b222f7ddbd624ea60b621793351a6cf}{ops\+\_\+offset}} \{\}
+\item 
+uint16\+\_\+t \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRInst_a2b989dd604f18c2e9169d12b61568edc}{ops\+\_\+count}} \{\}
+\item 
+uint64\+\_\+t \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRInst_ae4609f10fc9869dfc9d18bab35dd1466}{imm}} \{\}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+A single IR instruction in SSA form. 
+
+\begin{DoxyNote}{Note}
+Operands are stored in a flat pool in an owning \doxylink{structxiao_1_1ir_1_1IRFunction}{IRFunction}, indexed by {\ttfamily \doxylink{structxiao_1_1ir_1_1IRInst_a6b222f7ddbd624ea60b621793351a6cf}{ops\+\_\+offset}} and {\ttfamily \doxylink{structxiao_1_1ir_1_1IRInst_a2b989dd604f18c2e9169d12b61568edc}{ops\+\_\+count}}. 
+\end{DoxyNote}
+
+
+\label{structxiao_1_1ir_1_1IRInst_doc-variable-members}
+\Hypertarget{structxiao_1_1ir_1_1IRInst_doc-variable-members}
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structxiao_1_1ir_1_1IRInst_ae3c0cc0c138abbeb2b522c05efbae327}\index{xiao::ir::IRInst@{xiao::ir::IRInst}!cc@{cc}}
+\index{cc@{cc}!xiao::ir::IRInst@{xiao::ir::IRInst}}
+\doxysubsubsection{\texorpdfstring{cc}{cc}}
+{\footnotesize\ttfamily \label{structxiao_1_1ir_1_1IRInst_ae3c0cc0c138abbeb2b522c05efbae327} 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_a10f95311f5e810a4750779f5bbc45395}{ICmp\+CC}} xiao::\+ir::\+\+IRInst::\+cc \{\}}
+
+\Hypertarget{structxiao_1_1ir_1_1IRInst_ae4609f10fc9869dfc9d18bab35dd1466}\index{xiao::ir::IRInst@{xiao::ir::IRInst}!imm@{imm}}
+\index{imm@{imm}!xiao::ir::IRInst@{xiao::ir::IRInst}}
+\doxysubsubsection{\texorpdfstring{imm}{imm}}
+{\footnotesize\ttfamily \label{structxiao_1_1ir_1_1IRInst_ae4609f10fc9869dfc9d18bab35dd1466} 
+uint64\+\_\+t xiao::\+ir::\+\+IRInst::\+imm \{\}}
+
+\Hypertarget{structxiao_1_1ir_1_1IRInst_aa0baa96499dcc50b34f33dc1b6d77586}\index{xiao::ir::IRInst@{xiao::ir::IRInst}!op@{op}}
+\index{op@{op}!xiao::ir::IRInst@{xiao::ir::IRInst}}
+\doxysubsubsection{\texorpdfstring{op}{op}}
+{\footnotesize\ttfamily \label{structxiao_1_1ir_1_1IRInst_aa0baa96499dcc50b34f33dc1b6d77586} 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_ac329aef04cbbc2fe87693b471e87edf4}{IROp}} xiao::\+ir::\+\+IRInst::\+op \{\}}
+
+\Hypertarget{structxiao_1_1ir_1_1IRInst_a2b989dd604f18c2e9169d12b61568edc}\index{xiao::ir::IRInst@{xiao::ir::IRInst}!ops\_count@{ops\_count}}
+\index{ops\_count@{ops\_count}!xiao::ir::IRInst@{xiao::ir::IRInst}}
+\doxysubsubsection{\texorpdfstring{ops\_count}{ops\_count}}
+{\footnotesize\ttfamily \label{structxiao_1_1ir_1_1IRInst_a2b989dd604f18c2e9169d12b61568edc} 
+uint16\+\_\+t xiao::\+ir::\+\+IRInst::\+ops\+\_\+count \{\}}
+
+\Hypertarget{structxiao_1_1ir_1_1IRInst_a6b222f7ddbd624ea60b621793351a6cf}\index{xiao::ir::IRInst@{xiao::ir::IRInst}!ops\_offset@{ops\_offset}}
+\index{ops\_offset@{ops\_offset}!xiao::ir::IRInst@{xiao::ir::IRInst}}
+\doxysubsubsection{\texorpdfstring{ops\_offset}{ops\_offset}}
+{\footnotesize\ttfamily \label{structxiao_1_1ir_1_1IRInst_a6b222f7ddbd624ea60b621793351a6cf} 
+uint32\+\_\+t xiao::\+ir::\+\+IRInst::\+ops\+\_\+offset \{\}}
+
+\Hypertarget{structxiao_1_1ir_1_1IRInst_a6e2b8ae52cf6647e821d5f392adbbca2}\index{xiao::ir::IRInst@{xiao::ir::IRInst}!result@{result}}
+\index{result@{result}!xiao::ir::IRInst@{xiao::ir::IRInst}}
+\doxysubsubsection{\texorpdfstring{result}{result}}
+{\footnotesize\ttfamily \label{structxiao_1_1ir_1_1IRInst_a6e2b8ae52cf6647e821d5f392adbbca2} 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_a3c6f38c38dc4f75306f47a9c6033e364}{Value\+Ref}} xiao::\+ir::\+\+IRInst::\+result \{\}}
+
+
+
+The documentation for this struct was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+include/\+xiao/\+ir/\doxymbox{\hyperlink{ir_2inst_8hh}{inst.\+hh}}\end{DoxyCompactItemize}

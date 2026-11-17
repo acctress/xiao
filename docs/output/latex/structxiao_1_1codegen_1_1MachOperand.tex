@@ -1,0 +1,122 @@
+\doxysection{xiao::codegen::Mach\+Operand Struct Reference}
+\hypertarget{structxiao_1_1codegen_1_1MachOperand}{}\label{structxiao_1_1codegen_1_1MachOperand}\index{xiao::codegen::MachOperand@{xiao::codegen::MachOperand}}
+
+
+A packed register operand for a \doxylink{classxiao_1_1codegen_1_1MachInst}{Mach\+Inst}. Layout: bits 63:43 -\/ vreg index bit 42 -\/ vreg class bits 41:40 -\/ \doxylink{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7b}{Operand\+Kind} bit 39 -\/ \doxylink{namespacexiao_1_1codegen_a318f5ddbbcd950f939a08d496ec90dfe}{Operand\+Pos} bit 38 -\/ constraint kind bits 37:8 -\/ reserved bits 7:0 -\/ \doxylink{structxiao_1_1codegen_1_1PReg}{PReg} bits if Fixed, else 0.  
+
+
+
+
+{\ttfamily \+\#include $<$operand.\+hh$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VReg}{VReg}} \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a1d3216ccd9dc3721ae6321bc2762e5b9}{vreg}} () const noexcept
+\item 
+constexpr \doxymbox{\hyperlink{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7b}{Operand\+Kind}} \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a1d83e9fa1ee446dd0e9b19aeb0561a60}{kind}} () const noexcept
+\item 
+constexpr \doxymbox{\hyperlink{namespacexiao_1_1codegen_a318f5ddbbcd950f939a08d496ec90dfe}{Operand\+Pos}} \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a73c4642aa986decdd01bf91ce85ad5aa}{pos}} () const noexcept
+\item 
+constexpr bool \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a3f71a54b39e0a2ec403f20a224e358ad}{is\+\_\+fixed}} () const noexcept
+\item 
+constexpr std::\+optional$<$ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} $>$ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_af8e3b61b7f7a63fb2eeb717c1661cb46}{fixed\+\_\+preg}} () const noexcept
+\begin{DoxyCompactList}\small\item\em Returns the fixed \doxylink{structxiao_1_1codegen_1_1PReg}{PReg} if this is a fixed constrained operand. \end{DoxyCompactList}\item 
+constexpr bool \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a164854c9bdd2e8f561d2b698f1553dbc}{operator==}} (const \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand}{Mach\+Operand}} \&) const noexcept=default
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand}{Mach\+Operand}} \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a90a2656197f506c0bc643f06cc238916}{any}} (const \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VReg}{VReg}} vreg, const \doxymbox{\hyperlink{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7b}{Operand\+Kind}} kind, const \doxymbox{\hyperlink{namespacexiao_1_1codegen_a318f5ddbbcd950f939a08d496ec90dfe}{Operand\+Pos}} pos) noexcept
+\begin{DoxyCompactList}\small\item\em Construct an any constrained operand. \end{DoxyCompactList}\item 
+static constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand}{Mach\+Operand}} \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a230c5d280fd33274ba4850d2fbd7633f}{fixed}} (const \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VReg}{VReg}} vreg, const \doxymbox{\hyperlink{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7b}{Operand\+Kind}} kind, const \doxymbox{\hyperlink{namespacexiao_1_1codegen_a318f5ddbbcd950f939a08d496ec90dfe}{Operand\+Pos}} pos, const \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} preg) noexcept
+\begin{DoxyCompactList}\small\item\em Construct a fixed constrained operand. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+uint64\+\_\+t \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand_a943b98da3bb40e392ac186d577ed4f7d}{bits}} \{\}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+A packed register operand for a \doxylink{classxiao_1_1codegen_1_1MachInst}{Mach\+Inst}. Layout: bits 63:43 -\/ vreg index bit 42 -\/ vreg class bits 41:40 -\/ \doxylink{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7b}{Operand\+Kind} bit 39 -\/ \doxylink{namespacexiao_1_1codegen_a318f5ddbbcd950f939a08d496ec90dfe}{Operand\+Pos} bit 38 -\/ constraint kind bits 37:8 -\/ reserved bits 7:0 -\/ \doxylink{structxiao_1_1codegen_1_1PReg}{PReg} bits if Fixed, else 0. 
+
+\label{structxiao_1_1codegen_1_1MachOperand_doc-func-members}
+\Hypertarget{structxiao_1_1codegen_1_1MachOperand_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structxiao_1_1codegen_1_1MachOperand_a90a2656197f506c0bc643f06cc238916}\index{xiao::codegen::MachOperand@{xiao::codegen::MachOperand}!any@{any}}
+\index{any@{any}!xiao::codegen::MachOperand@{xiao::codegen::MachOperand}}
+\doxysubsubsection{\texorpdfstring{any()}{any()}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1MachOperand_a90a2656197f506c0bc643f06cc238916} 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand}{Mach\+Operand}} xiao::\+codegen::\+\+Mach\+Operand::\+any (\begin{DoxyParamCaption}\item[{const \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VReg}{VReg}}}]{vreg}{, }\item[{const \doxymbox{\hyperlink{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7b}{Operand\+Kind}}}]{kind}{, }\item[{const \doxymbox{\hyperlink{namespacexiao_1_1codegen_a318f5ddbbcd950f939a08d496ec90dfe}{Operand\+Pos}}}]{pos}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}, {\ttfamily [nodiscard]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+Construct an any constrained operand. 
+
+\Hypertarget{structxiao_1_1codegen_1_1MachOperand_a230c5d280fd33274ba4850d2fbd7633f}\index{xiao::codegen::MachOperand@{xiao::codegen::MachOperand}!fixed@{fixed}}
+\index{fixed@{fixed}!xiao::codegen::MachOperand@{xiao::codegen::MachOperand}}
+\doxysubsubsection{\texorpdfstring{fixed()}{fixed()}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1MachOperand_a230c5d280fd33274ba4850d2fbd7633f} 
+constexpr \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand}{Mach\+Operand}} xiao::\+codegen::\+\+Mach\+Operand::\+fixed (\begin{DoxyParamCaption}\item[{const \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VReg}{VReg}}}]{vreg}{, }\item[{const \doxymbox{\hyperlink{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7b}{Operand\+Kind}}}]{kind}{, }\item[{const \doxymbox{\hyperlink{namespacexiao_1_1codegen_a318f5ddbbcd950f939a08d496ec90dfe}{Operand\+Pos}}}]{pos}{, }\item[{const \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}}}]{preg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}, {\ttfamily [nodiscard]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+Construct a fixed constrained operand. 
+
+\Hypertarget{structxiao_1_1codegen_1_1MachOperand_af8e3b61b7f7a63fb2eeb717c1661cb46}\index{xiao::codegen::MachOperand@{xiao::codegen::MachOperand}!fixed\_preg@{fixed\_preg}}
+\index{fixed\_preg@{fixed\_preg}!xiao::codegen::MachOperand@{xiao::codegen::MachOperand}}
+\doxysubsubsection{\texorpdfstring{fixed\_preg()}{fixed\_preg()}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1MachOperand_af8e3b61b7f7a63fb2eeb717c1661cb46} 
+std::\+optional$<$ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} $>$ xiao::\+codegen::\+\+Mach\+Operand::\+fixed\+\_\+preg (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+Returns the fixed \doxylink{structxiao_1_1codegen_1_1PReg}{PReg} if this is a fixed constrained operand. 
+
+\Hypertarget{structxiao_1_1codegen_1_1MachOperand_a3f71a54b39e0a2ec403f20a224e358ad}\index{xiao::codegen::MachOperand@{xiao::codegen::MachOperand}!is\_fixed@{is\_fixed}}
+\index{is\_fixed@{is\_fixed}!xiao::codegen::MachOperand@{xiao::codegen::MachOperand}}
+\doxysubsubsection{\texorpdfstring{is\_fixed()}{is\_fixed()}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1MachOperand_a3f71a54b39e0a2ec403f20a224e358ad} 
+bool xiao::\+codegen::\+\+Mach\+Operand::\+is\+\_\+fixed (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+\Hypertarget{structxiao_1_1codegen_1_1MachOperand_a1d83e9fa1ee446dd0e9b19aeb0561a60}\index{xiao::codegen::MachOperand@{xiao::codegen::MachOperand}!kind@{kind}}
+\index{kind@{kind}!xiao::codegen::MachOperand@{xiao::codegen::MachOperand}}
+\doxysubsubsection{\texorpdfstring{kind()}{kind()}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1MachOperand_a1d83e9fa1ee446dd0e9b19aeb0561a60} 
+\doxymbox{\hyperlink{namespacexiao_1_1codegen_a0ffda67b6b2c0f7317dd01cc4e986c7b}{Operand\+Kind}} xiao::\+codegen::\+\+Mach\+Operand::\+kind (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+\Hypertarget{structxiao_1_1codegen_1_1MachOperand_a164854c9bdd2e8f561d2b698f1553dbc}\index{xiao::codegen::MachOperand@{xiao::codegen::MachOperand}!operator==@{operator==}}
+\index{operator==@{operator==}!xiao::codegen::MachOperand@{xiao::codegen::MachOperand}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1MachOperand_a164854c9bdd2e8f561d2b698f1553dbc} 
+bool xiao::\+codegen::\+\+Mach\+Operand::\+operator== (\begin{DoxyParamCaption}\item[{const \doxymbox{\hyperlink{structxiao_1_1codegen_1_1MachOperand}{Mach\+Operand}} \&}]{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [nodiscard]}, {\ttfamily [constexpr]}, {\ttfamily [default]}, {\ttfamily [noexcept]}}
+
+\Hypertarget{structxiao_1_1codegen_1_1MachOperand_a73c4642aa986decdd01bf91ce85ad5aa}\index{xiao::codegen::MachOperand@{xiao::codegen::MachOperand}!pos@{pos}}
+\index{pos@{pos}!xiao::codegen::MachOperand@{xiao::codegen::MachOperand}}
+\doxysubsubsection{\texorpdfstring{pos()}{pos()}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1MachOperand_a73c4642aa986decdd01bf91ce85ad5aa} 
+\doxymbox{\hyperlink{namespacexiao_1_1codegen_a318f5ddbbcd950f939a08d496ec90dfe}{Operand\+Pos}} xiao::\+codegen::\+\+Mach\+Operand::\+pos (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+\Hypertarget{structxiao_1_1codegen_1_1MachOperand_a1d3216ccd9dc3721ae6321bc2762e5b9}\index{xiao::codegen::MachOperand@{xiao::codegen::MachOperand}!vreg@{vreg}}
+\index{vreg@{vreg}!xiao::codegen::MachOperand@{xiao::codegen::MachOperand}}
+\doxysubsubsection{\texorpdfstring{vreg()}{vreg()}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1MachOperand_a1d3216ccd9dc3721ae6321bc2762e5b9} 
+\doxymbox{\hyperlink{structxiao_1_1codegen_1_1VReg}{VReg}} xiao::\+codegen::\+\+Mach\+Operand::\+vreg (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}, {\ttfamily [constexpr]}, {\ttfamily [noexcept]}}
+
+
+
+\label{structxiao_1_1codegen_1_1MachOperand_doc-variable-members}
+\Hypertarget{structxiao_1_1codegen_1_1MachOperand_doc-variable-members}
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structxiao_1_1codegen_1_1MachOperand_a943b98da3bb40e392ac186d577ed4f7d}\index{xiao::codegen::MachOperand@{xiao::codegen::MachOperand}!bits@{bits}}
+\index{bits@{bits}!xiao::codegen::MachOperand@{xiao::codegen::MachOperand}}
+\doxysubsubsection{\texorpdfstring{bits}{bits}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1MachOperand_a943b98da3bb40e392ac186d577ed4f7d} 
+uint64\+\_\+t xiao::\+codegen::\+\+Mach\+Operand::\+bits \{\}}
+
+
+
+The documentation for this struct was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+include/\+xiao/\+codegen/\doxymbox{\hyperlink{operand_8hh}{operand.\+hh}}\end{DoxyCompactItemize}

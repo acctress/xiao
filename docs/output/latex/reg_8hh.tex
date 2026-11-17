@@ -1,0 +1,34 @@
+\doxysection{include/\+xiao/\+codegen/\+reg.hh File Reference}
+\hypertarget{reg_8hh}{}\label{reg_8hh}\index{include/xiao/codegen/reg.hh@{include/xiao/codegen/reg.hh}}
+{\ttfamily \+\#include $<$cassert$>$}\newline
+{\ttfamily \+\#include $<$cstdint$>$}\newline
+{\ttfamily \+\#include $<$format$>$}\newline
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{xiao::\+codegen::\+\+PReg}}
+\begin{DoxyCompactList}\small\item\em A physical register Hardware encoding and register class packed into a single byte (6 bits, 1 bit). Layout: bit 0 -\/ \doxylink{namespacexiao_1_1codegen_adaee5b962fda789cdd870325ee2c9d7e}{Reg\+Class} bits 6:1 -\/ hardware encoding bit 7 -\/ reserved. \end{DoxyCompactList}\item 
+struct \doxymbox{\hyperlink{structxiao_1_1codegen_1_1VReg}{xiao::\+codegen::\+\+VReg}}
+\begin{DoxyCompactList}\small\item\em A virtual register Layout: bit 0 -\/ \doxylink{namespacexiao_1_1codegen_adaee5b962fda789cdd870325ee2c9d7e}{Reg\+Class} bits 31:1 -\/ vreg index. \end{DoxyCompactList}\item 
+struct \doxymbox{\hyperlink{structxiao_1_1codegen_1_1Reg}{xiao::\+codegen::\+\+Reg}}
+\begin{DoxyCompactList}\small\item\em A register, either physical or virtual. \end{DoxyCompactList}\item 
+struct \doxymbox{\hyperlink{structstd_1_1formatter_3_01xiao_1_1codegen_1_1PReg_01_4}{std::\+formatter$<$ xiao::\+codegen::\+\+PReg $>$}}
+\item 
+struct \doxymbox{\hyperlink{structstd_1_1formatter_3_01xiao_1_1codegen_1_1VReg_01_4}{std::\+formatter$<$ xiao::\+codegen::\+\+VReg $>$}}
+\item 
+struct \doxymbox{\hyperlink{structstd_1_1formatter_3_01xiao_1_1codegen_1_1Reg_01_4}{std::\+formatter$<$ xiao::\+codegen::\+\+Reg $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \doxymbox{\hyperlink{namespacexiao}{xiao}}
+\item 
+namespace \doxymbox{\hyperlink{namespacexiao_1_1codegen}{xiao::\+codegen}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum class \doxymbox{\hyperlink{namespacexiao_1_1codegen_adaee5b962fda789cdd870325ee2c9d7e}{xiao::\+codegen::\+\+Reg\+Class}} : uint8\+\_\+t \{ \doxymbox{\hyperlink{namespacexiao_1_1codegen_adaee5b962fda789cdd870325ee2c9d7ea1686a6c336b71b36d77354cea19a8b52}{xiao::\+codegen::\+\+Int}} = 0
+, \doxymbox{\hyperlink{namespacexiao_1_1codegen_adaee5b962fda789cdd870325ee2c9d7ea22ae0e2b89e5e3d477f988cc36d3272b}{xiao::\+codegen::\+\+Float}} = 1
+ \}
+\begin{DoxyCompactList}\small\item\em Register class. \end{DoxyCompactList}\end{DoxyCompactItemize}

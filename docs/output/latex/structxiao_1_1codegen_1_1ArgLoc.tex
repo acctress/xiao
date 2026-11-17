@@ -1,0 +1,83 @@
+\doxysection{xiao::codegen::Arg\+Loc Struct Reference}
+\hypertarget{structxiao_1_1codegen_1_1ArgLoc}{}\label{structxiao_1_1codegen_1_1ArgLoc}\index{xiao::codegen::ArgLoc@{xiao::codegen::ArgLoc}}
+
+
+A single solved argument or return location.  
+
+
+
+
+{\ttfamily \+\#include $<$abi.\+hh$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \doxymbox{\hyperlink{structxiao_1_1codegen_1_1ArgLoc_a23e0d35605ca5fb26b61ebfab2e11e63}{is\+\_\+reg}} () const noexcept
+\item 
+bool \doxymbox{\hyperlink{structxiao_1_1codegen_1_1ArgLoc_a35e935f1e36967db878cba8f90f43c82}{is\+\_\+stack}} () const noexcept
+\item 
+\doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} \doxymbox{\hyperlink{structxiao_1_1codegen_1_1ArgLoc_a879d6a171913dac5f2380a5ee6c4775f}{reg}} () const noexcept
+\item 
+int32\+\_\+t \doxymbox{\hyperlink{structxiao_1_1codegen_1_1ArgLoc_a57ad44d469f6d1da49156745b4993fd8}{stack\+\_\+offset}} () const noexcept
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std::\+variant$<$ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}}, int32\+\_\+t $>$ \doxymbox{\hyperlink{structxiao_1_1codegen_1_1ArgLoc_aaca7c85c600a1b173948156846eea7f8}{slot}}
+\item 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_a307713cf4121f80d62a84fb66835ef8f}{ir::\+\+Type}} \doxymbox{\hyperlink{structxiao_1_1codegen_1_1ArgLoc_aa90cf21323b741b169a50628b3c813b0}{ty}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+A single solved argument or return location. 
+
+\label{structxiao_1_1codegen_1_1ArgLoc_doc-func-members}
+\Hypertarget{structxiao_1_1codegen_1_1ArgLoc_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structxiao_1_1codegen_1_1ArgLoc_a23e0d35605ca5fb26b61ebfab2e11e63}\index{xiao::codegen::ArgLoc@{xiao::codegen::ArgLoc}!is\_reg@{is\_reg}}
+\index{is\_reg@{is\_reg}!xiao::codegen::ArgLoc@{xiao::codegen::ArgLoc}}
+\doxysubsubsection{\texorpdfstring{is\_reg()}{is\_reg()}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1ArgLoc_a23e0d35605ca5fb26b61ebfab2e11e63} 
+bool xiao::\+codegen::\+\+Arg\+Loc::\+is\+\_\+reg (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}, {\ttfamily [noexcept]}}
+
+\Hypertarget{structxiao_1_1codegen_1_1ArgLoc_a35e935f1e36967db878cba8f90f43c82}\index{xiao::codegen::ArgLoc@{xiao::codegen::ArgLoc}!is\_stack@{is\_stack}}
+\index{is\_stack@{is\_stack}!xiao::codegen::ArgLoc@{xiao::codegen::ArgLoc}}
+\doxysubsubsection{\texorpdfstring{is\_stack()}{is\_stack()}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1ArgLoc_a35e935f1e36967db878cba8f90f43c82} 
+bool xiao::\+codegen::\+\+Arg\+Loc::\+is\+\_\+stack (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}, {\ttfamily [noexcept]}}
+
+\Hypertarget{structxiao_1_1codegen_1_1ArgLoc_a879d6a171913dac5f2380a5ee6c4775f}\index{xiao::codegen::ArgLoc@{xiao::codegen::ArgLoc}!reg@{reg}}
+\index{reg@{reg}!xiao::codegen::ArgLoc@{xiao::codegen::ArgLoc}}
+\doxysubsubsection{\texorpdfstring{reg()}{reg()}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1ArgLoc_a879d6a171913dac5f2380a5ee6c4775f} 
+\doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}} xiao::\+codegen::\+\+Arg\+Loc::\+reg (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}, {\ttfamily [noexcept]}}
+
+\Hypertarget{structxiao_1_1codegen_1_1ArgLoc_a57ad44d469f6d1da49156745b4993fd8}\index{xiao::codegen::ArgLoc@{xiao::codegen::ArgLoc}!stack\_offset@{stack\_offset}}
+\index{stack\_offset@{stack\_offset}!xiao::codegen::ArgLoc@{xiao::codegen::ArgLoc}}
+\doxysubsubsection{\texorpdfstring{stack\_offset()}{stack\_offset()}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1ArgLoc_a57ad44d469f6d1da49156745b4993fd8} 
+int32\+\_\+t xiao::\+codegen::\+\+Arg\+Loc::\+stack\+\_\+offset (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}, {\ttfamily [noexcept]}}
+
+
+
+\label{structxiao_1_1codegen_1_1ArgLoc_doc-variable-members}
+\Hypertarget{structxiao_1_1codegen_1_1ArgLoc_doc-variable-members}
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structxiao_1_1codegen_1_1ArgLoc_aaca7c85c600a1b173948156846eea7f8}\index{xiao::codegen::ArgLoc@{xiao::codegen::ArgLoc}!slot@{slot}}
+\index{slot@{slot}!xiao::codegen::ArgLoc@{xiao::codegen::ArgLoc}}
+\doxysubsubsection{\texorpdfstring{slot}{slot}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1ArgLoc_aaca7c85c600a1b173948156846eea7f8} 
+std::\+variant$<$\doxymbox{\hyperlink{structxiao_1_1codegen_1_1PReg}{PReg}}, int32\+\_\+t$>$ xiao::\+codegen::\+\+Arg\+Loc::\+slot}
+
+\Hypertarget{structxiao_1_1codegen_1_1ArgLoc_aa90cf21323b741b169a50628b3c813b0}\index{xiao::codegen::ArgLoc@{xiao::codegen::ArgLoc}!ty@{ty}}
+\index{ty@{ty}!xiao::codegen::ArgLoc@{xiao::codegen::ArgLoc}}
+\doxysubsubsection{\texorpdfstring{ty}{ty}}
+{\footnotesize\ttfamily \label{structxiao_1_1codegen_1_1ArgLoc_aa90cf21323b741b169a50628b3c813b0} 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_a307713cf4121f80d62a84fb66835ef8f}{ir::\+\+Type}} xiao::\+codegen::\+\+Arg\+Loc::\+ty}
+
+
+
+The documentation for this struct was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+include/\+xiao/\+codegen/\doxymbox{\hyperlink{codegen_2abi_8hh}{abi.\+hh}}\end{DoxyCompactItemize}

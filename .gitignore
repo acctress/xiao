@@ -11,10 +11,10 @@ CTestTestfile.cmake
 _deps
 CMakeUserPresets.json
 .idea
-
-# Build directories
+private/
 .vs/
 out/
 bin/
 build/
 vs-build/
+docs/manual/book/

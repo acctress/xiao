@@ -1,0 +1,144 @@
+\doxysection{xiao::ir::IRModule Class Reference}
+\hypertarget{classxiao_1_1ir_1_1IRModule}{}\label{classxiao_1_1ir_1_1IRModule}\index{xiao::ir::IRModule@{xiao::ir::IRModule}}
+
+
+A module which owns the arena and interned strings.  
+
+
+
+
+{\ttfamily \+\#include $<$module.\+hh$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\doxymbox{\hyperlink{classxiao_1_1ir_1_1IRModule_aeb31f265e4466ec92e1e481680b6fb3f}{IRModule}} (const std::\+size\+\_\+t arena\+\_\+size=\doxymbox{\hyperlink{classxiao_1_1support_1_1Arena_a537d1ef24d7c2a3dc3ee47384d168c80}{support::\+\+Arena::\+default\+\_\+slab\+\_\+size}})
+\item 
+\doxymbox{\hyperlink{classxiao_1_1ir_1_1IRModule_a407de4b9d51c00e8dd9a5a886aea917b}{IRModule}} (IRModule \&\&) noexcept=default
+\item 
+\doxymbox{\hyperlink{classxiao_1_1ir_1_1IRModule_aeb31f265e4466ec92e1e481680b6fb3f}{IRModule}} \& \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRModule_a8df6baebb78c23b42502138cc3fe8fa7}{operator=}} (\doxymbox{\hyperlink{classxiao_1_1ir_1_1IRModule_aeb31f265e4466ec92e1e481680b6fb3f}{IRModule}} \&\&) noexcept=default
+\item 
+\doxymbox{\hyperlink{classxiao_1_1ir_1_1IRModule_a37854785da624f5e93f51348d20b0c9e}{IRModule}} (const IRModule \&)=delete
+\item 
+\doxymbox{\hyperlink{classxiao_1_1ir_1_1IRModule_aeb31f265e4466ec92e1e481680b6fb3f}{IRModule}} \& \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRModule_ad3ccb705703d1a7e3c85a735351cbd18}{operator=}} (const \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRModule_aeb31f265e4466ec92e1e481680b6fb3f}{IRModule}} \&)=delete
+\item 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_af797d8e76ccbec59a5ae9bd140381361}{Function\+Ref}} \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRModule_a4216d04f4842e0c4d5732176310a0030}{declare}} (const std::\+string\+\_\+view name, const \doxymbox{\hyperlink{namespacexiao_1_1ir_a307713cf4121f80d62a84fb66835ef8f}{Type}} ret, const std::\+span$<$ const \doxymbox{\hyperlink{namespacexiao_1_1ir_a307713cf4121f80d62a84fb66835ef8f}{Type}} $>$ params=\{\})
+\item 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_af797d8e76ccbec59a5ae9bd140381361}{Function\+Ref}} \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRModule_a700e14d0bee06bfc2d3c9ba05a93efba}{declare}} (const std::\+string\+\_\+view name, const \doxymbox{\hyperlink{namespacexiao_1_1ir_a307713cf4121f80d62a84fb66835ef8f}{Type}} ret, const std::\+initializer\+\_\+list$<$ const \doxymbox{\hyperlink{namespacexiao_1_1ir_a307713cf4121f80d62a84fb66835ef8f}{Type}} $>$ params=\{\})
+\item 
+std::\+pair$<$ \doxymbox{\hyperlink{namespacexiao_1_1ir_a1817af3ff3012e194ba11e4a269b753e}{String\+Ref}}, std::\+string\+\_\+view $>$ \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRModule_a34689f9bf44c73bb62d089198648fb1c}{intern}} (const std::\+string\+\_\+view sv)
+\begin{DoxyCompactList}\small\item\em Intern a string; returns a \doxylink{namespacexiao_1_1ir_a1817af3ff3012e194ba11e4a269b753e}{String\+Ref} + view pair. \end{DoxyCompactList}\item 
+std::\+string\+\_\+view \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRModule_a745dda369826cf260a69b411ce73b4cc}{string}} (\doxymbox{\hyperlink{namespacexiao_1_1ir_a1817af3ff3012e194ba11e4a269b753e}{String\+Ref}} ref) const noexcept
+\begin{DoxyCompactList}\small\item\em Resolve a \doxylink{namespacexiao_1_1ir_a1817af3ff3012e194ba11e4a269b753e}{String\+Ref} to its string\+\_\+view. \end{DoxyCompactList}\item 
+\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}} \texorpdfstring{$\ast$}{*} \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRModule_a1d31c8969aabb8b1ce9536200b253e26}{get}} (const \doxymbox{\hyperlink{namespacexiao_1_1ir_af797d8e76ccbec59a5ae9bd140381361}{Function\+Ref}} ref) noexcept
+\item 
+const \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}} \texorpdfstring{$\ast$}{*} \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRModule_a1b660fc37a31480ef4a14b2002b59114}{get}} (const \doxymbox{\hyperlink{namespacexiao_1_1ir_af797d8e76ccbec59a5ae9bd140381361}{Function\+Ref}} ref) const noexcept
+\item 
+std::\+span$<$ \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}} \texorpdfstring{$\ast$}{*}const $>$ \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRModule_a4f0e8fd98fbc858b667b74d4004002a7}{functions}} () const noexcept
+\item 
+\doxymbox{\hyperlink{classxiao_1_1support_1_1Arena}{support::\+\+Arena}} \& \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRModule_aa37f2590ae537965a1f3809a5cbd551f}{arena}} () noexcept
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+A module which owns the arena and interned strings. 
+
+\label{classxiao_1_1ir_1_1IRModule_doc-constructors}
+\Hypertarget{classxiao_1_1ir_1_1IRModule_doc-constructors}
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classxiao_1_1ir_1_1IRModule_aeb31f265e4466ec92e1e481680b6fb3f}\index{xiao::ir::IRModule@{xiao::ir::IRModule}!IRModule@{IRModule}}
+\index{IRModule@{IRModule}!xiao::ir::IRModule@{xiao::ir::IRModule}}
+\doxysubsubsection{\texorpdfstring{IRModule()}{IRModule()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily \label{classxiao_1_1ir_1_1IRModule_aeb31f265e4466ec92e1e481680b6fb3f} 
+xiao::\+ir::\+\+IRModule::\+\+IRModule (\begin{DoxyParamCaption}\item[{const std::\+size\+\_\+t}]{arena\+\_\+size}{ = {\ttfamily \doxymbox{\hyperlink{classxiao_1_1support_1_1Arena_a537d1ef24d7c2a3dc3ee47384d168c80}{support::\+\+Arena::\+default\+\_\+slab\+\_\+size}}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+\Hypertarget{classxiao_1_1ir_1_1IRModule_a407de4b9d51c00e8dd9a5a886aea917b}\index{xiao::ir::IRModule@{xiao::ir::IRModule}!IRModule@{IRModule}}
+\index{IRModule@{IRModule}!xiao::ir::IRModule@{xiao::ir::IRModule}}
+\doxysubsubsection{\texorpdfstring{IRModule()}{IRModule()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily \label{classxiao_1_1ir_1_1IRModule_a407de4b9d51c00e8dd9a5a886aea917b} 
+xiao::\+ir::\+\+IRModule::\+\+IRModule (\begin{DoxyParamCaption}\item[{IRModule \&\&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}, {\ttfamily [noexcept]}}
+
+\Hypertarget{classxiao_1_1ir_1_1IRModule_a37854785da624f5e93f51348d20b0c9e}\index{xiao::ir::IRModule@{xiao::ir::IRModule}!IRModule@{IRModule}}
+\index{IRModule@{IRModule}!xiao::ir::IRModule@{xiao::ir::IRModule}}
+\doxysubsubsection{\texorpdfstring{IRModule()}{IRModule()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily \label{classxiao_1_1ir_1_1IRModule_a37854785da624f5e93f51348d20b0c9e} 
+xiao::\+ir::\+\+IRModule::\+\+IRModule (\begin{DoxyParamCaption}\item[{const IRModule \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+
+
+\label{classxiao_1_1ir_1_1IRModule_doc-func-members}
+\Hypertarget{classxiao_1_1ir_1_1IRModule_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classxiao_1_1ir_1_1IRModule_aa37f2590ae537965a1f3809a5cbd551f}\index{xiao::ir::IRModule@{xiao::ir::IRModule}!arena@{arena}}
+\index{arena@{arena}!xiao::ir::IRModule@{xiao::ir::IRModule}}
+\doxysubsubsection{\texorpdfstring{arena()}{arena()}}
+{\footnotesize\ttfamily \label{classxiao_1_1ir_1_1IRModule_aa37f2590ae537965a1f3809a5cbd551f} 
+\doxymbox{\hyperlink{classxiao_1_1support_1_1Arena}{support::\+\+Arena}} \& xiao::\+ir::\+\+IRModule::\+arena (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}, {\ttfamily [noexcept]}}
+
+\Hypertarget{classxiao_1_1ir_1_1IRModule_a700e14d0bee06bfc2d3c9ba05a93efba}\index{xiao::ir::IRModule@{xiao::ir::IRModule}!declare@{declare}}
+\index{declare@{declare}!xiao::ir::IRModule@{xiao::ir::IRModule}}
+\doxysubsubsection{\texorpdfstring{declare()}{declare()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classxiao_1_1ir_1_1IRModule_a700e14d0bee06bfc2d3c9ba05a93efba} 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_af797d8e76ccbec59a5ae9bd140381361}{Function\+Ref}} xiao::\+ir::\+\+IRModule::\+declare (\begin{DoxyParamCaption}\item[{const std::\+string\+\_\+view}]{name}{, }\item[{const \doxymbox{\hyperlink{namespacexiao_1_1ir_a307713cf4121f80d62a84fb66835ef8f}{Type}}}]{ret}{, }\item[{const std::\+initializer\+\_\+list$<$ const \doxymbox{\hyperlink{namespacexiao_1_1ir_a307713cf4121f80d62a84fb66835ef8f}{Type}} $>$}]{params}{ = {\ttfamily \{\}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}}
+
+\Hypertarget{classxiao_1_1ir_1_1IRModule_a4216d04f4842e0c4d5732176310a0030}\index{xiao::ir::IRModule@{xiao::ir::IRModule}!declare@{declare}}
+\index{declare@{declare}!xiao::ir::IRModule@{xiao::ir::IRModule}}
+\doxysubsubsection{\texorpdfstring{declare()}{declare()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classxiao_1_1ir_1_1IRModule_a4216d04f4842e0c4d5732176310a0030} 
+\doxymbox{\hyperlink{namespacexiao_1_1ir_af797d8e76ccbec59a5ae9bd140381361}{Function\+Ref}} xiao::\+ir::\+\+IRModule::\+declare (\begin{DoxyParamCaption}\item[{const std::\+string\+\_\+view}]{name}{, }\item[{const \doxymbox{\hyperlink{namespacexiao_1_1ir_a307713cf4121f80d62a84fb66835ef8f}{Type}}}]{ret}{, }\item[{const std::\+span$<$ const \doxymbox{\hyperlink{namespacexiao_1_1ir_a307713cf4121f80d62a84fb66835ef8f}{Type}} $>$}]{params}{ = {\ttfamily \{\}}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}}
+
+\Hypertarget{classxiao_1_1ir_1_1IRModule_a4f0e8fd98fbc858b667b74d4004002a7}\index{xiao::ir::IRModule@{xiao::ir::IRModule}!functions@{functions}}
+\index{functions@{functions}!xiao::ir::IRModule@{xiao::ir::IRModule}}
+\doxysubsubsection{\texorpdfstring{functions()}{functions()}}
+{\footnotesize\ttfamily \label{classxiao_1_1ir_1_1IRModule_a4f0e8fd98fbc858b667b74d4004002a7} 
+std::\+span$<$ \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}} \texorpdfstring{$\ast$}{*}const  $>$ xiao::\+ir::\+\+IRModule::\+functions (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}, {\ttfamily [noexcept]}}
+
+\Hypertarget{classxiao_1_1ir_1_1IRModule_a1b660fc37a31480ef4a14b2002b59114}\index{xiao::ir::IRModule@{xiao::ir::IRModule}!get@{get}}
+\index{get@{get}!xiao::ir::IRModule@{xiao::ir::IRModule}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classxiao_1_1ir_1_1IRModule_a1b660fc37a31480ef4a14b2002b59114} 
+const \doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}} \texorpdfstring{$\ast$}{*} xiao::\+ir::\+\+IRModule::\+get (\begin{DoxyParamCaption}\item[{const \doxymbox{\hyperlink{namespacexiao_1_1ir_af797d8e76ccbec59a5ae9bd140381361}{Function\+Ref}}}]{ref}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}, {\ttfamily [noexcept]}}
+
+\Hypertarget{classxiao_1_1ir_1_1IRModule_a1d31c8969aabb8b1ce9536200b253e26}\index{xiao::ir::IRModule@{xiao::ir::IRModule}!get@{get}}
+\index{get@{get}!xiao::ir::IRModule@{xiao::ir::IRModule}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classxiao_1_1ir_1_1IRModule_a1d31c8969aabb8b1ce9536200b253e26} 
+\doxymbox{\hyperlink{structxiao_1_1ir_1_1IRFunction}{IRFunction}} \texorpdfstring{$\ast$}{*} xiao::\+ir::\+\+IRModule::\+get (\begin{DoxyParamCaption}\item[{const \doxymbox{\hyperlink{namespacexiao_1_1ir_af797d8e76ccbec59a5ae9bd140381361}{Function\+Ref}}}]{ref}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}, {\ttfamily [noexcept]}}
+
+\Hypertarget{classxiao_1_1ir_1_1IRModule_a34689f9bf44c73bb62d089198648fb1c}\index{xiao::ir::IRModule@{xiao::ir::IRModule}!intern@{intern}}
+\index{intern@{intern}!xiao::ir::IRModule@{xiao::ir::IRModule}}
+\doxysubsubsection{\texorpdfstring{intern()}{intern()}}
+{\footnotesize\ttfamily \label{classxiao_1_1ir_1_1IRModule_a34689f9bf44c73bb62d089198648fb1c} 
+std::\+pair$<$ \doxymbox{\hyperlink{namespacexiao_1_1ir_a1817af3ff3012e194ba11e4a269b753e}{String\+Ref}}, std::\+string\+\_\+view $>$ xiao::\+ir::\+\+IRModule::\+intern (\begin{DoxyParamCaption}\item[{const std::\+string\+\_\+view}]{sv}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}}
+
+
+
+Intern a string; returns a \doxylink{namespacexiao_1_1ir_a1817af3ff3012e194ba11e4a269b753e}{String\+Ref} + view pair. 
+
+\Hypertarget{classxiao_1_1ir_1_1IRModule_ad3ccb705703d1a7e3c85a735351cbd18}\index{xiao::ir::IRModule@{xiao::ir::IRModule}!operator=@{operator=}}
+\index{operator=@{operator=}!xiao::ir::IRModule@{xiao::ir::IRModule}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classxiao_1_1ir_1_1IRModule_ad3ccb705703d1a7e3c85a735351cbd18} 
+\doxymbox{\hyperlink{classxiao_1_1ir_1_1IRModule_aeb31f265e4466ec92e1e481680b6fb3f}{IRModule}} \& xiao::\+ir::\+\+IRModule::\+operator= (\begin{DoxyParamCaption}\item[{const \doxymbox{\hyperlink{classxiao_1_1ir_1_1IRModule_aeb31f265e4466ec92e1e481680b6fb3f}{IRModule}} \&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+\Hypertarget{classxiao_1_1ir_1_1IRModule_a8df6baebb78c23b42502138cc3fe8fa7}\index{xiao::ir::IRModule@{xiao::ir::IRModule}!operator=@{operator=}}
+\index{operator=@{operator=}!xiao::ir::IRModule@{xiao::ir::IRModule}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classxiao_1_1ir_1_1IRModule_a8df6baebb78c23b42502138cc3fe8fa7} 
+\doxymbox{\hyperlink{classxiao_1_1ir_1_1IRModule_aeb31f265e4466ec92e1e481680b6fb3f}{IRModule}} \& xiao::\+ir::\+\+IRModule::\+operator= (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{classxiao_1_1ir_1_1IRModule_aeb31f265e4466ec92e1e481680b6fb3f}{IRModule}} \&\&}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [default]}, {\ttfamily [noexcept]}}
+
+\Hypertarget{classxiao_1_1ir_1_1IRModule_a745dda369826cf260a69b411ce73b4cc}\index{xiao::ir::IRModule@{xiao::ir::IRModule}!string@{string}}
+\index{string@{string}!xiao::ir::IRModule@{xiao::ir::IRModule}}
+\doxysubsubsection{\texorpdfstring{string()}{string()}}
+{\footnotesize\ttfamily \label{classxiao_1_1ir_1_1IRModule_a745dda369826cf260a69b411ce73b4cc} 
+std::\+string\+\_\+view xiao::\+ir::\+\+IRModule::\+string (\begin{DoxyParamCaption}\item[{\doxymbox{\hyperlink{namespacexiao_1_1ir_a1817af3ff3012e194ba11e4a269b753e}{String\+Ref}}}]{ref}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [nodiscard]}, {\ttfamily [noexcept]}}
+
+
+
+Resolve a \doxylink{namespacexiao_1_1ir_a1817af3ff3012e194ba11e4a269b753e}{String\+Ref} to its string\+\_\+view. 
+
+
+
+The documentation for this class was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+include/\+xiao/\+ir/\doxymbox{\hyperlink{module_8hh}{module.\+hh}}\end{DoxyCompactItemize}
