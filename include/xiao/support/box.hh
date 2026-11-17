@@ -17,13 +17,11 @@ namespace xiao::support
 
         Box( Box&& ) noexcept = default;
 
-        Box& operator= ( const Box& other )
+        Box& operator= ( Box other ) noexcept
         {
-            if ( this != &other ) m_ptr = other.m_ptr ? std::make_unique< T >( *other.m_ptr ) : nullptr;
+            std::swap( m_ptr, other.m_ptr );
             return *this;
         }
-
-        Box& operator= ( Box&& ) noexcept = default;
 
         ~Box( ) = default;
 
