@@ -6,9 +6,8 @@
 
 #include <xiao/ir/visitor.hh>
 #include <xiao/ir/function.hh>
-#include <xiao/isa/x86/inst.hh>
-#include <xiao/isa/x86/machenv.hh>
-#include <xiao/isa/x86/reg.hh>
+#include <xiao/isa/x86/inst/inst.hh>
+#include <xiao/isa/x86/inst/regs.hh>
 #include <xiao/codegen/abi.hh>
 #include <xiao/codegen/machenv.hh>
 #include <xiao/codegen/vcode.hh>
@@ -214,6 +213,17 @@ namespace xiao::x86_64
             }
         }
 
+        void push_load( const Reg dst, const GprMem& mem, const ir::Type ty )
+        {
+            switch ( ir::bit_width( ty ) )
+            {
+                case 8: m_builder.push( inst::movzxq_rm8 { dst, mem } ); break;
+                case 16: m_builder.push( inst::movzxq_rm16 { dst, mem } ); break;
+                case 32: m_builder.push( inst::movl_rm { dst, mem } ); break;
+                default: m_builder.push( inst::movq_rm { dst, mem } ); break;
+            }
+        }
+
         void lower_params( const ir::IRFunction& fn, const ir::IRBlock& entry )
         {
             assert( entry.params_count == fn.sig.params.size( ) && "[xiao::lower::lower_params] entry block params must match the sig" );
@@ -221,10 +231,15 @@ namespace xiao::x86_64
             for ( uint16_t i { 0 }; i < entry.params_count; ++i )
             {
                 const auto& loc = m_sig.params[ i ];
-                assert( loc.is_reg( ) && "[xiao::lower::lower_params] stack passed params not support YET" );
+                const auto  val = fn.block_params[ entry.params_offset + i ];
 
-                const auto val = fn.block_params[ entry.params_offset + i ];
-                mov( reg_for( val ), Reg::from_preg( loc.reg( ) ) );
+                if ( loc.is_reg( ) )
+                {
+                    mov( reg_for( val ), Reg::from_preg( loc.reg( ) ) );
+                    continue;
+                }
+
+                push_load( reg_for( val ), GprMem { incoming_arg( loc.stack_offset( ) ) }, loc.ty );
             }
         }
 
@@ -360,12 +375,12 @@ namespace xiao::x86_64
                 const auto& term = fn.insts[ b.insts_offset + b.insts_count - 1 ];
                 if ( term.op != ir::IROp::brif ) continue;
 
-                const auto cond = fn.operands[ term.ops_offset ];
-                const auto def  = fn.values[ cond.id ].inst.id;
+                const auto [ id ] = fn.operands[ term.ops_offset ];
+                const auto def    = fn.values[ id ].inst.id;
                 if ( def < b.insts_offset || def >= b.insts_offset + b.insts_count ) continue;
-                if ( fn.insts[ def ].op != ir::IROp::icmp || uses[ cond.id ] != 1 ) continue;
+                if ( fn.insts[ def ].op != ir::IROp::icmp || uses[ id ] != 1 ) continue;
 
-                m_fused[ cond.id ] = true;
+                m_fused[ id ] = true;
             }
         }
 
@@ -492,13 +507,7 @@ namespace xiao::x86_64
                 AddressMode { .base = reg_for( operand( inst, 0 ) ), .disp = ir::mem_offset( inst ) }
             };
 
-            switch ( ir::bit_width( type_of( inst.result ) ) )
-            {
-                case 8: m_builder.push( inst::movzxq_rm8 { dst, mem } ); break;
-                case 16: m_builder.push( inst::movzxq_rm16 { dst, mem } ); break;
-                case 32: m_builder.push( inst::movl_rm { dst, mem } ); break;
-                default: m_builder.push( inst::movq_rm { dst, mem } ); break;
-            }
+            push_load( dst, mem, type_of( inst.result ) );
         }
 
         void lower_store( const ir::IRInst& inst )

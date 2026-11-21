@@ -33,20 +33,20 @@ target_include_directories(xiao_headers INTERFACE
     $<INSTALL_INTERFACE:include>
 )
 
-file(GLOB XIAO_X86_ISA CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/include/xiao/isa/x86/defs/*.isa")
+file(GLOB XIAO_X86_ISA CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/include/xiao/isa/x86/inst/defs/*.isa")
 
 if (TARGET xiao-isagen AND XIAO_X86_ISA)
     set(XIAO_X86_GEN_TESTS "${XIAO_GEN_DIR}/tests/x86_insts_test.cc")
 
     xiao_isagen(xiao_x86_gen
-        HEADER "${CMAKE_CURRENT_SOURCE_DIR}/include/xiao/isa/x86/gen/insts.hh"
+        HEADER "${CMAKE_CURRENT_SOURCE_DIR}/include/xiao/isa/x86/inst/gen/insts.hh"
         TESTS  "${XIAO_X86_GEN_TESTS}"
         INPUTS ${XIAO_X86_ISA}
     )
 
     add_dependencies(xiao_headers xiao_x86_gen)
 elseif (TARGET xiao-isagen)
-    message(STATUS "xiao-isagen: no .isa files in include/xiao/isa/x86/defs yet, x86 generation is off")
+    message(STATUS "xiao-isagen: no .isa files in include/xiao/isa/x86/inst/defs yet, x86 generation is off")
 endif()
 
 file(GLOB_RECURSE PROJ_HEADERS CONFIGURE_DEPENDS

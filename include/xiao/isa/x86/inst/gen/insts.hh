@@ -1,7 +1,9 @@
 #pragma once
 
-#include <xiao/isa/x86/asm.hh>
-#include <xiao/isa/x86/pseudo.hh>
+#include <xiao/isa/x86/inst/args.hh>
+#include <xiao/isa/x86/inst/encoding.hh>
+#include <xiao/isa/x86/inst/fmt.hh>
+#include <xiao/isa/x86/inst/pseudo.hh>
 
 #include <algorithm>
 #include <cassert>

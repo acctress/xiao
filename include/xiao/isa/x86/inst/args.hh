@@ -1,11 +1,14 @@
 #pragma once
 
-#include <xiao/isa/x86/reg.hh>
+#include <xiao/codegen/operand.hh>
 #include <xiao/codegen/reg.hh>
+#include <xiao/isa/x86/inst/regs.hh>
 
+#include <concepts>
 #include <cstdint>
-#include <string_view>
-#include <utility>
+#include <span>
+#include <type_traits>
+#include <variant>
 
 namespace xiao::x86_64
 {
@@ -54,47 +57,47 @@ namespace xiao::x86_64
         int32_t                    incoming_base { };
     };
 
-    struct LabelUse
-    {
-        enum class Kind : uint8_t
-        {
-            JmpRel32
-        } kind;
-
-        explicit constexpr LabelUse( const Kind k ) : kind { k } { }
-
-        [[nodiscard]] static int32_t encode( const LabelUse use, const uint32_t from, const uint32_t to )
-        {
-            switch ( use.kind )
-            {
-                case Kind::JmpRel32: return static_cast< int32_t >( to ) - static_cast< int32_t >( from + 4 );
-            }
-
-            std::unreachable( );
-        }
-    };
-
     [[nodiscard]] static constexpr AddressMode incoming_arg( const int32_t offset ) noexcept
     { return { .disp = offset, .amode_kind = AmodeKind::IncomingArg }; }
 
     [[nodiscard]] static constexpr AddressMode stack_slot( const int32_t slot, const int32_t offset ) noexcept
     { return { .disp = offset, .amode_kind = AmodeKind::Slot, .slot = slot }; }
 
-    [[nodiscard]] constexpr std::string_view to_string( const CC cc ) noexcept
+    struct GprMem
     {
-        switch ( cc )
+        std::variant< Reg, AddressMode > value { };
+
+        GprMem( ) = default;
+
+        explicit GprMem( const Reg reg ) noexcept : value { reg } { }
+
+        explicit GprMem( const AddressMode& mem ) noexcept : value { mem } { }
+    };
+
+    template < typename M, typename V >
+        requires std::same_as< std::remove_const_t< M >, AddressMode >
+    void visit_mem( M& mode, V& v )
+    {
+        if constexpr ( requires { v.mem( mode ); } ) v.mem( mode );
+        v.use( mode.base );
+        v.use( mode.index );
+    }
+
+    template < typename G, typename V >
+    void visit_gpr_mem( G& rm, V& v, const OperandKind kind )
+    {
+        if ( auto* reg = std::get_if< Reg >( &rm.value ) )
         {
-            case CC::E: return "e";
-            case CC::NE: return "ne";
-            case CC::L: return "l";
-            case CC::LE: return "le";
-            case CC::G: return "g";
-            case CC::GE: return "ge";
-            case CC::B: return "b";
-            case CC::BE: return "be";
-            case CC::A: return "a";
-            case CC::AE: return "ae";
+            switch ( kind )
+            {
+                case OperandKind::Use: v.use( *reg ); break;
+                case OperandKind::Def: v.def( *reg ); break;
+                case OperandKind::UseDef: v.usedef( *reg ); break;
+            }
+            return;
         }
-        return "<?>";
+
+        auto& mem = std::get< AddressMode >( rm.value );
+        visit_mem( mem, v );
     }
 } // namespace xiao::x86_64

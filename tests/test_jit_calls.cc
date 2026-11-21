@@ -81,7 +81,7 @@ namespace
     }
 
     const std::vector< int64_t > small_values { 0, 1, -1, 2, -3, 9, 100, -1000, 123456, -987654321, 0x7fffffff, -0x80000000LL };
-}
+} // namespace
 
 TEST_CASE( "call a host function with no arguments", "[jit][calls]" )
 {
@@ -92,7 +92,7 @@ TEST_CASE( "call a host function with no arguments", "[jit][calls]" )
                                   {
                                   const auto fr = j.mod.declare_func_in_func( callee, b );
                                   b.ret( b.call( fr, { } ) );
-                                  } );
+                              } );
     j.finalise( );
     CHECK( j.get< int64_t( ) >( id )( ) == 77 );
 }
@@ -106,7 +106,7 @@ TEST_CASE( "call a host function with one argument", "[jit][calls]" )
                                   {
                                   const auto fr = j.mod.declare_func_in_func( callee, b );
                                   b.ret( b.call( fr, Args { a[ 0 ] } ) );
-                                  } );
+                              } );
     j.finalise( );
     const auto f = j.get< int64_t( int64_t ) >( id );
     for ( const auto x : small_values ) CHECK( f( x ) == h_one( x ) );
@@ -121,13 +121,13 @@ TEST_CASE( "call a host function with two arguments in both orders", "[jit][call
                                   {
                                    const auto fr = j.mod.declare_func_in_func( callee, b );
                                    b.ret( b.call( fr, Args { a[ 0 ], a[ 1 ] } ) );
-                                  } );
+                               } );
     const auto rev    = j.define( "rev", Type::i64, { Type::i64, Type::i64 },
                                   [ & ]( ir::IRBuilder& b, const Args& a )
                                   {
                                    const auto fr = j.mod.declare_func_in_func( callee, b );
                                    b.ret( b.call( fr, Args { a[ 1 ], a[ 0 ] } ) );
-                                  } );
+                               } );
     j.finalise( );
     for ( const auto x : small_values )
         for ( const auto y : { int64_t { 0 }, int64_t { 5 }, int64_t { -11 } } )
@@ -146,7 +146,7 @@ TEST_CASE( "call a host function with three arguments", "[jit][calls]" )
                                   {
                                   const auto fr = j.mod.declare_func_in_func( callee, b );
                                   b.ret( b.call( fr, Args { a[ 2 ], a[ 0 ], a[ 1 ] } ) );
-                                  } );
+                              } );
     j.finalise( );
     const auto f = j.get< int64_t( int64_t, int64_t, int64_t ) >( id );
     CHECK( f( 1, 2, 3 ) == h_three( 3, 1, 2 ) );
@@ -183,7 +183,7 @@ TEST_CASE( "call a host function with four reversed arguments", "[jit][calls]" )
                                   {
                                   const auto fr = j.mod.declare_func_in_func( callee, b );
                                   b.ret( b.call( fr, Args { a[ 3 ], a[ 2 ], a[ 1 ], a[ 0 ] } ) );
-                                  } );
+                              } );
     j.finalise( );
     const auto f = j.get< int64_t( int64_t, int64_t, int64_t, int64_t ) >( id );
     CHECK( f( 1, 2, 3, 4 ) == 4321 );
@@ -200,13 +200,13 @@ TEST_CASE( "call a host function with duplicated arguments", "[jit][calls]" )
                                   {
                                     const auto fr = j.mod.declare_func_in_func( callee, b );
                                     b.ret( b.call( fr, Args { a[ 0 ], a[ 0 ], a[ 0 ], a[ 0 ] } ) );
-                                  } );
+                                } );
     const auto pairs  = j.define( "pairs", Type::i64, { Type::i64, Type::i64 },
                                   [ & ]( ir::IRBuilder& b, const Args& a )
                                   {
                                      const auto fr = j.mod.declare_func_in_func( callee, b );
                                      b.ret( b.call( fr, Args { a[ 1 ], a[ 1 ], a[ 0 ], a[ 0 ] } ) );
-                                  } );
+                                 } );
     j.finalise( );
     CHECK( j.get< int64_t( int64_t ) >( same )( 3 ) == 3333 );
     CHECK( j.get< int64_t( int64_t ) >( same )( -2 ) == -2222 );
@@ -223,7 +223,7 @@ TEST_CASE( "call a host function with constant arguments", "[jit][calls]" )
                                   const auto fr = j.mod.declare_func_in_func( callee, b );
                                   b.ret( b.call( fr, Args { b.iconst( Type::i64, 5 ), b.iconst( Type::i64, 0 ), b.iconst( Type::i64, 7 ),
                                                             b.iconst( Type::i64, static_cast< uint64_t >( -1 ) ) } ) );
-                                  } );
+                              } );
     j.finalise( );
     CHECK( j.get< int64_t( ) >( id )( ) == h_four( 5, 0, 7, -1 ) );
 }
@@ -238,7 +238,7 @@ TEST_CASE( "call a host function taking each integer width", "[jit][calls]" )
                                   const auto fr = j.mod.declare_func_in_func( callee, b );
                                   b.ret( b.call( fr, Args { b.ireduce( Type::i8, a[ 0 ] ), b.ireduce( Type::i16, a[ 1 ] ),
                                                             b.ireduce( Type::i32, a[ 2 ] ), a[ 3 ] } ) );
-                                  } );
+                              } );
     j.finalise( );
     const auto f = j.get< int64_t( int64_t, int64_t, int64_t, int64_t ) >( id );
     for ( const auto x : edge_values( ) )
@@ -255,7 +255,7 @@ TEST_CASE( "call a jit function taking narrow parameters directly", "[jit][calls
                                   {
                                   const auto fr = j.mod.declare_func_in_func( callee, b );
                                   b.ret( b.call( fr, a ) );
-                                  } );
+                              } );
     j.finalise( );
     const auto f = j.get< int64_t( int8_t, int16_t, int32_t, int64_t ) >( id );
     CHECK( f( -1, -1, -1, -1 ) == h_mixed( -1, -1, -1, -1 ) );
@@ -293,7 +293,7 @@ TEST_CASE( "narrow host return values extend correctly", "[jit][calls]" )
                                           const auto fr = j.mod.declare_func_in_func( callee, b );
                                           const auto r  = b.call( fr, Args { a[ 0 ] } );
                                           b.ret( c.is_signed ? b.sextend( Type::i64, r ) : b.uextend( Type::i64, r ) );
-                                          } );
+                                      } );
             j.finalise( );
             const auto f = j.get< int64_t( int64_t ) >( id );
             for ( const auto x : edge_values( ) )
@@ -316,7 +316,7 @@ TEST_CASE( "narrow host return value passed straight back to the caller", "[jit]
                                [ & ]( ir::IRBuilder& b, const Args& a )
                                {
                                   b.ret( b.call( j.mod.declare_func_in_func( r8, b ), Args { a[ 0 ] } ) );
-                               } );
+                              } );
     const auto f16 = j.define( "f16", Type::i16, { Type::i64 },
                                [ & ]( ir::IRBuilder& b, const Args& a )
                                {
@@ -347,7 +347,7 @@ TEST_CASE( "call a void host function through a pointer argument", "[jit][calls]
                                   ( void ) b.call( fr, Args { a[ 0 ], a[ 1 ] } );
                                   ( void ) b.call( fr, Args { a[ 0 ], b.iadd( a[ 1 ], a[ 1 ] ) } );
                                   b.ret( );
-                                  } );
+                              } );
     j.finalise( );
     int64_t    acc = 10;
     const auto f   = j.get< void( int64_t*, int64_t ) >( id );
@@ -367,7 +367,7 @@ TEST_CASE( "call a void host function with no arguments repeatedly", "[jit][call
                                   const auto fr = j.mod.declare_func_in_func( callee, b );
                                   for ( int k = 0; k < 5; ++k ) ( void ) b.call( fr, { } );
                                   b.ret( a[ 0 ] );
-                                  } );
+                              } );
     j.finalise( );
     g_ticks = 0;
     CHECK( j.get< int64_t( int64_t ) >( id )( 1234 ) == 1234 );
@@ -388,7 +388,7 @@ TEST_CASE( "nested host calls feed results into each other", "[jit][calls]" )
                                   const auto y  = b.call( f2, Args { a[ 1 ], a[ 0 ] } );
                                   const auto z  = b.call( f2, Args { x, y } );
                                   b.ret( b.iadd( b.call( f1, Args { z } ), b.imul( a[ 0 ], a[ 1 ] ) ) );
-                               } );
+                              } );
     j.finalise( );
     const auto f = j.get< int64_t( int64_t, int64_t ) >( id );
     for ( const auto x : small_values )
@@ -411,7 +411,7 @@ TEST_CASE( "many values stay live across a single host call", "[jit][calls]" )
                                   auto acc = b.call( fr, Args { a[ 1 ] } );
                                   for ( int k = 0; k < n; ++k ) acc = b.iadd( b.imul( acc, b.iconst( Type::i64, 3 ) ), vs[ k ] );
                                   b.ret( b.iadd( acc, b.isub( a[ 0 ], a[ 1 ] ) ) );
-                                  } );
+                              } );
     j.finalise( );
     const auto f = j.get< int64_t( int64_t, int64_t ) >( id );
     for ( const auto x : small_values )
@@ -447,7 +447,7 @@ TEST_CASE( "values defined between several host calls survive all of them", "[ji
                                   const auto u  = b.iadd( b.iadd( p, q ), b.iadd( r, s ) );
                                   const auto v  = b.iadd( b.iadd( c1, c2 ), b.iadd( c3, t ) );
                                   b.ret( b.iadd( b.iadd( u, v ), b.iadd( a[ 0 ], b.iadd( a[ 1 ], a[ 2 ] ) ) ) );
-                               } );
+                              } );
     j.finalise( );
     const auto f = j.get< int64_t( int64_t, int64_t, int64_t ) >( id );
     for ( const auto x : small_values )
@@ -478,7 +478,7 @@ TEST_CASE( "a long chain of sequential host calls", "[jit][calls]" )
                                   for ( int k = 0; k < 24; ++k )
                                       acc = b.call( fr, Args { acc, k % 2 ? a[ 1 ] : b.iconst( Type::i64, k ) } );
                                   b.ret( acc );
-                               } );
+                              } );
     j.finalise( );
     const auto f = j.get< int64_t( int64_t, int64_t ) >( id );
     for ( const auto x : small_values )
@@ -510,7 +510,7 @@ TEST_CASE( "host call inside a counted loop", "[jit][calls]" )
                                   b.br( loop, Args { b.iadd( i, b.iconst( Type::i64, 1 ) ), b.iadd( acc, v ) } );
                                   b.switch_to_block( exit );
                                   b.ret( acc );
-                               } );
+                              } );
     j.finalise( );
     const auto f = j.get< int64_t( int64_t ) >( id );
     for ( const int64_t n : { 0, 1, 2, 5, 17, 100, 1000 } )
@@ -812,10 +812,10 @@ TEST_CASE( "func_addr of an imported function then call_indirect", "[jit][calls]
                                 {
                                   const auto fr  = j.mod.declare_func_in_func( four, b );
                                   const auto sig = b.import_signature( { Type::i64, Type::i64, Type::i64, Type::i64 }, Type::i64,
-                                                                       codegen::host_call_conv( ) );
+                                                                         codegen::host_call_conv( ) );
                                   const auto p   = b.func_addr( Type::ptr, fr );
                                   b.ret( b.call_indirect( sig, p, Args { a[ 1 ], a[ 0 ], a[ 1 ], a[ 0 ] } ) );
-                                } );
+                              } );
     j.finalise( );
     CHECK( j.get< int64_t( int64_t, int64_t ) >( id )( 1, 2 ) == 2121 );
     CHECK( j.get< int64_t( int64_t, int64_t ) >( id )( 0, 9 ) == 9090 );
@@ -828,13 +828,13 @@ TEST_CASE( "func_addr returned to the host is callable", "[jit][calls]" )
                                       [ & ]( ir::IRBuilder& b, const Args& a )
                                       {
                                   b.ret( b.imul( a[ 0 ], a[ 0 ] ) );
-                                      } );
+                              } );
     const auto one        = j.import( "h_one", Type::i64, { Type::i64 } );
     const auto get_local  = j.define( "get_local", Type::ptr, { },
                                       [ & ]( ir::IRBuilder& b, const Args& )
                                       {
                                          b.ret( b.func_addr( Type::ptr, j.mod.declare_func_in_func( sq, b ) ) );
-                                      } );
+                                     } );
     const auto get_import = j.define( "get_import", Type::ptr, { },
                                       [ & ]( ir::IRBuilder& b, const Args& )
                                       {
@@ -917,7 +917,7 @@ TEST_CASE( "call_indirect through a function pointer loaded from memory", "[jit]
                                   const auto slot = b.iadd( a[ 0 ], b.ishl( a[ 1 ], b.iconst( Type::i64, 3 ) ) );
                                   const auto fp   = b.load( Type::ptr, slot );
                                   b.ret( b.call_indirect( sig, fp, Args { a[ 2 ] } ) );
-                                 } );
+                              } );
     const auto fixed = j.define( "g", Type::i64, { Type::ptr, Type::i64 },
                                  [ & ]( ir::IRBuilder& b, const Args& a )
                                  {
@@ -930,11 +930,11 @@ TEST_CASE( "call_indirect through a function pointer loaded from memory", "[jit]
                               +[]( const int64_t x ) -> int64_t
                               {
                                 return -x;
-                              },
+                            },
                               +[]( const int64_t x ) -> int64_t
                               {
                                 return x << 4;
-                              } };
+                            } };
     const auto f          = j.get< int64_t( const Fn*, int64_t, int64_t ) >( id );
     for ( const auto x : small_values )
     {
@@ -973,7 +973,7 @@ TEST_CASE( "host function calls back into jit code", "[jit][calls]" )
                                  [ & ]( ir::IRBuilder& b, const Args& a )
                                  {
                                   b.ret( b.imul( a[ 0 ], a[ 0 ] ) );
-                                 } );
+                              } );
     const auto apply = j.import( "h_apply", Type::i64, { Type::ptr, Type::i64 } );
     const auto id    = j.define( "f", Type::i64, { Type::i64 },
                                  [ & ]( ir::IRBuilder& b, const Args& a )
@@ -981,7 +981,7 @@ TEST_CASE( "host function calls back into jit code", "[jit][calls]" )
                                   const auto ap = j.mod.declare_func_in_func( apply, b );
                                   const auto p  = b.func_addr( Type::ptr, j.mod.declare_func_in_func( sq, b ) );
                                   b.ret( b.iadd( b.call( ap, Args { p, a[ 0 ] } ), a[ 0 ] ) );
-                                 } );
+                              } );
     j.finalise( );
     const auto f = j.get< int64_t( int64_t ) >( id );
     for ( const int64_t x : { 0, 1, 2, -5, 1000 } ) CHECK( f( x ) == x * x + ( x + 1 ) * ( x + 1 ) + x );
@@ -996,7 +996,7 @@ TEST_CASE( "host receives pointer arguments unchanged", "[jit][calls]" )
                                 {
                                   const auto fr = j.mod.declare_func_in_func( diff, b );
                                   b.ret( b.call( fr, Args { b.iadd( a[ 0 ], a[ 1 ] ), a[ 0 ] } ) );
-                                } );
+                              } );
     j.finalise( );
     const char buf[ 64 ] { };
     for ( const int64_t k : { 0, 1, 7, 63 } ) CHECK( j.get< int64_t( const char*, int64_t ) >( id )( buf, k ) == k );
@@ -1022,9 +1022,54 @@ TEST_CASE( "call result selected between branches", "[jit][calls]" )
                                   b.br( join, Args { b.call( f2, Args { a[ 1 ], a[ 0 ] } ) } );
                                   b.switch_to_block( join );
                                   b.ret( b.iadd( b.block_param( join, 0 ), b.isub( a[ 0 ], a[ 1 ] ) ) );
-                               } );
+                              } );
     j.finalise( );
     const auto f = j.get< int64_t( int64_t, int64_t ) >( id );
     for ( const auto x : small_values )
         for ( const int64_t y : { -5, 0, 5 } ) CHECK( f( x, y ) == ( x > y ? h_one( x ) : h_two( y, x ) ) + ( x - y ) );
+}
+
+TEST_CASE( "read eight parameters with the last four on the stack", "[jit][calls]" )
+{
+    Jit        j { host_builder( ) };
+    const auto id = j.define( "f", Type::i64, std::vector< Type >( 8, Type::i64 ),
+                              [ & ]( ir::IRBuilder& b, const Args& a )
+                              {
+                                  auto sum = b.iconst( Type::i64, 0 );
+                                  for ( uint64_t k { 0 }; k < 8; ++k ) sum = b.iadd( sum, b.imul( a[ k ], b.iconst( Type::i64, k + 1 ) ) );
+                                  b.ret( sum );
+                              } );
+    j.finalise( );
+    const auto f = j.get< int64_t( int64_t, int64_t, int64_t, int64_t, int64_t, int64_t, int64_t, int64_t ) >( id );
+    CHECK( f( 1, 10, 100, 1000, 10000, 100000, 1000000, 10000000 ) == 87654321 );
+}
+
+
+TEST_CASE( "read a narrow parameter passed on the stack", "[jit][calls]" )
+{
+    Jit        j { host_builder( ) };
+    const auto id = j.define( "f", Type::i64, { Type::i64, Type::i64, Type::i64, Type::i64, Type::i64, Type::i32 },
+                              [ & ]( ir::IRBuilder& b, const Args& a )
+                              {
+                                  b.ret( b.sextend( Type::i64, a[ 5 ] ) );
+                              } );
+    j.finalise( );
+    const auto f = j.get< int64_t( int64_t, int64_t, int64_t, int64_t, int64_t, int32_t ) >( id );
+    CHECK( f( 0, 0, 0, 0, 0, -1 ) == -1 );
+    CHECK( f( 0, 0, 0, 0, 0, 0x7fffffff ) == 0x7fffffff );
+}
+
+TEST_CASE( "read stack parameters in a function that makes a call", "[jit][calls]" )
+{
+    Jit        j { host_builder( ) };
+    const auto callee = j.import( "h_one", Type::i64, { Type::i64 } );
+    const auto id     = j.define( "f", Type::i64, std::vector< Type >( 8, Type::i64 ),
+                                  [ & ]( ir::IRBuilder& b, const Args& a )
+                                  {
+                                      const auto fr = j.mod.declare_func_in_func( callee, b );
+                                      b.ret( b.iadd( b.call( fr, Args { a[ 5 ] } ), a[ 7 ] ) );
+                                  } );
+    j.finalise( );
+    const auto f = j.get< int64_t( int64_t, int64_t, int64_t, int64_t, int64_t, int64_t, int64_t, int64_t ) >( id );
+    CHECK( f( 0, 0, 0, 0, 0, 20, 0, 9 ) == 20 * 3 + 1 + 9 );
 }

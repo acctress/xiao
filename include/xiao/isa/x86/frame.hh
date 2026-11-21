@@ -1,20 +1,19 @@
 #pragma once
 
-#include <ranges>
 #include <xiao/codegen/call_conv.hh>
 #include <xiao/codegen/machbuffer.hh>
 #include <xiao/codegen/machenv.hh>
 #include <xiao/codegen/vcode.hh>
 #include <xiao/ir/function.hh>
-#include <xiao/isa/x86/encode.hh>
-#include <xiao/isa/x86/inst.hh>
-#include <xiao/isa/x86/reg.hh>
+#include <xiao/isa/x86/inst/inst.hh>
+#include <xiao/isa/x86/inst/regs.hh>
 #include <xiao/regalloc/regalloc.hh>
 
 #include <algorithm>
 #include <array>
 #include <cassert>
 #include <cstdint>
+#include <ranges>
 #include <span>
 #include <vector>
 
@@ -107,79 +106,29 @@ namespace xiao::x86_64
         return frame;
     }
 
-    inline void emit_spill_load( MachBuffer< LabelUse >& buf, const PReg dst, const int32_t offset )
-    {
-        emit_rex_mem( buf, true, dst, RSP, PReg::invalid( ) );
-        buf.emit_u8( 0x8B );
-        emit_mem_operand( buf, dst.hw( ), RSP, PReg::invalid( ), 0, offset );
-    }
-
-    inline void emit_spill_store( MachBuffer< LabelUse >& buf, const int32_t offset, const PReg src )
-    {
-        emit_rex_mem( buf, true, src, RSP, PReg::invalid( ) );
-        buf.emit_u8( 0x89 );
-        emit_mem_operand( buf, src.hw( ), RSP, PReg::invalid( ), 0, offset );
-    }
-
-    inline void emit_move( MachBuffer< LabelUse >& buf, const FrameLayout& frame, const regalloc::Move& m )
-    {
-        if ( m.from.is_reg( ) && m.to.is_reg( ) )
-        {
-            emit_rex( buf, true, m.from.preg, m.to.preg );
-            buf.emit_u8( 0x89 );
-            buf.emit_u8( modrm( 0b11, m.from.preg.hw( ), m.to.preg.hw( ) ) );
-        }
-        else if ( m.from.is_reg( ) )
-            emit_spill_store( buf, frame.spill_offset( m.to.slot ), m.from.preg );
-        else if ( m.to.is_reg( ) )
-            emit_spill_load( buf, m.to.preg, frame.spill_offset( m.from.slot ) );
-        else
-        {
-            emit_spill_load( buf, frame.scratch[ 1 ], frame.spill_offset( m.from.slot ) );
-            emit_spill_store( buf, frame.spill_offset( m.to.slot ), frame.scratch[ 1 ] );
-        }
-    }
-
-    inline void emit_edits( MachBuffer< LabelUse >& buf, const FrameLayout& frame, const std::span< const regalloc::Edit > edits )
-    {
-        for ( auto e = edits.begin( ); e != edits.end( ); )
-        {
-            std::vector< regalloc::Move > group;
-            auto                          end = e;
-            for ( ; end != edits.end( ) && end->prio == e->prio; ++end )
-            {
-                assert( ( !end->from.is_reg( ) || end->from.preg.rc( ) == RegClass::Int )
-                        && ( !end->to.is_reg( ) || end->to.preg.rc( ) == RegClass::Int )
-                        && "[xiao::x86_64::emit_edits] float moves not supported YET" );
-                group.push_back( { end->from, end->to } );
-            }
-            for ( const auto& m :
-                  regalloc::sequence_parallel_moves( std::move( group ), regalloc::Allocation { .preg = frame.scratch[ 0 ] } ) )
-                emit_move( buf, frame, m );
-            e = end;
-        }
-    }
-
     inline void emit_rsp_adjust( MachBuffer< LabelUse >& buf, const uint8_t ext, const uint32_t n )
     {
-        buf.emit_u8( 0x48 );
-        if ( n <= 127 )
+        const GprMem rsp { Reg::from_preg( RSP ) };
+        const bool   sub = ext == 5;
+
+        if ( fits_i8( n ) )
         {
-            buf.emit_u8( 0x83 );
-            buf.emit_u8( modrm( 0b11, ext, 4 ) );
-            buf.emit_u8( static_cast< uint8_t >( n ) );
+            const auto imm = static_cast< int8_t >( n );
+            if ( sub ) inst::subq_mi8 { rsp, imm }.emit( buf );
+            else
+                inst::addq_mi8 { rsp, imm }.emit( buf );
+            return;
         }
+
+        const auto imm = static_cast< int32_t >( n );
+        if ( sub ) inst::subq_mi32 { rsp, imm }.emit( buf );
         else
-        {
-            buf.emit_u8( 0x81 );
-            buf.emit_u8( modrm( 0b11, ext, 4 ) );
-            buf.emit_u32( n );
-        }
+            inst::addq_mi32 { rsp, imm }.emit( buf );
     }
 
     inline void emit_prologue( MachBuffer< LabelUse >& buf, const FrameLayout& frame )
     {
-        for ( const auto pr : frame.saved ) emit_push( buf, pr );
+        for ( const auto pr : frame.saved ) inst::pushq_r { Reg::from_preg( pr ) }.emit( buf );
 
         if ( frame.stack_adjust ) emit_rsp_adjust( buf, 5, frame.stack_adjust );
     }
@@ -188,6 +137,6 @@ namespace xiao::x86_64
     {
         if ( frame.stack_adjust ) emit_rsp_adjust( buf, 0, frame.stack_adjust );
 
-        for ( const auto pr : std::views::reverse( frame.saved ) ) emit_pop( buf, pr );
+        for ( const auto pr : std::views::reverse( frame.saved ) ) inst::popq_r { Reg::from_preg( pr ) }.emit( buf );
     }
 } // namespace xiao::x86_64

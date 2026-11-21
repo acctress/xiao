@@ -2,7 +2,7 @@
 
 #include <xiao/isa/x86/abi.hh>
 #include <xiao/isa/x86/lower.hh>
-#include <xiao/isa/x86/machenv.hh>
+#include <xiao/isa/x86/inst/regs.hh>
 #include <xiao/regalloc/regalloc.hh>
 
 #include <memory>

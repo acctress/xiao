@@ -4,7 +4,8 @@
 #include <xiao/codegen/call_conv.hh>
 #include <xiao/codegen/vcode.hh>
 #include <xiao/codegen/reg.hh>
-#include <xiao/isa/x86/asm.hh>
+#include <xiao/isa/x86/inst/encoding.hh>
+#include <xiao/isa/x86/inst/fmt.hh>
 #include <xiao/ir/extname.hh>
 #include <xiao/support/box.hh>
 

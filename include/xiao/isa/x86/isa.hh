@@ -1,14 +1,14 @@
 #pragma once
 
-#include "abi.hh"
-#include "emit.hh"
-#include "lower.hh"
-#include "machenv.hh"
-#include "xiao/regalloc/regalloc.hh"
-
 #include <xiao/codegen/isa.hh>
 #include <xiao/codegen/compiled.hh>
 #include <xiao/ir/function.hh>
+#include <xiao/isa/x86/abi.hh>
+#include <xiao/isa/x86/emit.hh>
+#include <xiao/isa/x86/frame.hh>
+#include <xiao/isa/x86/lower.hh>
+#include <xiao/isa/x86/inst/regs.hh>
+#include <xiao/regalloc/regalloc.hh>
 #include <expected>
 #include <string_view>
 

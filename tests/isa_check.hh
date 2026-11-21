@@ -1,6 +1,7 @@
 #pragma once
 
-#include <xiao/isa/x86/asm.hh>
+#include <xiao/isa/x86/inst/encoding.hh>
+#include <xiao/isa/x86/inst/fmt.hh>
 
 #include <catch2/catch_test_macros.hpp>
 #include <Zydis.h>

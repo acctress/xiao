@@ -1,7 +1,7 @@
 #include "support.hh"
 
 #include <xiao/codegen/machbuffer.hh>
-#include <xiao/isa/x86/inst.hh>
+#include <xiao/isa/x86/inst/inst.hh>
 
 #include <vector>
 

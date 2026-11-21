@@ -98,7 +98,7 @@ namespace isagen
         w.blank( );
         w.raw( "#include \"isa_check.hh\"" );
         w.blank( );
-        w.raw( "#include <xiao/isa/x86/gen/insts.hh>" );
+        w.raw( "#include <xiao/isa/x86/inst/gen/insts.hh>" );
         w.blank( );
         w.raw( "using namespace isa_check;" );
         w.blank( );

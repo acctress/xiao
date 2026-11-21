@@ -1,7 +1,7 @@
 #include "support.hh"
 
-#include <xiao/isa/x86/inst.hh>
-#include <xiao/isa/x86/reg.hh>
+#include <xiao/isa/x86/inst/inst.hh>
+#include <xiao/isa/x86/inst/regs.hh>
 
 #include <cstddef>
 #include <utility>

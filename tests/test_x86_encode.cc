@@ -2,10 +2,10 @@
 
 #include <xiao/codegen/machbuffer.hh>
 #include <xiao/isa/x86/emit.hh>
-#include <xiao/isa/x86/encode.hh>
+#include <xiao/isa/x86/inst/encoding.hh>
 #include <xiao/isa/x86/frame.hh>
-#include <xiao/isa/x86/inst.hh>
-#include <xiao/isa/x86/reg.hh>
+#include <xiao/isa/x86/inst/inst.hh>
+#include <xiao/isa/x86/inst/regs.hh>
 
 #include <Zydis.h>
 

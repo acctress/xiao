@@ -2,8 +2,8 @@
 
 #include <xiao/codegen/operand.hh>
 #include <xiao/codegen/reg.hh>
-#include <xiao/isa/x86/fmt.hh>
-#include <xiao/isa/x86/reg.hh>
+#include <xiao/isa/x86/inst/fmt.hh>
+#include <xiao/isa/x86/inst/regs.hh>
 
 #include <array>
 #include <format>

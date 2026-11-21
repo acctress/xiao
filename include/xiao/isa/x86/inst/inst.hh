@@ -4,7 +4,7 @@
 #include <xiao/codegen/machinst.hh>
 #include <xiao/codegen/operand.hh>
 #include <xiao/codegen/reg.hh>
-#include <xiao/isa/x86/gen/insts.hh>
+#include <xiao/isa/x86/inst/gen/insts.hh>
 #include <xiao/ir/types.hh>
 
 #include <cassert>

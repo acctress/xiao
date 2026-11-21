@@ -467,7 +467,8 @@ namespace isagen
         Writer w;
         w.raw( "#pragma once" );
         w.blank( );
-        w.raw( "#include <xiao/isa/x86/asm.hh>" );
+        for ( const auto* header : { "xiao/isa/x86/inst/args.hh", "xiao/isa/x86/inst/encoding.hh", "xiao/isa/x86/inst/fmt.hh" } )
+            w.raw( std::string { "#include <" } + header + ">" );
         for ( const auto& header : isa.headers ) w.raw( "#include <" + header + ">" );
         w.blank( );
         for ( const auto* header :

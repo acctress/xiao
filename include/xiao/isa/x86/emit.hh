@@ -1,9 +1,13 @@
 #pragma once
 
-#include <xiao/regalloc/regalloc.hh>
 #include <xiao/codegen/machbuffer.hh>
 #include <xiao/isa/x86/frame.hh>
-#include <xiao/isa/x86/inst.hh>
+#include <xiao/isa/x86/inst/inst.hh>
+#include <xiao/isa/x86/inst/regs.hh>
+#include <xiao/regalloc/moves.hh>
+#include <xiao/regalloc/regalloc.hh>
+
+#include <algorithm>
 #include <array>
 #include <cassert>
 #include <cstdint>
@@ -12,6 +16,50 @@
 
 namespace xiao::x86_64
 {
+    [[nodiscard]] inline GprMem rsp_slot( const int32_t offset ) noexcept
+    { return GprMem { AddressMode { .base = Reg::from_preg( RSP ), .disp = offset } }; }
+
+    inline void emit_spill_load( MachBuffer< LabelUse >& buf, const PReg dst, const int32_t offset )
+    { inst::movq_rm { Reg::from_preg( dst ), rsp_slot( offset ) }.emit( buf ); }
+
+    inline void emit_spill_store( MachBuffer< LabelUse >& buf, const int32_t offset, const PReg src )
+    { inst::movq_mr { rsp_slot( offset ), Reg::from_preg( src ) }.emit( buf ); }
+
+    inline void emit_move( MachBuffer< LabelUse >& buf, const FrameLayout& frame, const regalloc::Move& m )
+    {
+        if ( m.from.is_reg( ) && m.to.is_reg( ) )
+            inst::movq_mr { GprMem { Reg::from_preg( m.to.preg ) }, Reg::from_preg( m.from.preg ) }.emit( buf );
+        else if ( m.from.is_reg( ) )
+            emit_spill_store( buf, frame.spill_offset( m.to.slot ), m.from.preg );
+        else if ( m.to.is_reg( ) )
+            emit_spill_load( buf, m.to.preg, frame.spill_offset( m.from.slot ) );
+        else
+        {
+            emit_spill_load( buf, frame.scratch[ 1 ], frame.spill_offset( m.from.slot ) );
+            emit_spill_store( buf, frame.spill_offset( m.to.slot ), frame.scratch[ 1 ] );
+        }
+    }
+
+    inline void emit_edits( MachBuffer< LabelUse >& buf, const FrameLayout& frame, const std::span< const regalloc::Edit > edits )
+    {
+        for ( auto e = edits.begin( ); e != edits.end( ); )
+        {
+            std::vector< regalloc::Move > group;
+            auto                          end = e;
+            for ( ; end != edits.end( ) && end->prio == e->prio; ++end )
+            {
+                assert( ( !end->from.is_reg( ) || end->from.preg.rc( ) == RegClass::Int )
+                        && ( !end->to.is_reg( ) || end->to.preg.rc( ) == RegClass::Int )
+                        && "[xiao::x86_64::emit_edits] float moves not supported YET" );
+                group.push_back( { end->from, end->to } );
+            }
+            for ( const auto& m :
+                  regalloc::sequence_parallel_moves( std::move( group ), regalloc::Allocation { .preg = frame.scratch[ 0 ] } ) )
+                emit_move( buf, frame, m );
+            e = end;
+        }
+    }
+
     inline void emit( VCode< X86Inst >& vcode, const regalloc::Allocations& allocs, const FrameLayout& frame,
                       MachBuffer< LabelUse >& buf )
     {
