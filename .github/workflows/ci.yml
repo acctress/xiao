@@ -65,12 +65,12 @@ jobs:
 
       - name: Show toolchain
         run: |
-          clang++-18 --version
+          g++-14 --version
           cmake --version
           ninja --version
 
       - name: Configure
-        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_CXX_COMPILER=clang++-18 -DCMAKE_C_COMPILER=clang-18
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_CXX_COMPILER=g++-14 -DCMAKE_C_COMPILER=gcc-14
 
       - name: Build
         run: cmake --build build --target xiao_tests
