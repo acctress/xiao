@@ -107,7 +107,8 @@ namespace
         Buffer buf;
         auto   rewritten = inst;
         rewritten.apply_alloc( pregs );
-        rewritten.emit( buf, slot_offsets );
+        rewritten.resolve_frame( FrameOffsets { .slots = slot_offsets } );
+        rewritten.emit( buf );
         return { buf.data( ).begin( ), buf.data( ).end( ) };
     }
 
@@ -605,13 +606,13 @@ TEST_CASE( "encode push and pop", "[x86][encode]" )
 
 TEST_CASE( "encode stack addr resolves the slot offset from rsp", "[x86][encode]" )
 {
-    CHECK( enc( inst::StackAddr { r( RAX ), 0, 0 }, { RAX }, { 0 } ) == Bytes { 0x48, 0x8D, 0x04, 0x24 } );
-    CHECK( enc( inst::StackAddr { r( RAX ), 0, 8 }, { RAX }, { 0 } ) == Bytes { 0x48, 0x8D, 0x44, 0x24, 0x08 } );
-    CHECK( enc( inst::StackAddr { r( RAX ), 1, 4 }, { RAX }, { 0, 32 } ) == Bytes { 0x48, 0x8D, 0x44, 0x24, 0x24 } );
-    CHECK( enc( inst::StackAddr { r( RAX ), 0, 0 }, { RAX }, { 127 } ) == Bytes { 0x48, 0x8D, 0x44, 0x24, 0x7F } );
-    CHECK( enc( inst::StackAddr { r( RAX ), 0, 1 }, { RAX }, { 127 } ) == Bytes { 0x48, 0x8D, 0x84, 0x24, 0x80, 0x00, 0x00, 0x00 } );
-    CHECK( enc( inst::StackAddr { r( R9 ), 0, 8 }, { R9 }, { 0 } ) == Bytes { 0x4C, 0x8D, 0x4C, 0x24, 0x08 } );
-    CHECK( enc( inst::StackAddr { r( R12 ), 0, 16 }, { R12 }, { 0 } ) == Bytes { 0x4C, 0x8D, 0x64, 0x24, 0x10 } );
+    CHECK( enc( inst::leaq_rm { r( RAX ), stack_slot( 0, 0 ) }, { RAX }, { 0 } ) == Bytes { 0x48, 0x8D, 0x04, 0x24 } );
+    CHECK( enc( inst::leaq_rm { r( RAX ), stack_slot( 0, 8 ) }, { RAX }, { 0 } ) == Bytes { 0x48, 0x8D, 0x44, 0x24, 0x08 } );
+    CHECK( enc( inst::leaq_rm { r( RAX ), stack_slot( 1, 4 ) }, { RAX }, { 0, 32 } ) == Bytes { 0x48, 0x8D, 0x44, 0x24, 0x24 } );
+    CHECK( enc( inst::leaq_rm { r( RAX ), stack_slot( 0, 0 ) }, { RAX }, { 127 } ) == Bytes { 0x48, 0x8D, 0x44, 0x24, 0x7F } );
+    CHECK( enc( inst::leaq_rm { r( RAX ), stack_slot( 0, 1 ) }, { RAX }, { 127 } ) == Bytes { 0x48, 0x8D, 0x84, 0x24, 0x80, 0x00, 0x00, 0x00 } );
+    CHECK( enc( inst::leaq_rm { r( R9 ), stack_slot( 0, 8 ) }, { R9 }, { 0 } ) == Bytes { 0x4C, 0x8D, 0x4C, 0x24, 0x08 } );
+    CHECK( enc( inst::leaq_rm { r( R12 ), stack_slot( 0, 16 ) }, { R12 }, { 0 } ) == Bytes { 0x4C, 0x8D, 0x64, 0x24, 0x10 } );
 }
 
 TEST_CASE( "encode setcc every condition and byte register", "[x86][encode]" )
@@ -643,7 +644,7 @@ TEST_CASE( "encode jmp and jcc leave a rel32 label fixup", "[x86][encode]" )
 {
     Buffer     buf;
     const auto target = buf.new_label( );
-    X86Inst { inst::Jmp { codegen::BlockId { target } } }.emit( buf, { } );
+    X86Inst { inst::Jmp { codegen::BlockId { target } } }.emit( buf );
     CHECK( take( buf ) == Bytes { 0xE9, 0x00, 0x00, 0x00, 0x00 } );
     buf.bind_label( target );
     buf.resolve_labels( );
@@ -672,7 +673,7 @@ TEST_CASE( "encode jcc every condition", "[x86][encode]" )
         X86Inst {
             inst::Jcc { cc, codegen::BlockId { l }, codegen::BlockId { l } }
         }
-            .emit( buf, { } );
+            .emit( buf );
         buf.resolve_labels( );
         CHECK( take( buf ) == Bytes { 0x0F, code, 0xFA, 0xFF, 0xFF, 0xFF, 0xE9, 0xF5, 0xFF, 0xFF, 0xFF } );
     }
@@ -698,7 +699,7 @@ TEST_CASE( "encode call records a pc relative reloc", "[x86][encode][relocs]" )
 TEST_CASE( "encode call with no args and no return", "[x86][encode][relocs]" )
 {
     Buffer buf;
-    X86Inst { inst::Call { .name = { 0, 1 } } }.emit( buf, { } );
+    X86Inst { inst::Call { .name = { 0, 1 } } }.emit( buf );
     const auto code = std::move( buf ).finish( );
     CHECK( code.code == Bytes { 0xE8, 0x00, 0x00, 0x00, 0x00 } );
     REQUIRE( code.relocs.size( ) == 1 );
@@ -1221,7 +1222,7 @@ TEST_CASE( "zydis sweep stack addr", "[x86][encode][zydis]" )
     Sweep         s;
     for ( const auto d : gprs )
         for ( const auto off : offsets )
-            s.check( inst::StackAddr { r( d ), 0, 0 }, { d }, std::format( "lea {}, [rsp{}]", q( d ), disp_text( off ) ), { off } );
+            s.check( inst::leaq_rm { r( d ), stack_slot( 0, 0 ) }, { d }, std::format( "lea {}, [rsp{}]", q( d ), disp_text( off ) ), { off } );
     CHECK( s.failures == 0 );
 }
 
@@ -1231,7 +1232,7 @@ TEST_CASE( "zydis sweep branches and calls", "[x86][encode][zydis]" )
     {
         Buffer buf;
         ( void ) buf.new_label( );
-        X86Inst { inst::Jmp { { 0 } } }.emit( buf, { } );
+        X86Inst { inst::Jmp { { 0 } } }.emit( buf );
         const auto d = decode( take( buf ) );
         CHECK( d.ok );
         CHECK( d.length == 5 );
@@ -1244,7 +1245,7 @@ TEST_CASE( "zydis sweep branches and calls", "[x86][encode][zydis]" )
         X86Inst {
             inst::Jcc { cc, { 0 } }
         }
-            .emit( buf, { } );
+            .emit( buf );
         const auto d = decode( take( buf ) );
         CHECK( d.ok );
         CHECK( d.length == 6 );

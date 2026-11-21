@@ -1284,6 +1284,25 @@ TEST_CASE( "verifier rejects brif arguments of the wrong type on either edge", "
     CHECK( f.errors( ) == Errs { "brif to b1: arg 0 is i64, block param is i32", "brif to b2: arg 0 is i8, block param is i64" } );
 }
 
+TEST_CASE( "verifier rejects a brif condition that is not an integer", "[verifier]" )
+{
+    Fn f { Type::i64, { Type::f64 } };
+    f.build(
+        []( ir::IRBuilder& b )
+        {
+            const auto e   = b.add_block( { Type::f64 } );
+            const auto yes = b.add_block( { } );
+            const auto no  = b.add_block( { } );
+            b.switch_to_block( e );
+            b.brif( b.param( 0 ), yes, Args { }, no, Args { } );
+            b.switch_to_block( yes );
+            b.ret( b.iconst( Type::i64, 1 ) );
+            b.switch_to_block( no );
+            b.ret( b.iconst( Type::i64, 2 ) );
+        } );
+    CHECK( f.errors( ) == Errs { "brif: condition is f64, expect an integer" } );
+}
+
 TEST_CASE( "verifier rejects a branch with the wrong successor count", "[verifier]" )
 {
     SECTION( "br with two successors" )

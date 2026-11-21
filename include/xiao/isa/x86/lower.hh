@@ -481,17 +481,16 @@ namespace xiao::x86_64
 
         void lower_stack_addr( const ir::IRInst& inst )
         {
-            m_builder.push( inst::StackAddr {
-                .dst    = reg_for( inst.result ),
-                .slot   = ir::slot_of( inst ).id,
-                .offset = ir::slot_offset( inst ),
-            } );
+            const auto slot = static_cast< int32_t >( ir::slot_of( inst ).id );
+            m_builder.push( inst::leaq_rm { .dst = reg_for( inst.result ), .src = stack_slot( slot, ir::slot_offset( inst ) ) } );
         }
 
         void lower_load( const ir::IRInst& inst )
         {
             const auto   dst = reg_for( inst.result );
-            const GprMem mem { AddressMode { .base = reg_for( operand( inst, 0 ) ), .disp = ir::mem_offset( inst ) } };
+            const GprMem mem {
+                AddressMode { .base = reg_for( operand( inst, 0 ) ), .disp = ir::mem_offset( inst ) }
+            };
 
             switch ( ir::bit_width( type_of( inst.result ) ) )
             {
@@ -505,7 +504,9 @@ namespace xiao::x86_64
         void lower_store( const ir::IRInst& inst )
         {
             const auto   src = reg_for( operand( inst, 0 ) );
-            const GprMem mem { AddressMode { .base = reg_for( operand( inst, 1 ) ), .disp = ir::mem_offset( inst ) } };
+            const GprMem mem {
+                AddressMode { .base = reg_for( operand( inst, 1 ) ), .disp = ir::mem_offset( inst ) }
+            };
 
             switch ( ir::bit_width( type_of( operand( inst, 0 ) ) ) )
             {
@@ -647,8 +648,7 @@ namespace xiao::x86_64
                 mov( Reg::from_vreg( temps.back( ) ), Reg::from_vreg( c.src ) );
             }
 
-            for ( std::size_t i { 0 }; i < copies.size( ); ++i )
-                mov( Reg::from_vreg( copies[ i ].dst ), Reg::from_vreg( temps[ i ] ) );
+            for ( std::size_t i { 0 }; i < copies.size( ); ++i ) mov( Reg::from_vreg( copies[ i ].dst ), Reg::from_vreg( temps[ i ] ) );
         }
 
         struct CallTarget
@@ -680,7 +680,9 @@ namespace xiao::x86_64
             for ( const auto callee_env = env_for( cc ); const auto& cls : callee_env.preferred )
                 clobbers.insert( clobbers.end( ), cls.begin( ), cls.end( ) );
 
-            support::Box info { inst::CallInfo { .args = std::move( args ), .ret = ret_preg, .clobbers = std::move( clobbers ), .cc = cc } };
+            support::Box info {
+                inst::CallInfo { .args = std::move( args ), .ret = ret_preg, .clobbers = std::move( clobbers ), .cc = cc }
+            };
             if ( target.name ) m_builder.push( inst::Call { .name = *target.name, .info = std::move( info ) } );
             else
                 m_builder.push( inst::CallInd { .target = target.reg, .info = std::move( info ) } );

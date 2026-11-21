@@ -28,9 +28,13 @@ namespace xiao::x86_64
         uint32_t               spill_base { };
         std::array< PReg, 2 >  scratch { };
         std::vector< int32_t > slot_offsets { };
+        int32_t                incoming_base { };
 
         [[nodiscard]] int32_t spill_offset( const int32_t slot ) const noexcept
         { return static_cast< int32_t >( spill_base ) + slot * 8; }
+
+        [[nodiscard]] FrameOffsets offsets( ) const noexcept
+        { return FrameOffsets { .slots = slot_offsets, .incoming_base = incoming_base }; }
     };
 
     [[nodiscard]] inline FrameLayout compute_frame( const VCode< X86Inst >& vcode, const regalloc::Allocations& allocs,
@@ -94,7 +98,8 @@ namespace xiao::x86_64
             frame.stack_adjust    = base + pad;
         }
 
-        frame.spill_base = shadow;
+        frame.spill_base    = shadow;
+        frame.incoming_base = static_cast< int32_t >( frame.stack_adjust + 8 * frame.saved.size( ) + 8 );
 
         assert( env.scratch[ 0 ].size( ) >= 2 && "[xiao::x86_64::compute_frame] need two int scratch registers for spilling" );
         frame.scratch = { env.scratch[ 0 ][ 0 ], env.scratch[ 0 ][ 1 ] };

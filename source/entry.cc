@@ -26,6 +26,7 @@ int main( )
     const auto     fn_id    = *jit.declare_function( "f", module::Linkage::Export, module::signature_of( *irm.get( fn_ref ) ) );
     {
         ir::IRBuilder b { *irm.get( fn_ref ) };
+
         const auto    slot = b.create_stack_slot( 8, 8 );
         b.switch_to_block( b.add_block( params ) );
 

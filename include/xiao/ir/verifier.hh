@@ -359,6 +359,10 @@ namespace xiao::ir
                 return;
             }
 
+            if ( !is_br )
+                if ( const auto c = operand_type( fn, term, 0 ); !is_int( c ) )
+                    errs.push_back( { std::format( "brif: condition is {}, expect an integer", c ) } );
+
             const auto [ then_args, else_args ] = branch_args( fn, block, term );
             verify_args( fn, name, then_args, fn.succs[ block.succs_offset ] );
             if ( !is_br ) verify_args( fn, name, else_args, fn.succs[ block.succs_offset + 1 ] );
@@ -373,6 +377,16 @@ namespace xiao::ir
                 if ( const auto want = fn.values[ fn.block_params[ tb.params_offset + i ].id ].type; got != want )
                     errs.push_back( { std::format( "{} to b{}: arg {} is {}, block param is {}", name, target.id, i, got, want ) } );
             }
+        }
+
+        void verify_ret( const IRFunction& fn, const IRInst& inst )
+        {
+            const auto need = fn.sig.ret;
+            if ( !expect_operands( inst, need == Type::unit ? 0 : 1 ) ) return;
+            if ( need == Type::unit ) return;
+
+            if ( const auto got = operand_type( fn, inst, 0 ); got != need )
+                errs.push_back( { std::format( "ret: value type is {}, the function's signature wants {}", got, need ) } );
         }
     };
 } // namespace xiao::ir

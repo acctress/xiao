@@ -2,7 +2,7 @@
      ((w "66 "      r16)
       (l ""         r32)
       (q "REX.W + " r64))
-  (inst lea${s}_rm (asm "lea") (ops (w dst $r) (r src m)) (enc RM "${pre}8D /r")))
+  (inst lea${s}_rm (asm "lea") (ops (w dst $r) (r src m)) (enc RM "${pre}8D /r") (addr-only)))
 
 (for (s pre        r   m)
      ((l ""         r32 m32)

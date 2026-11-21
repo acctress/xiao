@@ -4803,8 +4803,7 @@ namespace xiao::x86_64::inst
         void visit( this auto& self, auto& v )
         {
             v.def( self.dst );
-            v.use( self.src.base );
-            v.use( self.src.index );
+            visit_mem( self.src, v );
         }
 
         void emit( MachBuffer< LabelUse >& buf ) const
@@ -4817,8 +4816,6 @@ namespace xiao::x86_64::inst
         {
             return std::format( "lea {}, {}", fmt_gpr( dst, 16 ), fmt_mem( src, 0 ) );
         }
-
-        [[nodiscard]] bool mem_access( ) const noexcept { return true; }
     };
 
     struct leal_rm
@@ -4829,8 +4826,7 @@ namespace xiao::x86_64::inst
         void visit( this auto& self, auto& v )
         {
             v.def( self.dst );
-            v.use( self.src.base );
-            v.use( self.src.index );
+            visit_mem( self.src, v );
         }
 
         void emit( MachBuffer< LabelUse >& buf ) const
@@ -4843,8 +4839,6 @@ namespace xiao::x86_64::inst
         {
             return std::format( "lea {}, {}", fmt_gpr( dst, 32 ), fmt_mem( src, 0 ) );
         }
-
-        [[nodiscard]] bool mem_access( ) const noexcept { return true; }
     };
 
     struct leaq_rm
@@ -4855,8 +4849,7 @@ namespace xiao::x86_64::inst
         void visit( this auto& self, auto& v )
         {
             v.def( self.dst );
-            v.use( self.src.base );
-            v.use( self.src.index );
+            visit_mem( self.src, v );
         }
 
         void emit( MachBuffer< LabelUse >& buf ) const
@@ -4869,8 +4862,6 @@ namespace xiao::x86_64::inst
         {
             return std::format( "lea {}, {}", fmt_gpr( dst, 64 ), fmt_mem( src, 0 ) );
         }
-
-        [[nodiscard]] bool mem_access( ) const noexcept { return true; }
     };
 
     struct movntil_mr
@@ -4880,8 +4871,7 @@ namespace xiao::x86_64::inst
 
         void visit( this auto& self, auto& v )
         {
-            v.use( self.dst.base );
-            v.use( self.dst.index );
+            visit_mem( self.dst, v );
             v.use( self.src );
         }
 
@@ -4906,8 +4896,7 @@ namespace xiao::x86_64::inst
 
         void visit( this auto& self, auto& v )
         {
-            v.use( self.dst.base );
-            v.use( self.dst.index );
+            visit_mem( self.dst, v );
             v.use( self.src );
         }
 
@@ -4931,8 +4920,7 @@ namespace xiao::x86_64::inst
 
         void visit( this auto& self, auto& v )
         {
-            v.use( self.src.base );
-            v.use( self.src.index );
+            visit_mem( self.src, v );
         }
 
         void emit( MachBuffer< LabelUse >& buf ) const
@@ -4955,8 +4943,7 @@ namespace xiao::x86_64::inst
 
         void visit( this auto& self, auto& v )
         {
-            v.use( self.src.base );
-            v.use( self.src.index );
+            visit_mem( self.src, v );
         }
 
         void emit( MachBuffer< LabelUse >& buf ) const
@@ -4979,8 +4966,7 @@ namespace xiao::x86_64::inst
 
         void visit( this auto& self, auto& v )
         {
-            v.use( self.src.base );
-            v.use( self.src.index );
+            visit_mem( self.src, v );
         }
 
         void emit( MachBuffer< LabelUse >& buf ) const
@@ -5003,8 +4989,7 @@ namespace xiao::x86_64::inst
 
         void visit( this auto& self, auto& v )
         {
-            v.use( self.src.base );
-            v.use( self.src.index );
+            visit_mem( self.src, v );
         }
 
         void emit( MachBuffer< LabelUse >& buf ) const
@@ -5027,8 +5012,7 @@ namespace xiao::x86_64::inst
 
         void visit( this auto& self, auto& v )
         {
-            v.use( self.src.base );
-            v.use( self.src.index );
+            visit_mem( self.src, v );
         }
 
         void emit( MachBuffer< LabelUse >& buf ) const
@@ -5051,8 +5035,7 @@ namespace xiao::x86_64::inst
 
         void visit( this auto& self, auto& v )
         {
-            v.use( self.src.base );
-            v.use( self.src.index );
+            visit_mem( self.src, v );
         }
 
         void emit( MachBuffer< LabelUse >& buf ) const
@@ -5075,8 +5058,7 @@ namespace xiao::x86_64::inst
 
         void visit( this auto& self, auto& v )
         {
-            v.use( self.dst.base );
-            v.use( self.dst.index );
+            visit_mem( self.dst, v );
         }
 
         void emit( MachBuffer< LabelUse >& buf ) const
@@ -5103,8 +5085,7 @@ namespace xiao::x86_64::inst
 
         void visit( this auto& self, auto& v )
         {
-            v.use( self.dst.base );
-            v.use( self.dst.index );
+            visit_mem( self.dst, v );
             v.usedef( self.rax, RAX );
             v.usedef( self.rdx, RDX );
             v.use( self.rbx, RBX );
@@ -10952,11 +10933,10 @@ namespace xiao::x86_64::inst
         Call,
         CallInd,
         LoadExtName,
-        StackAddr,
         DummyUse,
     };
 
-    inline constexpr std::size_t kind_count = 439;
+    inline constexpr std::size_t kind_count = 438;
 
     template < typename T >
     struct kind_of;
@@ -11398,7 +11378,6 @@ namespace xiao::x86_64::inst
     template <> struct kind_of< Call > { static constexpr Kind value = Kind::Call; };
     template <> struct kind_of< CallInd > { static constexpr Kind value = Kind::CallInd; };
     template <> struct kind_of< LoadExtName > { static constexpr Kind value = Kind::LoadExtName; };
-    template <> struct kind_of< StackAddr > { static constexpr Kind value = Kind::StackAddr; };
     template <> struct kind_of< DummyUse > { static constexpr Kind value = Kind::DummyUse; };
 
     template < typename T >
@@ -11846,7 +11825,6 @@ namespace xiao::x86_64::inst
         Call,
         CallInd,
         LoadExtName,
-        StackAddr,
         DummyUse
     >;
 
@@ -12295,7 +12273,6 @@ namespace xiao::x86_64::inst
                 case Kind::Call: return std::forward< F >( f )( self.template get< Call >( ) );
                 case Kind::CallInd: return std::forward< F >( f )( self.template get< CallInd >( ) );
                 case Kind::LoadExtName: return std::forward< F >( f )( self.template get< LoadExtName >( ) );
-                case Kind::StackAddr: return std::forward< F >( f )( self.template get< StackAddr >( ) );
                 case Kind::DummyUse: return std::forward< F >( f )( self.template get< DummyUse >( ) );
             }
             std::unreachable( );
@@ -12801,7 +12778,6 @@ namespace xiao::x86_64::inst
             alignof( Call ),
             alignof( CallInd ),
             alignof( LoadExtName ),
-            alignof( StackAddr ),
             alignof( DummyUse )
         } );
 
@@ -13243,7 +13219,6 @@ namespace xiao::x86_64::inst
             sizeof( Call ),
             sizeof( CallInd ),
             sizeof( LoadExtName ),
-            sizeof( StackAddr ),
             sizeof( DummyUse )
         } );
 

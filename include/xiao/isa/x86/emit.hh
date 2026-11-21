@@ -106,7 +106,8 @@ namespace xiao::x86_64
 
                 auto& inst = vcode.insts[ i_idx ];
                 inst.apply_alloc( pregs );
-                inst.emit( buf, frame.slot_offsets );
+                inst.resolve_frame( frame.offsets( ) );
+                inst.emit( buf );
 
                 for ( std::size_t s { 0 }; s < n_spills; ++s )
                     if ( spills[ s ].store ) emit_spill_store( buf, frame.spill_offset( spills[ s ].slot ), spills[ s ].scratch );

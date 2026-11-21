@@ -179,31 +179,6 @@ namespace xiao::x86_64::inst
         }
     };
 
-    struct StackAddr
-    {
-        Reg      dst { };
-        uint32_t slot { };
-        int32_t  offset { };
-
-        void visit( this auto& self, auto& v )
-        { v.def( self.dst ); }
-
-        void emit( MachBuffer< LabelUse >& buf, const std::span< const int32_t > slot_offsets ) const
-        {
-            assert( slot < slot_offsets.size( ) && "[xiao::x86_64::emit] stack slot without a frame offset" );
-            const auto d = dst.as_preg( );
-            emit_rex_mem( buf, true, d, RSP, PReg::invalid( ) );
-            buf.emit_u8( 0x8D );
-            emit_mem_operand( buf, d.hw( ), RSP, PReg::invalid( ), 0, slot_offsets[ slot ] + offset );
-        }
-
-        [[nodiscard]] std::string to_string( ) const
-        {
-            return offset ? std::format( "lea {}, [ss{}{:+}]", fmt_gpr( dst, 64 ), slot, offset )
-                          : std::format( "lea {}, [ss{}]", fmt_gpr( dst, 64 ), slot );
-        }
-    };
-
     struct DummyUse
     {
         Reg reg { };

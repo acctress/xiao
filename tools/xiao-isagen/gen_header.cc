@@ -98,7 +98,7 @@ namespace isagen
                         return std::format( "v.{}( self.{}, {} );", visitor_method( op.role ), op.name, upper( op.fixed ) );
                     return std::format( "v.{}( self.{} );", visitor_method( op.role ), op.name );
                 case Kind::GprMem: return std::format( "visit_gpr_mem( self.{}, v, {} );", op.name, operand_kind( op.role ) );
-                case Kind::Mem: return std::format( "v.use( self.{}.base );\nv.use( self.{}.index );", op.name, op.name );
+                case Kind::Mem: return std::format( "visit_mem( self.{}, v );", op.name );
                 case Kind::Imm:
                 case Kind::Cond: return { };
             }
@@ -242,6 +242,8 @@ namespace isagen
 
         void emit_mem_access( Writer& w, const Inst& inst )
         {
+            if ( inst.addr_only ) return;
+
             std::vector< std::string > terms;
             for ( const auto& op : inst.ops )
             {

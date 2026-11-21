@@ -173,7 +173,7 @@ TEST_CASE( "x86 division operands pin rax and rdx", "[x86][inst][operands]" )
 
 TEST_CASE( "x86 stack and frame operands", "[x86][inst][operands]" )
 {
-    CHECK( ops_of( inst::StackAddr { v( 200 ), 0, 16 } ) == std::vector { def( 200 ) } );
+    CHECK( ops_of( inst::leaq_rm { v( 200 ), stack_slot( 0, 16 ) } ) == std::vector { def( 200 ) } );
     CHECK( ops_of( inst::DummyUse { v( 200 ) } ) == std::vector { use( 200 ) } );
     CHECK( ops_of( inst::DummyUse { } ).empty( ) );
 }
@@ -283,10 +283,9 @@ TEST_CASE( "x86 is_mem_access when an operand is memory", "[x86][inst]" )
         inst::movq_rm { v( 200 ), rm( v( 201 ) ) }
     }
                      .is_mem_access( ) );
-    CHECK_FALSE( X86Inst { inst::StackAddr { } }.is_mem_access( ) );
     CHECK_FALSE( X86Inst { inst::MovImm { } }.is_mem_access( ) );
 
-    CHECK( X86Inst { inst::leaq_rm { } }.is_mem_access( ) );
+    CHECK_FALSE( X86Inst { inst::leaq_rm { } }.is_mem_access( ) );
 }
 
 TEST_CASE( "x86 as_move only recognises a register to register movq_mr", "[x86][inst]" )
@@ -587,12 +586,12 @@ TEST_CASE( "x86 to_string for division stack and frame", "[x86][inst][fmt]" )
                .to_string( )
            == "idiv v200" );
     CHECK( X86Inst {
-               inst::StackAddr { v( 200 ), 2, 8 }
+               inst::leaq_rm { v( 200 ), stack_slot( 2, 8 ) }
     }
                .to_string( )
-           == "lea v200, [ss2+8]" );
+           == "lea v200, [ss2+0x8]" );
     CHECK( X86Inst {
-               inst::StackAddr { v( 200 ), 0, 0 }
+               inst::leaq_rm { v( 200 ), stack_slot( 0, 0 ) }
     }
                .to_string( )
            == "lea v200, [ss0]" );
@@ -663,7 +662,7 @@ TEST_CASE( "x86 apply_alloc rewrites registers in operand order", "[x86][inst][a
     check( inst::movsxq_rm16 { v( 200 ), rm( v( 201 ) ) }, { RAX, RCX }, "movsx rax, cx" );
     check( inst::divq_m { rm( v( 200 ) ), p( RAX ), p( RDX ) }, { R11, RAX, RDX }, "div r11" );
     check( inst::idivq_m { rm( v( 200 ) ), p( RAX ), p( RDX ) }, { R15, RAX, RDX }, "idiv r15" );
-    check( inst::StackAddr { v( 200 ), 3, 16 }, { RDI }, "lea rdi, [ss3+16]" );
+    check( inst::leaq_rm { v( 200 ), stack_slot( 3, 16 ) }, { RDI }, "lea rdi, [ss3+0x10]" );
     check( inst::setcc_m8 { rm( v( 200 ) ), CC::NE }, { RCX }, "setne cl" );
     check( inst::DummyUse { v( 200 ) }, { RAX }, "# keep-alive rax" );
 }

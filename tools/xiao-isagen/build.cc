@@ -392,7 +392,7 @@ namespace isagen
             Inst inst { .name = expect_symbol( items[ 1 ], "an instruction name" ), .loc = form.loc };
 
             const OpEnForm* op_en { };
-            bool            seen_asm { }, seen_ops { }, seen_enc { };
+            bool            seen_asm { }, seen_ops { }, seen_enc { }, seen_addr_only { };
             for ( const auto& clause : items | std::views::drop( 2 ) )
             {
                 const auto& parts = expect_list( clause, "a clause such as (asm ...)" );
@@ -419,6 +419,12 @@ namespace isagen
                 {
                     once( seen_enc );
                     op_en = &parse_enc( clause, inst );
+                }
+                else if ( head == "addr-only" )
+                {
+                    once( seen_addr_only );
+                    if ( parts.size( ) != 1 ) fail( clause.loc, "(addr-only) takes no arguments" );
+                    inst.addr_only = true;
                 }
                 else
                     fail( parts.front( ).loc, std::format( "unknown clause '{}'", head ) );

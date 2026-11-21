@@ -6,11 +6,13 @@
 #include <xiao/isa/x86/fmt.hh>
 
 #include <array>
+#include <concepts>
 #include <cstdint>
 #include <format>
 #include <iterator>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <variant>
 
 namespace xiao::x86_64
@@ -35,6 +37,15 @@ namespace xiao::x86_64
         explicit GprMem( const AddressMode& mem ) noexcept : value { mem } { }
     };
 
+    template < typename M, typename V >
+        requires std::same_as< std::remove_const_t< M >, AddressMode >
+    void visit_mem( M& mode, V& v )
+    {
+        if constexpr ( requires { v.mem( mode ); } ) v.mem( mode );
+        v.use( mode.base );
+        v.use( mode.index );
+    }
+
     template < typename G, typename V >
     void visit_gpr_mem( G& rm, V& v, const OperandKind kind )
     {
@@ -50,8 +61,7 @@ namespace xiao::x86_64
         }
 
         auto& mem = std::get< AddressMode >( rm.value );
-        v.use( mem.base );
-        v.use( mem.index );
+        visit_mem( mem, v );
     }
 
     namespace detail
@@ -145,13 +155,21 @@ namespace xiao::x86_64
     [[nodiscard]] inline std::string fmt_address( const AddressMode& mem )
     {
         std::string out { "[" };
-        if ( mem.base.valid( ) ) out += fmt_gpr( mem.base, 64 );
 
-        if ( mem.index.valid( ) )
+        switch ( mem.amode_kind )
         {
-            if ( out.size( ) > 1 ) out += '+';
-            out += fmt_gpr( mem.index, 64 );
-            if ( mem.scale ) std::format_to( std::back_inserter( out ), "*{}", 1u << mem.scale );
+            case AmodeKind::IncomingArg: out += "in"; break;
+            case AmodeKind::Slot: std::format_to( std::back_inserter( out ), "ss{}", mem.slot ); break;
+            case AmodeKind::Real:
+                if ( mem.base.valid( ) ) out += fmt_gpr( mem.base, 64 );
+
+                if ( mem.index.valid( ) )
+                {
+                    if ( out.size( ) > 1 ) out += '+';
+                    out += fmt_gpr( mem.index, 64 );
+                    if ( mem.scale ) std::format_to( std::back_inserter( out ), "*{}", 1u << mem.scale );
+                }
+                break;
         }
 
         if ( mem.disp > 0 ) std::format_to( std::back_inserter( out ), "+0x{:X}", mem.disp );

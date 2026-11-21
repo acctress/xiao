@@ -65,6 +65,7 @@ namespace isagen
         std::string            mnemonic { };
         std::vector< Operand > ops { };
         Encoding               enc { };
+        bool                   addr_only { };
         Location               loc { };
     };
 

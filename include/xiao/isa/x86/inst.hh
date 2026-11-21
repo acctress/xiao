@@ -7,6 +7,8 @@
 #include <xiao/isa/x86/gen/insts.hh>
 #include <xiao/ir/types.hh>
 
+#include <cassert>
+#include <cstddef>
 #include <cstdint>
 #include <optional>
 #include <span>
@@ -15,6 +17,36 @@
 
 namespace xiao::x86_64
 {
+    struct FrameResolver
+    {
+        const FrameOffsets& offsets;
+
+        void use( auto&, const PReg = PReg::invalid( ) ) noexcept { }
+
+        void def( auto&, const PReg = PReg::invalid( ) ) noexcept { }
+
+        void usedef( auto&, const PReg = PReg::invalid( ) ) noexcept { }
+
+        void mem( AddressMode& m ) const noexcept
+        {
+            switch ( m.amode_kind )
+            {
+                case AmodeKind::Real: return;
+                case AmodeKind::IncomingArg: m.disp += offsets.incoming_base; break;
+                case AmodeKind::Slot:
+                    assert( m.slot >= 0 && static_cast< std::size_t >( m.slot ) < offsets.slots.size( )
+                            && "[xiao::x86_64::resolve_frame] stack slot without a frame offset" );
+                    m.disp += offsets.slots[ static_cast< std::size_t >( m.slot ) ];
+                    break;
+            }
+
+            m.base       = Reg::from_preg( RSP );
+            m.index      = Reg { };
+            m.scale      = 0;
+            m.amode_kind = AmodeKind::Real;
+        }
+    };
+
     struct X86Inst : MachInst< X86Inst, LabelUse >
     {
         inst::MInst inner;
@@ -31,6 +63,12 @@ namespace xiao::x86_64
                 {
                     i.visit( v );
                 } );
+        }
+
+        void resolve_frame( const FrameOffsets& offsets ) noexcept
+        {
+            FrameResolver resolver { offsets };
+            visit( resolver );
         }
 
         [[nodiscard]] MachTerminator is_term( ) const noexcept
@@ -80,14 +118,12 @@ namespace xiao::x86_64
 
         [[nodiscard]] static constexpr uint32_t worst_case_island_growth( ) = delete;
 
-        void emit( MachBuffer< LabelUse >& buf, const std::span< const int32_t > slot_offsets = { } ) const
+        void emit( MachBuffer< LabelUse >& buf ) const
         {
             inner.dispatch(
                 [ & ]( const auto& i )
                 {
-                    if constexpr ( requires { i.emit( buf, slot_offsets ); } ) i.emit( buf, slot_offsets );
-                    else
-                        i.emit( buf );
+                    i.emit( buf );
                 } );
         }
 
