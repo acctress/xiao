@@ -1,0 +1,77 @@
+name: ci
+
+on:
+  push:
+    branches: [ cxx ]
+    paths-ignore: [ "docs/**", "**.md", ".github/badges/**", ".github/workflows/loc.yml", ".github/workflows/manual.yml" ]
+  pull_request:
+    paths-ignore: [ "docs/**", "**.md", ".github/badges/**", ".github/workflows/loc.yml", ".github/workflows/manual.yml" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows:
+    name: windows (${{ matrix.build_type }})
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [ Debug, Release ]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Ninja
+        run: choco install ninja --no-progress -y
+
+      - name: Show toolchain
+        run: |
+          clang++ --version
+          cmake --version
+          ninja --version
+
+      - name: Configure
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang
+
+      - name: Build
+        run: cmake --build build
+
+      - name: Test
+        run: build/tests/xiao_tests.exe
+
+  linux:
+    name: linux (${{ matrix.build_type }}, experimental)
+    runs-on: ubuntu-24.04
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [ Debug, Release ]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Ninja
+        run: sudo apt-get update && sudo apt-get install -y ninja-build
+
+      - name: Show toolchain
+        run: |
+          clang++-18 --version
+          cmake --version
+          ninja --version
+
+      - name: Configure
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_CXX_COMPILER=clang++-18 -DCMAKE_C_COMPILER=clang-18
+
+      - name: Build
+        run: cmake --build build --target xiao_tests
+
+      - name: Test
+        run: build/tests/xiao_tests

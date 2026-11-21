@@ -9,6 +9,7 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/acctress/xiao/actions/workflows/ci.yml"><img src="https://github.com/acctress/xiao/actions/workflows/ci.yml/badge.svg?branch=cxx" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
   <img src="https://img.shields.io/badge/language-C%2B%2B23-blue" alt="C++23">
   <img src="https://img.shields.io/badge/target-x86--64-lightgrey" alt="x86-64">
