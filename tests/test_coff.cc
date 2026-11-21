@@ -683,6 +683,9 @@ TEST_CASE( "coff output of an object module round trips its symbols", "[coff]" )
 
 TEST_CASE( "coff object links into a runnable executable", "[coff][link]" )
 {
+#if !defined( _WIN32 )
+    SKIP( "a coff object only links into an executable on windows" );
+#endif
 #if defined( _WIN32 )
     constexpr std::string_view null_device = "NUL";
 #else

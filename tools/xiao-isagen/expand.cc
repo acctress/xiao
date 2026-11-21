@@ -120,7 +120,7 @@ namespace isagen
                         {
                             if ( const auto* value = lookup( env, *var ) )
                             {
-                                if ( const auto* list = std::get_if< List >( &value->value ) ) out.append_range( *list );
+                                if ( const auto* list = std::get_if< List >( &value->value ) ) out.insert( out.end( ), list->begin( ), list->end( ) );
                                 else
                                 {
                                     out.push_back( *value );

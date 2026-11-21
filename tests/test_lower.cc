@@ -1212,8 +1212,8 @@ TEST_CASE( "lower the same lowerer can be reused", "[lower]" )
     IRLowerer  lowerer { env, host_abi( ) };
 
     ir::IRModule irm;
-    const auto   a = irm.declare( "a", Type::i64, { Type::i64 } );
-    const auto   c = irm.declare( "c", Type::i64, { Type::i64, Type::i64 } );
+    const auto   a = irm.declare( "a", Type::i64, { Type::i64 }, CallConv::WindowsFastcall );
+    const auto   c = irm.declare( "c", Type::i64, { Type::i64, Type::i64 }, CallConv::WindowsFastcall );
     {
         ir::IRBuilder b { *irm.get( a ) };
         b.switch_to_block( b.add_block( { Type::i64 } ) );

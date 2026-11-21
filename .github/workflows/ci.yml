@@ -29,8 +29,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Ninja
-        run: choco install ninja --no-progress -y
+      - name: Install Ninja and a current LLVM
+        run: |
+          choco install ninja --no-progress -y
+          choco upgrade llvm --no-progress -y
 
       - name: Show toolchain
         run: |
