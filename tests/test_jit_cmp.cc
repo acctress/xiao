@@ -418,7 +418,7 @@ TEST_CASE( "icmp between two narrow constants", "[jit][cmp]" )
 {
     for ( const auto ty : { Type::i8, Type::i16, Type::i32 } )
         for ( const auto cc : all_ccs )
-            for ( const auto [ c, d ] : { std::pair< int64_t, int64_t > { -1, 1 }, { 0x80, 0x7f }, { 0xffff, 0 }, { 0x80000000, 0x7fffffff } } )
+            for ( const auto& [ c, d ] : { std::pair< int64_t, int64_t > { -1, 1 }, { 0x80, 0x7f }, { 0xffff, 0 }, { 0x80000000, 0x7fffffff } } )
             {
                 auto f = compile< int64_t( ) >( Type::i64, { },
                                                 [ & ]( ir::IRBuilder& b, const Args& )

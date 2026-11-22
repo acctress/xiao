@@ -146,6 +146,10 @@ namespace xiao::ir
                     case IROp::ishl:
                     case IROp::ushr:
                     case IROp::sshr:
+                    case IROp::rotl:
+                    case IROp::rotr:
+                    case IROp::umulhi:
+                    case IROp::smulhi:
                     case IROp::icmp: return in.ops_count == 2 ? other( static_cast< uint16_t >( 1 - k ) ) : std::nullopt;
                     case IROp::select:
                         if ( k == 0 ) return Type::i64;
@@ -308,9 +312,17 @@ namespace xiao::ir
                         case IROp::bxor:
                         case IROp::ishl:
                         case IROp::ushr:
-                        case IROp::sshr: std::format_to( out, "{}{} {}, {}\n", res, in.op, a( 0 ), a( 1 ) ); break;
+                        case IROp::sshr:
+                        case IROp::rotl:
+                        case IROp::rotr:
+                        case IROp::umulhi:
+                        case IROp::smulhi: std::format_to( out, "{}{} {}, {}\n", res, in.op, a( 0 ), a( 1 ) ); break;
                         case IROp::bnot:
-                        case IROp::ineg: std::format_to( out, "{}{} {}\n", res, in.op, a( 0 ) ); break;
+                        case IROp::ineg:
+                        case IROp::bswap:
+                        case IROp::clz:
+                        case IROp::ctz:
+                        case IROp::popcnt: std::format_to( out, "{}{} {}\n", res, in.op, a( 0 ) ); break;
                         case IROp::uextend:
                         case IROp::sextend:
                         case IROp::ireduce: std::format_to( out, "{}{}.{} {}\n", res, in.op, ty( in.result ), a( 0 ) ); break;
@@ -362,6 +374,9 @@ namespace xiao::ir
                             else
                                 std::format_to( out, "return\n" );
                             break;
+                        case IROp::trap: std::format_to( out, "trap {}\n", trap_code( in ) ); break;
+                        case IROp::trapz:
+                        case IROp::trapnz: std::format_to( out, "{} {}, {}\n", in.op, a( 0 ), trap_code( in ) ); break;
                     }
                 }
             }

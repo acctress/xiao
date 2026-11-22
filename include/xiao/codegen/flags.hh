@@ -15,5 +15,8 @@ namespace xiao::codegen
         bool            enable_probe_stack { true };
         uint8_t         probe_stack_size_log2 { 12 };
         ProbeStackStrat probe_stack_strat { ProbeStackStrat::Inline };
+        bool            has_popcnt { false };
+        bool            has_lzcnt { false };
+        bool            has_bmi1 { false };
     };
 } // namespace xiao::codegen

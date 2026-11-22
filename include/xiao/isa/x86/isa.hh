@@ -79,7 +79,7 @@ namespace xiao::x86_64
                 return std::unexpected( CodegenError { .kind = CodegenError::Kind::ImplLimitExceeded, .messages = { std::move( *limit ) } } );
 
             const auto             env = env_for( fn.sig.cc );
-            IRLowerer              lowerer { env, host_abi( ) };
+            IRLowerer              lowerer { env, host_abi( ), flags( ) };
             auto                   vcode  = lowerer.lower( fn );
             const auto             allocs = regalloc::allocate( vcode, env );
             const auto             frame  = compute_frame( vcode, allocs, env, fn.stack_slots, flags( ) );

@@ -7,6 +7,7 @@
 #include <xiao/isa/x86/inst/encoding.hh>
 #include <xiao/isa/x86/inst/fmt.hh>
 #include <xiao/ir/extname.hh>
+#include <xiao/ir/inst.hh>
 #include <xiao/support/box.hh>
 
 #include <cassert>
@@ -179,6 +180,43 @@ namespace xiao::x86_64::inst
                 return std::format( "lea {}, [rip+u{}:{}{}]", fmt_gpr( dst, 64 ), name.ns, name.index, off );
             return std::format( "mov {}, u{}:{}{}", fmt_gpr( dst, 64 ), name.ns, name.index, off );
         }
+    };
+
+    struct Trap
+    {
+        ir::TrapCode code { };
+
+        void visit( this auto&, auto& ) { }
+
+        void emit( MachBuffer< LabelUse >& buf ) const
+        {
+            buf.add_trap( code );
+            buf.emit_u8( 0x0F );
+            buf.emit_u8( 0x0B );
+        }
+
+        [[nodiscard]] std::string to_string( ) const
+        { return std::format( "ud2 ; trap {}", code ); }
+    };
+
+    struct TrapIf
+    {
+        CC           cc { };
+        ir::TrapCode code { };
+
+        void visit( this auto&, auto& ) { }
+
+        void emit( MachBuffer< LabelUse >& buf ) const
+        {
+            buf.emit_u8( static_cast< uint8_t >( 0x70 | ( cc_nibble( cc ) ^ 1 ) ) );
+            buf.emit_u8( 0x02 );
+            buf.add_trap( code );
+            buf.emit_u8( 0x0F );
+            buf.emit_u8( 0x0B );
+        }
+
+        [[nodiscard]] std::string to_string( ) const
+        { return std::format( "trap{} {}", x86_64::to_string( cc ), code ); }
     };
 
     struct DummyUse

@@ -42,7 +42,30 @@ namespace xiao::ir
         func_addr,
         call_indirect,
         stack_addr,
+        rotl,
+        rotr,
+        bswap,
+        clz,
+        ctz,
+        popcnt,
+        umulhi,
+        smulhi,
+        trap,
+        trapz,
+        trapnz,
     };
+
+    enum class TrapCode : uint16_t
+    {
+        unreachable,
+        integer_overflow,
+        integer_division_by_zero,
+        bad_conversion_to_integer,
+        user = 0x100,
+    };
+
+    [[nodiscard]] constexpr TrapCode user_trap( const uint8_t n ) noexcept
+    { return static_cast< TrapCode >( static_cast< uint16_t >( TrapCode::user ) + n ); }
 
     //! @brief Condition kinds for icmp.
     enum class ICmpCC : uint8_t
@@ -84,6 +107,9 @@ namespace xiao::ir
 
     [[nodiscard]] constexpr int32_t slot_offset( const IRInst& inst ) noexcept
     { return static_cast< int32_t >( static_cast< uint32_t >( inst.imm >> 32 ) ); }
+
+    [[nodiscard]] constexpr TrapCode trap_code( const IRInst& inst ) noexcept
+    { return static_cast< TrapCode >( static_cast< uint16_t >( inst.imm ) ); }
 } // namespace xiao::ir
 
 template <>
@@ -128,6 +154,17 @@ struct std::formatter< xiao::ir::IROp >
             case func_addr: return std::format_to( ctx.out( ), "func_addr" );
             case call_indirect: return std::format_to( ctx.out( ), "call_indirect" );
             case stack_addr: return std::format_to( ctx.out( ), "stack_addr" );
+            case rotl: return std::format_to( ctx.out( ), "rotl" );
+            case rotr: return std::format_to( ctx.out( ), "rotr" );
+            case bswap: return std::format_to( ctx.out( ), "bswap" );
+            case clz: return std::format_to( ctx.out( ), "clz" );
+            case ctz: return std::format_to( ctx.out( ), "ctz" );
+            case popcnt: return std::format_to( ctx.out( ), "popcnt" );
+            case umulhi: return std::format_to( ctx.out( ), "umulhi" );
+            case smulhi: return std::format_to( ctx.out( ), "smulhi" );
+            case trap: return std::format_to( ctx.out( ), "trap" );
+            case trapz: return std::format_to( ctx.out( ), "trapz" );
+            case trapnz: return std::format_to( ctx.out( ), "trapnz" );
         }
         return ctx.out( );
     }
@@ -173,5 +210,29 @@ struct std::formatter< xiao::ir::IRInst >
                                    inst.ops_offset + 1 );
         return std::format_to( ctx.out( ), "v{} = {} [ops {}..{}]", inst.result.id, inst.op, inst.ops_offset,
                                inst.ops_offset + inst.ops_count );
+    }
+};
+
+template <>
+struct std::formatter< xiao::ir::TrapCode >
+{
+    constexpr auto parse( auto& ctx )
+    { return ctx.begin( ); }
+
+    auto format( xiao::ir::TrapCode code, auto& ctx ) const
+    {
+        using enum xiao::ir::TrapCode;
+        switch ( code )
+        {
+            case unreachable: return std::format_to( ctx.out( ), "unreachable" );
+            case integer_overflow: return std::format_to( ctx.out( ), "integer_overflow" );
+            case integer_division_by_zero: return std::format_to( ctx.out( ), "integer_division_by_zero" );
+            case bad_conversion_to_integer: return std::format_to( ctx.out( ), "bad_conversion_to_integer" );
+            default: break;
+        }
+
+        const auto raw = static_cast< uint16_t >( code );
+        if ( raw >= static_cast< uint16_t >( user ) ) return std::format_to( ctx.out( ), "user{}", raw - static_cast< uint16_t >( user ) );
+        return std::format_to( ctx.out( ), "code{}", raw );
     }
 };

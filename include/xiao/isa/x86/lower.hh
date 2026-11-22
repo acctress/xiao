@@ -9,6 +9,7 @@
 #include <xiao/isa/x86/inst/inst.hh>
 #include <xiao/isa/x86/inst/regs.hh>
 #include <xiao/codegen/abi.hh>
+#include <xiao/codegen/flags.hh>
 #include <xiao/codegen/machenv.hh>
 #include <xiao/codegen/vcode.hh>
 
@@ -24,7 +25,10 @@ namespace xiao::x86_64
     class IRLowerer : public ir::IRVisitor< IRLowerer >
     {
     public:
-        explicit IRLowerer( const MachineEnv& env, const ABISpec& abi ) noexcept : m_env { env }, m_abi { abi } { }
+        explicit IRLowerer( const MachineEnv& env, const ABISpec& abi, const codegen::Flags& flags = { } ) noexcept
+            : m_env { env }, m_abi { abi }, m_flags { flags }
+        {
+        }
 
         [[nodiscard]] VCode< X86Inst > lower( ir::IRFunction& fn )
         {
@@ -149,6 +153,23 @@ namespace xiao::x86_64
                 case func_addr: lower_func_addr( inst ); break;
                 case call_indirect: lower_call_indirect( inst ); break;
                 case stack_addr: lower_stack_addr( inst ); break;
+                case rotl:
+                    lower_shift< Sized< inst::rolb_mc, inst::rolw_mc, inst::roll_mc, inst::rolq_mc >,
+                                 Sized< inst::rolb_mi8, inst::rolw_mi8, inst::roll_mi8, inst::rolq_mi8 > >( inst );
+                    break;
+                case rotr:
+                    lower_shift< Sized< inst::rorb_mc, inst::rorw_mc, inst::rorl_mc, inst::rorq_mc >,
+                                 Sized< inst::rorb_mi8, inst::rorw_mi8, inst::rorl_mi8, inst::rorq_mi8 > >( inst );
+                    break;
+                case bswap: lower_bswap( inst ); break;
+                case clz: lower_clz( inst ); break;
+                case ctz: lower_ctz( inst ); break;
+                case popcnt: lower_popcnt( inst ); break;
+                case umulhi: lower_mulhi( inst, false ); break;
+                case smulhi: lower_mulhi( inst, true ); break;
+                case trap: m_builder.push( inst::Trap { .code = ir::trap_code( inst ) } ); break;
+                case trapz: lower_trap_if( inst, CC::E ); break;
+                case trapnz: lower_trap_if( inst, CC::NE ); break;
             }
         }
 
@@ -173,6 +194,7 @@ namespace xiao::x86_64
         ir::IRFunction*                                          m_fn { nullptr };
         const MachineEnv&                                        m_env;
         const ABISpec&                                           m_abi;
+        codegen::Flags                                           m_flags;
         ABISig                                                   m_sig { };
         VCodeBuilder< X86Inst >                                  m_builder { };
         std::vector< VReg >                                      m_value_regs { };
@@ -335,6 +357,8 @@ namespace xiao::x86_64
                 case ishl:
                 case ushr:
                 case sshr:
+                case rotl:
+                case rotr:
                     if ( const auto v = const_value( rhs ); i == 1 && v )
                         return static_cast< int32_t >( *v & ir::bit_width( type_of( lhs ) ) - 1 );
                     return std::nullopt;
@@ -658,6 +682,197 @@ namespace xiao::x86_64
                 m_builder.push( inst::andl_mi8 { GprMem { rcx }, static_cast< int8_t >( bits - 1 ) } );
 
             push_sized< ByCl >( ty, GprMem { dst }, rcx );
+        }
+
+        [[nodiscard]] Reg temp( ) noexcept
+        { return Reg::from_vreg( alloc_vreg( ir::Type::i64 ) ); }
+
+        void extend_to_64( const Reg dst, const Reg src, const ir::Type ty, const bool is_signed )
+        {
+            const GprMem from { src };
+            switch ( ir::bit_width( ty ) )
+            {
+                case 8:
+                    if ( is_signed ) m_builder.push( inst::movsxq_rm8 { dst, from } );
+                    else
+                        m_builder.push( inst::movzxq_rm8 { dst, from } );
+                    break;
+                case 16:
+                    if ( is_signed ) m_builder.push( inst::movsxq_rm16 { dst, from } );
+                    else
+                        m_builder.push( inst::movzxq_rm16 { dst, from } );
+                    break;
+                case 32:
+                    if ( is_signed ) m_builder.push( inst::movsxdq_rm32 { dst, from } );
+                    else
+                        m_builder.push( inst::movl_rm { dst, from } );
+                    break;
+                default: mov( dst, src ); break;
+            }
+        }
+
+        void lower_bswap( const ir::IRInst& inst )
+        {
+            const auto dst = reg_for( inst.result );
+            mov( dst, reg_for( operand( inst, 0 ) ) );
+
+            switch ( ir::bit_width( type_of( inst.result ) ) )
+            {
+                case 16: m_builder.push( inst::rolw_mi8 { GprMem { dst }, 8 } ); break;
+                case 32: m_builder.push( inst::bswapl_r { dst } ); break;
+                default: m_builder.push( inst::bswapq_r { dst } ); break;
+            }
+        }
+
+        void lower_clz( const ir::IRInst& inst )
+        {
+            const auto ty   = type_of( inst.result );
+            const auto bits = ir::bit_width( ty );
+            const auto dst  = reg_for( inst.result );
+            const auto src  = reg_for( operand( inst, 0 ) );
+
+            if ( m_flags.has_lzcnt )
+            {
+                if ( bits == 8 )
+                {
+                    const auto wide = temp( );
+                    extend_to_64( wide, src, ty, false );
+                    m_builder.push( inst::lzcntl_rm { dst, GprMem { wide } } );
+                    m_builder.push( inst::subl_mi8 { GprMem { dst }, 24 } );
+                    return;
+                }
+
+                push_sized< Sized< inst::lzcntw_rm, inst::lzcntw_rm, inst::lzcntl_rm, inst::lzcntq_rm > >( ty, dst, GprMem { src } );
+                return;
+            }
+
+            auto wide = src;
+            if ( bits < 64 )
+            {
+                wide = temp( );
+                extend_to_64( wide, src, ty, false );
+            }
+
+            const auto idx = temp( );
+            m_builder.push( inst::MovImm { .dst = dst, .imm = -1 } );
+            m_builder.push( inst::bsrq_rm { idx, GprMem { wide } } );
+            m_builder.push( inst::cmovq_rm { idx, GprMem { dst }, CC::E } );
+            m_builder.push( inst::MovImm { .dst = dst, .imm = bits - 1 } );
+            m_builder.push( inst::subq_mr { GprMem { dst }, idx } );
+        }
+
+        void lower_ctz( const ir::IRInst& inst )
+        {
+            const auto ty   = type_of( inst.result );
+            const auto bits = ir::bit_width( ty );
+            const auto dst  = reg_for( inst.result );
+            const auto src  = reg_for( operand( inst, 0 ) );
+
+            if ( m_flags.has_bmi1 && bits > 8 )
+            {
+                push_sized< Sized< inst::tzcntw_rm, inst::tzcntw_rm, inst::tzcntl_rm, inst::tzcntq_rm > >( ty, dst, GprMem { src } );
+                return;
+            }
+
+            if ( bits < 64 )
+            {
+                const auto wide = temp( );
+                extend_to_64( wide, src, ty, false );
+                m_builder.push( inst::btsq_mi8 { GprMem { wide }, static_cast< int8_t >( bits ) } );
+                m_builder.push( inst::bsfq_rm { dst, GprMem { wide } } );
+                return;
+            }
+
+            const auto none = temp( );
+            m_builder.push( inst::MovImm { .dst = none, .imm = 64 } );
+            m_builder.push( inst::bsfq_rm { dst, GprMem { src } } );
+            m_builder.push( inst::cmovq_rm { dst, GprMem { none }, CC::E } );
+        }
+
+        void lower_popcnt( const ir::IRInst& inst )
+        {
+            const auto ty   = type_of( inst.result );
+            const auto bits = ir::bit_width( ty );
+            const auto dst  = reg_for( inst.result );
+            const auto src  = reg_for( operand( inst, 0 ) );
+
+            if ( m_flags.has_popcnt )
+            {
+                if ( bits == 8 )
+                {
+                    const auto wide = temp( );
+                    extend_to_64( wide, src, ty, false );
+                    m_builder.push( inst::popcntl_rm { dst, GprMem { wide } } );
+                    return;
+                }
+
+                push_sized< Sized< inst::popcntw_rm, inst::popcntw_rm, inst::popcntl_rm, inst::popcntq_rm > >( ty, dst, GprMem { src } );
+                return;
+            }
+
+            const auto t = temp( );
+            const auto k = temp( );
+            extend_to_64( dst, src, ty, false );
+
+            mov( t, dst );
+            m_builder.push( inst::shrq_mi8 { GprMem { t }, 1 } );
+            m_builder.push( inst::MovImm { .dst = k, .imm = static_cast< int64_t >( 0x5555555555555555ull ) } );
+            m_builder.push( inst::andq_mr { GprMem { t }, k } );
+            m_builder.push( inst::subq_mr { GprMem { dst }, t } );
+
+            m_builder.push( inst::MovImm { .dst = k, .imm = static_cast< int64_t >( 0x3333333333333333ull ) } );
+            mov( t, dst );
+            m_builder.push( inst::shrq_mi8 { GprMem { t }, 2 } );
+            m_builder.push( inst::andq_mr { GprMem { t }, k } );
+            m_builder.push( inst::andq_mr { GprMem { dst }, k } );
+            m_builder.push( inst::addq_mr { GprMem { dst }, t } );
+
+            mov( t, dst );
+            m_builder.push( inst::shrq_mi8 { GprMem { t }, 4 } );
+            m_builder.push( inst::addq_mr { GprMem { dst }, t } );
+            m_builder.push( inst::MovImm { .dst = k, .imm = static_cast< int64_t >( 0x0F0F0F0F0F0F0F0Full ) } );
+            m_builder.push( inst::andq_mr { GprMem { dst }, k } );
+
+            m_builder.push( inst::MovImm { .dst = k, .imm = static_cast< int64_t >( 0x0101010101010101ull ) } );
+            m_builder.push( inst::imulq_rm { dst, GprMem { k } } );
+            m_builder.push( inst::shrq_mi8 { GprMem { dst }, 56 } );
+        }
+
+        void lower_mulhi( const ir::IRInst& inst, const bool is_signed )
+        {
+            const auto ty   = type_of( inst.result );
+            const auto bits = ir::bit_width( ty );
+            const auto dst  = reg_for( inst.result );
+            const auto lhs  = reg_for( operand( inst, 0 ) );
+            const auto rhs  = reg_for( operand( inst, 1 ) );
+
+            if ( bits == 64 )
+            {
+                constexpr auto rax = Reg::from_preg( RAX );
+                constexpr auto rdx = Reg::from_preg( RDX );
+
+                mov( rax, lhs );
+                m_builder.push( inst::MovImm { .dst = rdx, .imm = 0 } );
+                if ( is_signed ) m_builder.push( inst::imulq_m { GprMem { rhs }, rax, rdx } );
+                else
+                    m_builder.push( inst::mulq_m { GprMem { rhs }, rax, rdx } );
+                mov( dst, rdx );
+                return;
+            }
+
+            const auto t = temp( );
+            extend_to_64( dst, lhs, ty, is_signed );
+            extend_to_64( t, rhs, ty, is_signed );
+            m_builder.push( inst::imulq_rm { dst, GprMem { t } } );
+            if ( is_signed ) m_builder.push( inst::sarq_mi8 { GprMem { dst }, static_cast< int8_t >( bits ) } );
+            else
+                m_builder.push( inst::shrq_mi8 { GprMem { dst }, static_cast< int8_t >( bits ) } );
+        }
+
+        void lower_trap_if( const ir::IRInst& inst, const CC cc )
+        {
+            push_test( reg_for( operand( inst, 0 ) ), type_of( operand( inst, 0 ) ) );
+            m_builder.push( inst::TrapIf { .cc = cc, .code = ir::trap_code( inst ) } );
         }
 
         void lower_select( const ir::IRInst& inst )

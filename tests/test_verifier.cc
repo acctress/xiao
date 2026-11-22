@@ -1680,3 +1680,106 @@ TEST_CASE( "verifier accepts a value used in a loop body that its header defines
         } );
     CHECK( f.errors( ).empty( ) );
 }
+
+TEST_CASE( "verifier accepts the bit ops and wide multiplies on every integer width", "[verifier]" )
+{
+    const Type ty   = GENERATE( Type::i8, Type::i16, Type::i32, Type::i64 );
+    const auto errs = errors_of( Type::unit, { ty, ty },
+                                 []( ir::IRBuilder& b )
+                                 {
+                                     const auto x = b.param( 0 );
+                                     const auto y = b.param( 1 );
+                                     ( void ) b.rotl( x, y );
+                                     ( void ) b.rotr( x, y );
+                                     ( void ) b.clz( x );
+                                     ( void ) b.ctz( x );
+                                     ( void ) b.popcnt( x );
+                                     ( void ) b.umulhi( x, y );
+                                     ( void ) b.smulhi( x, y );
+                                     b.ret( );
+                                 } );
+    CHECK( errs.empty( ) );
+}
+
+TEST_CASE( "verifier accepts bswap on i16, i32 and i64 and rejects i8", "[verifier]" )
+{
+    const Type ty   = GENERATE( Type::i16, Type::i32, Type::i64 );
+    const auto good = errors_of( Type::unit, { ty },
+                                 []( ir::IRBuilder& b )
+                                 {
+                                     ( void ) b.bswap( b.param( 0 ) );
+                                     b.ret( );
+                                 } );
+    CHECK( good.empty( ) );
+
+    const auto bad = errors_of( Type::unit, { Type::i8 },
+                                []( ir::IRBuilder& b )
+                                {
+                                    ( void ) b.bswap( b.param( 0 ) );
+                                    b.ret( );
+                                } );
+    CHECK( bad == Errs { "bswap: operand is i8, expected i16, i32 or i64" } );
+}
+
+TEST_CASE( "verifier rejects bit ops and wide multiplies on floats", "[verifier]" )
+{
+    const auto errs = errors_of( Type::unit, { Type::f64, Type::i64 },
+                                 []( ir::IRBuilder& b )
+                                 {
+                                     ( void ) b.popcnt( b.param( 0 ) );
+                                     ( void ) b.rotl( b.param( 0 ), b.param( 1 ) );
+                                     ( void ) b.umulhi( b.param( 1 ), b.param( 0 ) );
+                                     b.ret( );
+                                 } );
+    CHECK( errs
+           == Errs { "popcnt: operand is f64, expected an integer", "rotl: operands are f64 and i64, expected integers",
+                     "umulhi: operands are i64 and f64, expected integers" } );
+}
+
+TEST_CASE( "verifier rejects mismatched wide multiply operands", "[verifier]" )
+{
+    const auto errs = errors_of( Type::unit, { Type::i32, Type::i64 },
+                                 []( ir::IRBuilder& b )
+                                 {
+                                     ( void ) b.smulhi( b.param( 0 ), b.param( 1 ) );
+                                     b.ret( );
+                                 } );
+    CHECK( errs == Errs { "smulhi: operand types i32 and i64 don't match" } );
+}
+
+TEST_CASE( "verifier accepts trap as a terminator and trapz and trapnz inside a block", "[verifier]" )
+{
+    const auto errs = errors_of( Type::unit, { Type::i8, Type::i64 },
+                                 []( ir::IRBuilder& b )
+                                 {
+                                     b.trapz( b.param( 0 ), ir::TrapCode::integer_division_by_zero );
+                                     b.trapnz( b.param( 1 ), ir::user_trap( 3 ) );
+                                     b.trap( ir::TrapCode::unreachable );
+                                 } );
+    CHECK( errs.empty( ) );
+}
+
+TEST_CASE( "verifier rejects a float trap condition", "[verifier]" )
+{
+    const auto errs = errors_of( Type::unit, { Type::f32 },
+                                 []( ir::IRBuilder& b )
+                                 {
+                                     b.trapz( b.param( 0 ), ir::TrapCode::unreachable );
+                                     b.ret( );
+                                 } );
+    CHECK( errs == Errs { "trapz: condition is f32, expected an integer" } );
+}
+
+TEST_CASE( "verifier accepts a block that is only a trap", "[verifier]" )
+{
+    Fn f { Type::unit, { } };
+    f.build(
+        []( ir::IRBuilder& b )
+        {
+            b.switch_to_block( b.add_block( { } ) );
+            b.trap( ir::TrapCode::unreachable );
+        } );
+    auto& block = f.fn->blocks[ 0 ];
+    REQUIRE( block.insts_count == 1 );
+    CHECK( f.errors( ).empty( ) );
+}

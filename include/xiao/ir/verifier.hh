@@ -105,9 +105,20 @@ namespace xiao::ir
                 case IROp::icmp: verify_binary( fn, inst, false ); break;
                 case IROp::ishl:
                 case IROp::ushr:
-                case IROp::sshr: verify_shift( fn, inst ); break;
+                case IROp::sshr:
+                case IROp::rotl:
+                case IROp::rotr: verify_shift( fn, inst ); break;
+                case IROp::umulhi:
+                case IROp::smulhi: verify_binary( fn, inst, false ); break;
                 case IROp::bnot:
-                case IROp::ineg: verify_unary( fn, inst ); break;
+                case IROp::ineg:
+                case IROp::clz:
+                case IROp::ctz:
+                case IROp::popcnt: verify_unary( fn, inst ); break;
+                case IROp::bswap: verify_bswap( fn, inst ); break;
+                case IROp::trap: ( void ) expect_operands( inst, 0 ); break;
+                case IROp::trapz:
+                case IROp::trapnz: verify_trap_cond( fn, inst ); break;
                 case IROp::uextend:
                 case IROp::sextend:
                 case IROp::ireduce: verify_convert( fn, inst ); break;
@@ -132,7 +143,7 @@ namespace xiao::ir
         { return fn.values[ fn.operands[ inst.ops_offset + i ].id ].type; }
 
         [[nodiscard]] static bool is_terminator( const IROp op ) noexcept
-        { return op == IROp::ret || op == IROp::br || op == IROp::brif; }
+        { return op == IROp::ret || op == IROp::br || op == IROp::brif || op == IROp::trap; }
 
         [[nodiscard]] bool expect_operands( const IRInst& inst, const uint16_t n )
         {
@@ -193,6 +204,22 @@ namespace xiao::ir
 
             if ( const auto a = operand_type( fn, inst, 0 ); !is_int( a ) )
                 errs.push_back( { std::format( "{}: operand is {}, expected an integer", inst.op, a ) } );
+        }
+
+        void verify_bswap( const IRFunction& fn, const IRInst& inst )
+        {
+            if ( !expect_operands( inst, 1 ) ) return;
+
+            if ( const auto a = operand_type( fn, inst, 0 ); a != Type::i16 && a != Type::i32 && a != Type::i64 )
+                errs.push_back( { std::format( "bswap: operand is {}, expected i16, i32 or i64", a ) } );
+        }
+
+        void verify_trap_cond( const IRFunction& fn, const IRInst& inst )
+        {
+            if ( !expect_operands( inst, 1 ) ) return;
+
+            if ( const auto a = operand_type( fn, inst, 0 ); !is_int( a ) )
+                errs.push_back( { std::format( "{}: condition is {}, expected an integer", inst.op, a ) } );
         }
 
         void verify_convert( const IRFunction& fn, const IRInst& inst )

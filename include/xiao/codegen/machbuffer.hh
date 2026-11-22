@@ -106,10 +106,13 @@ namespace xiao::codegen
         void add_reloc( const RelocKind kind, const ir::ExternalName target, const int64_t addend )
         { m_relocs.push_back( { static_cast< uint32_t >( current_offset( ) ), kind, target, addend } ); }
 
+        void add_trap( const ir::TrapCode code )
+        { m_traps.push_back( { static_cast< uint32_t >( current_offset( ) ), code } ); }
+
         [[nodiscard]] CompiledCode finish( ) &&
         {
             resolve_labels( );
-            return CompiledCode { .code = std::move( m_bytes ), .relocs = std::move( m_relocs ) };
+            return CompiledCode { .code = std::move( m_bytes ), .relocs = std::move( m_relocs ), .traps = std::move( m_traps ) };
         }
 
         void resolve_labels( )
@@ -131,6 +134,7 @@ namespace xiao::codegen
         std::vector< LabelFixup > m_fixups { };
         std::vector< uint32_t >   m_label_offsets { };
         std::vector< Reloc >      m_relocs { };
+        std::vector< TrapSite >   m_traps { };
     };
 
 } // namespace xiao::codegen

@@ -198,6 +198,30 @@ namespace xiao::ir
         [[nodiscard]] ValueRef sshr( const ValueRef a, const ValueRef b )
         { return emit_binop( IROp::sshr, a, b ); }
 
+        [[nodiscard]] ValueRef rotl( const ValueRef a, const ValueRef b )
+        { return emit_binop( IROp::rotl, a, b ); }
+
+        [[nodiscard]] ValueRef rotr( const ValueRef a, const ValueRef b )
+        { return emit_binop( IROp::rotr, a, b ); }
+
+        [[nodiscard]] ValueRef umulhi( const ValueRef a, const ValueRef b )
+        { return emit_binop( IROp::umulhi, a, b ); }
+
+        [[nodiscard]] ValueRef smulhi( const ValueRef a, const ValueRef b )
+        { return emit_binop( IROp::smulhi, a, b ); }
+
+        [[nodiscard]] ValueRef bswap( const ValueRef a )
+        { return emit_unary( IROp::bswap, m_values[ a.id ].type, a ); }
+
+        [[nodiscard]] ValueRef clz( const ValueRef a )
+        { return emit_unary( IROp::clz, m_values[ a.id ].type, a ); }
+
+        [[nodiscard]] ValueRef ctz( const ValueRef a )
+        { return emit_unary( IROp::ctz, m_values[ a.id ].type, a ); }
+
+        [[nodiscard]] ValueRef popcnt( const ValueRef a )
+        { return emit_unary( IROp::popcnt, m_values[ a.id ].type, a ); }
+
         [[nodiscard]] ValueRef bnot( const ValueRef a )
         { return emit_unary( IROp::bnot, m_values[ a.id ].type, a ); }
 
@@ -238,6 +262,24 @@ namespace xiao::ir
             else
                 emit( IROp::ret, Type::unit, { } );
             m_block_inst_ends[ m_cur.id ] = static_cast< uint32_t >( m_insts.size( ) );
+        }
+
+        void trap( const TrapCode code )
+        {
+            emit( IROp::trap, Type::unit, { }, static_cast< uint64_t >( code ) );
+            m_block_inst_ends[ m_cur.id ] = static_cast< uint32_t >( m_insts.size( ) );
+        }
+
+        void trapz( const ValueRef cond, const TrapCode code )
+        {
+            const ValueRef ops[] = { cond };
+            emit( IROp::trapz, Type::unit, ops, static_cast< uint64_t >( code ) );
+        }
+
+        void trapnz( const ValueRef cond, const TrapCode code )
+        {
+            const ValueRef ops[] = { cond };
+            emit( IROp::trapnz, Type::unit, ops, static_cast< uint64_t >( code ) );
         }
 
         [[nodiscard]] ValueRef call( const FuncRef callee, const std::span< const ValueRef > args )

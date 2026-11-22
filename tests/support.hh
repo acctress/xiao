@@ -9,6 +9,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include <bit>
 #include <cstdint>
 #include <cstring>
 #include <functional>
@@ -296,6 +297,67 @@ namespace xt
                                 set( static_cast< uint64_t >( static_cast< int64_t >( sext( vt, v ) ) >> n ) );
                             break;
                         }
+                        case rotl:
+                        case rotr:
+                        {
+                            const auto vt = ty( op( i, 0 ) );
+                            const auto w  = ir::bit_width( vt );
+                            const auto n  = get( op( i, 1 ) ) & ( w - 1 );
+                            const auto v  = mask( vt, get( op( i, 0 ) ) );
+                            if ( n == 0 ) set( v );
+                            else if ( i.op == rotl )
+                                set( ( v << n ) | ( v >> ( w - n ) ) );
+                            else
+                                set( ( v >> n ) | ( v << ( w - n ) ) );
+                            break;
+                        }
+                        case bswap:
+                        {
+                            const auto vt = ty( op( i, 0 ) );
+                            const auto v  = get( op( i, 0 ) );
+                            uint64_t   r { };
+                            for ( uint32_t k { }; k < ir::bit_width( vt ) / 8u; ++k ) r = ( r << 8 ) | ( ( v >> ( 8 * k ) ) & 0xFF );
+                            set( r );
+                            break;
+                        }
+                        case clz:
+                        case ctz:
+                        case popcnt:
+                        {
+                            const auto vt = ty( op( i, 0 ) );
+                            const auto w  = static_cast< int >( ir::bit_width( vt ) );
+                            const auto v  = mask( vt, get( op( i, 0 ) ) );
+                            uint64_t   n { };
+                            if ( i.op == popcnt ) n = static_cast< uint64_t >( std::popcount( v ) );
+                            else if ( i.op == clz )
+                                for ( int k { w - 1 }; k >= 0 && !( ( v >> k ) & 1 ); --k ) ++n;
+                            else
+                                for ( int k { }; k < w && !( ( v >> k ) & 1 ); ++k ) ++n;
+                            set( n );
+                            break;
+                        }
+                        case umulhi:
+                        case smulhi:
+                        {
+                            const auto vt = ty( op( i, 0 ) );
+                            const auto w  = ir::bit_width( vt );
+                            const auto a  = get( op( i, 0 ) );
+                            const auto c  = get( op( i, 1 ) );
+                            if ( i.op == umulhi )
+                                set( static_cast< uint64_t >( ( static_cast< unsigned __int128 >( mask( vt, a ) ) * mask( vt, c ) ) >> w ) );
+                            else
+                                set( static_cast< uint64_t >( ( static_cast< __int128 >( static_cast< int64_t >( sext( vt, a ) ) )
+                                                                * static_cast< int64_t >( sext( vt, c ) ) )
+                                                              >> w ) );
+                            break;
+                        }
+                        case trap: throw InterpError { "trap" };
+                        case trapz:
+                            if ( get( op( i, 0 ) ) == 0 ) throw InterpError { "trap" };
+                            break;
+                        case trapnz:
+                            if ( get( op( i, 0 ) ) != 0 ) throw InterpError { "trap" };
+                            break;
                         case idiv:
                         case srem:
                         {

@@ -11,6 +11,13 @@ counts as a breaking change.
 
 - `icmp` on `i8`, `i16` and `i32` operands, compared at their own width
 - `ushr` and `sshr` on `i8`, `i16` and `i32` values
+- `rotl` and `rotr`, with the count masked to the value's width
+- `bswap` on `i16`, `i32` and `i64`
+- `clz`, `ctz` and `popcnt`. they use `lzcnt`, `tzcnt` and `popcnt` when `Flags::has_lzcnt`,
+  `has_bmi1` and `has_popcnt` are set, and portable sequences otherwise
+- `umulhi` and `smulhi`, the high half of a double width multiply
+- `trap`, a terminator, and `trapz` / `trapnz`, which stop the program with a `TrapCode`. each
+  trap site is recorded in `CompiledCode::traps` with its offset and code
 
 ### Changed
 

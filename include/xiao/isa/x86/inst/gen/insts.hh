@@ -10936,9 +10936,11 @@ namespace xiao::x86_64::inst
         CallInd,
         LoadExtName,
         DummyUse,
+        Trap,
+        TrapIf,
     };
 
-    inline constexpr std::size_t kind_count = 438;
+    inline constexpr std::size_t kind_count = 440;
 
     template < typename T >
     struct kind_of;
@@ -11381,6 +11383,8 @@ namespace xiao::x86_64::inst
     template <> struct kind_of< CallInd > { static constexpr Kind value = Kind::CallInd; };
     template <> struct kind_of< LoadExtName > { static constexpr Kind value = Kind::LoadExtName; };
     template <> struct kind_of< DummyUse > { static constexpr Kind value = Kind::DummyUse; };
+    template <> struct kind_of< Trap > { static constexpr Kind value = Kind::Trap; };
+    template <> struct kind_of< TrapIf > { static constexpr Kind value = Kind::TrapIf; };
 
     template < typename T >
     concept member = requires { kind_of< std::remove_cvref_t< T > >::value; };
@@ -11827,7 +11831,9 @@ namespace xiao::x86_64::inst
         Call,
         CallInd,
         LoadExtName,
-        DummyUse
+        DummyUse,
+        Trap,
+        TrapIf
     >;
 
     class MInst
@@ -12276,6 +12282,8 @@ namespace xiao::x86_64::inst
                 case Kind::CallInd: return std::forward< F >( f )( self.template get< CallInd >( ) );
                 case Kind::LoadExtName: return std::forward< F >( f )( self.template get< LoadExtName >( ) );
                 case Kind::DummyUse: return std::forward< F >( f )( self.template get< DummyUse >( ) );
+                case Kind::Trap: return std::forward< F >( f )( self.template get< Trap >( ) );
+                case Kind::TrapIf: return std::forward< F >( f )( self.template get< TrapIf >( ) );
             }
             std::unreachable( );
         }
@@ -12780,7 +12788,9 @@ namespace xiao::x86_64::inst
             alignof( Call ),
             alignof( CallInd ),
             alignof( LoadExtName ),
-            alignof( DummyUse )
+            alignof( DummyUse ),
+            alignof( Trap ),
+            alignof( TrapIf )
         } );
 
         static constexpr std::size_t storage_size = std::max( {
@@ -13221,7 +13231,9 @@ namespace xiao::x86_64::inst
             sizeof( Call ),
             sizeof( CallInd ),
             sizeof( LoadExtName ),
-            sizeof( DummyUse )
+            sizeof( DummyUse ),
+            sizeof( Trap ),
+            sizeof( TrapIf )
         } );
 
         template < typename T >

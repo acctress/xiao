@@ -590,3 +590,44 @@ TEST_CASE( "fmt_function prints a single function", "[ir][print]" )
     m.fmt_function( std::back_inserter( out ), *m.functions( )[ 1 ], named );
     CHECK( out == "define @second() {\nblock0:\n    return\n}\n" );
 }
+
+TEST_CASE( "printer writes the bit ops and wide multiplies", "[ir][print]" )
+{
+    CHECK( print_one( Type::i32, { Type::i32, Type::i32 },
+                      []( ir::IRBuilder& b, const Args& a )
+                      {
+                          const auto r = b.rotl( a[ 0 ], a[ 1 ] );
+                          const auto s = b.rotr( r, a[ 1 ] );
+                          const auto c = b.clz( s );
+                          const auto t = b.ctz( c );
+                          const auto p = b.popcnt( t );
+                          const auto w = b.bswap( p );
+                          const auto h = b.umulhi( w, a[ 0 ] );
+                          b.ret( b.smulhi( h, a[ 1 ] ) );
+                      } )
+           == "define @f(%v0: i32, %v1: i32) -> i32 {\nblock0:\n"
+              "    %v2 = rotl %v0, %v1\n"
+              "    %v3 = rotr %v2, %v1\n"
+              "    %v4 = clz %v3\n"
+              "    %v5 = ctz %v4\n"
+              "    %v6 = popcnt %v5\n"
+              "    %v7 = bswap %v6\n"
+              "    %v8 = umulhi %v7, %v0\n"
+              "    %v9 = smulhi %v8, %v1\n"
+              "    return %v9\n}\n" );
+}
+
+TEST_CASE( "printer writes traps with their codes", "[ir][print]" )
+{
+    CHECK( print_one( Type::unit, { Type::i64 },
+                      []( ir::IRBuilder& b, const Args& a )
+                      {
+                          b.trapz( a[ 0 ], ir::TrapCode::integer_division_by_zero );
+                          b.trapnz( a[ 0 ], ir::user_trap( 5 ) );
+                          b.trap( ir::TrapCode::unreachable );
+                      } )
+           == "define @f(%v0: i64) {\nblock0:\n"
+              "    trapz %v0, integer_division_by_zero\n"
+              "    trapnz %v0, user5\n"
+              "    trap unreachable\n}\n" );
+}
