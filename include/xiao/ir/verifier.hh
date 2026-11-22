@@ -183,12 +183,8 @@ namespace xiao::ir
             if ( !expect_operands( inst, 2 ) ) return;
 
             const auto value = operand_type( fn, inst, 0 );
-            const auto count = operand_type( fn, inst, 1 );
-
-            if ( !is_int( value ) || !is_int( count ) )
+            if ( const auto count = operand_type( fn, inst, 1 ); !is_int( value ) || !is_int( count ) )
                 errs.push_back( { std::format( "{}: operands are {} and {}, expected integers", inst.op, value, count ) } );
-            else if ( inst.op != IROp::ishl && bit_width( value ) != 64 )
-                errs.push_back( { std::format( "{}: value is {}, extend narrow values to i64 first", inst.op, value ) } );
         }
 
         void verify_unary( const IRFunction& fn, const IRInst& inst )

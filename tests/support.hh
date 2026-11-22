@@ -282,11 +282,20 @@ namespace xt
                         case bxor: set( get( op( i, 0 ) ) ^ get( op( i, 1 ) ) ); break;
                         case bnot: set( ~get( op( i, 0 ) ) ); break;
                         case ineg: set( uint64_t { 0 } - get( op( i, 0 ) ) ); break;
-                        case ishl: set( get( op( i, 0 ) ) << ( get( op( i, 1 ) ) & 63 ) ); break;
-                        case ushr: set( get( op( i, 0 ) ) >> ( get( op( i, 1 ) ) & 63 ) ); break;
+                        case ishl:
+                        case ushr:
                         case sshr:
-                            set( static_cast< uint64_t >( static_cast< int64_t >( get( op( i, 0 ) ) ) >> ( get( op( i, 1 ) ) & 63 ) ) );
+                        {
+                            const auto vt = ty( op( i, 0 ) );
+                            const auto n  = get( op( i, 1 ) ) & ir::bit_width( vt ) - 1;
+                            const auto v  = get( op( i, 0 ) );
+                            if ( i.op == ishl ) set( v << n );
+                            else if ( i.op == ushr )
+                                set( v >> n );
+                            else
+                                set( static_cast< uint64_t >( static_cast< int64_t >( sext( vt, v ) ) >> n ) );
                             break;
+                        }
                         case idiv:
                         case srem:
                         {

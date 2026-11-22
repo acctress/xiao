@@ -703,7 +703,7 @@ TEST_CASE( "verifier rejects shifts on non integers", "[verifier]" )
     CHECK( count == Errs { "ushr: operands are i64 and f32, expected integers" } );
 }
 
-TEST_CASE( "verifier rejects narrow right shifts", "[verifier]" )
+TEST_CASE( "verifier accepts narrow right shifts", "[verifier]" )
 {
     const Type ty   = GENERATE( Type::i8, Type::i16, Type::i32 );
     const auto errs = errors_of( Type::unit, { ty, Type::i64 },
@@ -713,12 +713,10 @@ TEST_CASE( "verifier rejects narrow right shifts", "[verifier]" )
                                      ( void ) b.sshr( b.param( 0 ), b.param( 1 ) );
                                      b.ret( );
                                  } );
-    CHECK( errs
-           == Errs { std::format( "ushr: value is {}, extend narrow values to i64 first", ty ),
-                     std::format( "sshr: value is {}, extend narrow values to i64 first", ty ) } );
+    CHECK( errs.empty( ) );
 }
 
-TEST_CASE( "verifier accepts narrow left shifts and any integer shift count", "[verifier]" )
+TEST_CASE( "verifier accepts every shift on every width with any integer count", "[verifier]" )
 {
     const Type value = GENERATE( Type::i8, Type::i16, Type::i32, Type::i64 );
     const Type count = GENERATE( Type::i8, Type::i16, Type::i32, Type::i64 );
@@ -726,6 +724,8 @@ TEST_CASE( "verifier accepts narrow left shifts and any integer shift count", "[
                                   []( ir::IRBuilder& b )
                                   {
                                      ( void ) b.ishl( b.param( 0 ), b.param( 1 ) );
+                                     ( void ) b.ushr( b.param( 0 ), b.param( 1 ) );
+                                     ( void ) b.sshr( b.param( 0 ), b.param( 1 ) );
                                      ( void ) b.ushr( b.param( 2 ), b.param( 1 ) );
                                      ( void ) b.sshr( b.param( 3 ), b.param( 1 ) );
                                      b.ret( );

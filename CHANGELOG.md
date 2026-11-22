@@ -7,6 +7,16 @@ counts as a breaking change.
 
 ## [Unreleased]
 
+### Added
+
+- `icmp` on `i8`, `i16` and `i32` operands, compared at their own width
+- `ushr` and `sshr` on `i8`, `i16` and `i32` values
+
+### Changed
+
+- Shifts of narrow values shift at the value's width and mask the count to `bits - 1`. A narrow
+  `ishl` by its width or more used to shift as 64 bits.
+
 ## [0.1.0] - 2026-11-22
 
 The first release of xiao. It compiles integer code correctly for x86-64 on Windows x64 and
@@ -15,7 +25,6 @@ System V, and input it cannot compile returns a `CodegenError` instead of produc
 ### Added
 
 **Intermediate representation**
-- `icmp` on `i8`, `i16` and `i32` operands, compared at their own width
 - SSA form with block parameters, built with `IRBuilder` and printed as text
 - Integer types `i8`, `i16`, `i32`, `i64` and `ptr`
 - Arithmetic, bitwise operations, shifts, conversions, `icmp` and `select`
@@ -55,6 +64,8 @@ System V, and input it cannot compile returns a `CodegenError` instead of produc
 
 - Floating point types are rejected with `CodegenError::Unsupported`. They are planned for 0.2.0.
 - Varargs, `br_table`, atomics and traps are not supported yet.
+- `icmp`, the division operations, `ushr` and `sshr` need `i64` operands. Narrow values have to be
+  extended first.
 - The verifier rejects a `windows_fastcall` function that calls a `system_v` function.
 - Object files are COFF only. ELF and Mach-O are not supported.
 - There is no thread-local data or unwind information.

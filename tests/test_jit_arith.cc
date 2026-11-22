@@ -114,7 +114,7 @@ namespace
             std::vector< BinOp > out;
             for ( const auto& op : binops( ) )
                 if ( op.name == "iadd" || op.name == "isub" || op.name == "imul" || op.name == "band" || op.name == "bor"
-                     || op.name == "bxor" || op.name == "ishl" )
+                     || op.name == "bxor" )
                     out.push_back( op );
             return out;
         }( );
@@ -146,6 +146,39 @@ namespace
     {
         if ( ty == Type::i64 ) return v;
         return is_signed ? b.sextend( Type::i64, v ) : b.uextend( Type::i64, v );
+    }
+
+    enum class Shift : uint8_t
+    {
+        shl,
+        shr,
+        sar
+    };
+
+    struct ShiftOp
+    {
+        std::string_view name;
+        BinBuild         build;
+        Shift            kind;
+    };
+
+    constexpr std::array< ShiftOp, 3 > shift_ops {
+        ShiftOp { "ishl", &ir::IRBuilder::ishl, Shift::shl },
+        ShiftOp { "ushr", &ir::IRBuilder::ushr, Shift::shr },
+        ShiftOp { "sshr", &ir::IRBuilder::sshr, Shift::sar },
+    };
+
+    uint64_t shift_ref( const Shift kind, const Type ty, const uint64_t value, const uint64_t count )
+    {
+        const auto n = count & ( ir::bit_width( ty ) - 1 );
+        const auto v = mask( ty, value );
+        switch ( kind )
+        {
+            case Shift::shl: return mask( ty, v << n );
+            case Shift::shr: return mask( ty, v >> n );
+            case Shift::sar: return mask( ty, static_cast< uint64_t >( static_cast< int64_t >( sext( ty, v ) ) >> n ) );
+        }
+        return 0;
     }
 } // namespace
 
@@ -524,6 +557,110 @@ TEST_CASE( "shift counts of narrow types use only their low bits", "[jit][arith]
     }
 }
 
+TEST_CASE( "shifts at every width by register counts mask the count to the width", "[jit][arith]" )
+{
+    for ( const auto ty : int_types )
+        for ( const auto& op : shift_ops )
+        {
+            DYNAMIC_SECTION( std::format( "{} {}", op.name, ty ) )
+            {
+                auto z = compile< int64_t( int64_t, int64_t ) >(
+                    Type::i64, { Type::i64, Type::i64 },
+                    [ & ]( ir::IRBuilder& b, const Args& a )
+                    {
+                        b.ret( widened( b, ty, ( b.*op.build )( narrowed( b, ty, a[ 0 ] ), a[ 1 ] ), false ) );
+                    } );
+                auto s = compile< int64_t( int64_t, int64_t ) >(
+                    Type::i64, { Type::i64, Type::i64 },
+                    [ & ]( ir::IRBuilder& b, const Args& a )
+                    {
+                        b.ret( widened( b, ty, ( b.*op.build )( narrowed( b, ty, a[ 0 ] ), a[ 1 ] ), true ) );
+                    } );
+                for ( const auto x : edge_values( ) )
+                    for ( const auto c : shift_counts( ) )
+                    {
+                        const auto r = shift_ref( op.kind, ty, u( x ), u( c ) );
+                        CAPTURE( x, c );
+                        CHECK( u( z( x, c ) ) == r );
+                        CHECK( u( s( x, c ) ) == sext( ty, r ) );
+                    }
+            }
+        }
+}
+
+TEST_CASE( "shifts at every width by constant counts mask the count to the width", "[jit][arith]" )
+{
+    for ( const auto ty : int_types )
+        for ( const auto& op : shift_ops )
+        {
+            DYNAMIC_SECTION( std::format( "{} {}", op.name, ty ) )
+            {
+                for ( const auto c : shift_counts( ) )
+                {
+                    auto f = compile< int64_t( int64_t ) >(
+                        Type::i64, { Type::i64 },
+                        [ & ]( ir::IRBuilder& b, const Args& a )
+                        {
+                            b.ret( widened( b, ty, ( b.*op.build )( narrowed( b, ty, a[ 0 ] ), b.iconst( Type::i64, u( c ) ) ), false ) );
+                        } );
+                    for ( const auto x : edge_values( ) )
+                    {
+                        CAPTURE( x, c );
+                        CHECK( u( f( x ) ) == shift_ref( op.kind, ty, u( x ), u( c ) ) );
+                    }
+                }
+            }
+        }
+}
+
+TEST_CASE( "narrow shifts by narrow counts ignore the upper bits of both", "[jit][arith]" )
+{
+    for ( const auto ty : { Type::i8, Type::i16, Type::i32 } )
+        for ( const auto cty : { Type::i8, Type::i16, Type::i32 } )
+            for ( const auto& op : shift_ops )
+            {
+                DYNAMIC_SECTION( std::format( "{} {} by {}", op.name, ty, cty ) )
+                {
+                    auto f = compile< int64_t( int64_t, int64_t ) >(
+                        Type::i64, { Type::i64, Type::i64 },
+                        [ & ]( ir::IRBuilder& b, const Args& a )
+                        {
+                            b.ret( b.uextend( Type::i64, ( b.*op.build )( b.ireduce( ty, a[ 0 ] ), b.ireduce( cty, a[ 1 ] ) ) ) );
+                        } );
+                    for ( const auto x : edge_values( ) )
+                        for ( const auto c : shift_counts( ) )
+                        {
+                            CAPTURE( x, c );
+                            CHECK( u( f( x, c ) ) == shift_ref( op.kind, ty, u( x ), mask( cty, u( c ) ) ) );
+                        }
+                }
+            }
+}
+
+TEST_CASE( "narrow sshr keeps the sign of negative values", "[jit][arith]" )
+{
+    for ( const auto ty : { Type::i8, Type::i16, Type::i32 } )
+    {
+        DYNAMIC_SECTION( std::format( "{}", ty ) )
+        {
+            auto f = compile< int64_t( int64_t, int64_t ) >( Type::i64, { Type::i64, Type::i64 },
+                                                             [ & ]( ir::IRBuilder& b, const Args& a )
+                                                             {
+                                                                 b.ret( b.sextend( Type::i64, b.sshr( b.ireduce( ty, a[ 0 ] ), a[ 1 ] ) ) );
+                                                             } );
+            const auto bits = static_cast< int64_t >( ir::bit_width( ty ) );
+            const auto min  = static_cast< int64_t >( sext( ty, uint64_t { 1 } << ( bits - 1 ) ) );
+            for ( int64_t n { }; n < bits; ++n )
+            {
+                CAPTURE( n );
+                CHECK( f( -1, n ) == -1 );
+                CHECK( f( -2, n ) == ( n == 0 ? -2 : -1 ) );
+                CHECK( f( min, n ) == ( min >> n ) );
+            }
+        }
+    }
+}
+
 TEST_CASE( "shift by the value itself", "[jit][arith]" )
 {
     auto f = compile< int64_t( int64_t ) >( Type::i64, { Type::i64 },
@@ -599,7 +736,6 @@ namespace
     {
         for ( const auto& op : narrow_binops( ) )
         {
-            if ( op.name == "ishl" ) continue;
             auto f = compile< T( T, T ) >( ty, { ty, ty },
                                            [ & ]( ir::IRBuilder& b, const Args& a )
                                            {
@@ -615,17 +751,21 @@ namespace
                 }
         }
 
-        auto shl = compile< T( T, int64_t ) >( ty, { ty, Type::i64 },
-                                               [ & ]( ir::IRBuilder& b, const Args& a )
-                                               {
-                                                   b.ret( b.ishl( a[ 0 ], a[ 1 ] ) );
-                                               } );
-        for ( const auto x : edge_values( ) )
-            for ( const auto c : shift_counts( ) )
-            {
-                CAPTURE( x, c );
-                CHECK( shl( static_cast< T >( x ), c ) == static_cast< T >( u( static_cast< T >( x ) ) << ( u( c ) & 63 ) ) );
-            }
+        for ( const auto& op : shift_ops )
+        {
+            auto sh = compile< T( T, int64_t ) >( ty, { ty, Type::i64 },
+                                                  [ & ]( ir::IRBuilder& b, const Args& a )
+                                                  {
+                                                      b.ret( ( b.*op.build )( a[ 0 ], a[ 1 ] ) );
+                                                  } );
+            for ( const auto x : edge_values( ) )
+                for ( const auto c : shift_counts( ) )
+                {
+                    const auto tx = static_cast< T >( x );
+                    CAPTURE( op.name, x, c );
+                    CHECK( sh( tx, c ) == static_cast< T >( shift_ref( op.kind, ty, u( tx ), u( c ) ) ) );
+                }
+        }
 
         auto un = compile< T( T ) >( ty, { ty },
                                      [ & ]( ir::IRBuilder& b, const Args& a )

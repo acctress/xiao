@@ -129,9 +129,18 @@ namespace xiao::x86_64
                 case bxor: lower_alu< inst::xorq_mr, inst::xorq_mi8, inst::xorq_mi32 >( inst ); break;
                 case bnot: lower_unary< inst::notq_m >( inst ); break;
                 case ineg: lower_unary< inst::negq_m >( inst ); break;
-                case ishl: lower_shift< inst::shlq_mc, inst::shlq_mi8 >( inst ); break;
-                case ushr: lower_shift< inst::shrq_mc, inst::shrq_mi8 >( inst ); break;
-                case sshr: lower_shift< inst::sarq_mc, inst::sarq_mi8 >( inst ); break;
+                case ishl:
+                    lower_shift< Sized< inst::shlb_mc, inst::shlw_mc, inst::shll_mc, inst::shlq_mc >,
+                                 Sized< inst::shlb_mi8, inst::shlw_mi8, inst::shll_mi8, inst::shlq_mi8 > >( inst );
+                    break;
+                case ushr:
+                    lower_shift< Sized< inst::shrb_mc, inst::shrw_mc, inst::shrl_mc, inst::shrq_mc >,
+                                 Sized< inst::shrb_mi8, inst::shrw_mi8, inst::shrl_mi8, inst::shrq_mi8 > >( inst );
+                    break;
+                case sshr:
+                    lower_shift< Sized< inst::sarb_mc, inst::sarw_mc, inst::sarl_mc, inst::sarq_mc >,
+                                 Sized< inst::sarb_mi8, inst::sarw_mi8, inst::sarl_mi8, inst::sarq_mi8 > >( inst );
+                    break;
                 case select: lower_select( inst ); break;
                 case uextend: lower_extend( inst, false ); break;
                 case sextend: lower_extend( inst, true ); break;
@@ -150,6 +159,15 @@ namespace xiao::x86_64
             std::span< const ir::ValueRef > args { };
             const ir::IRBlock*              target { };
             BlockId                         target_id { };
+        };
+
+        template < typename B, typename W, typename L, typename Q >
+        struct Sized
+        {
+            using b = B;
+            using w = W;
+            using l = L;
+            using q = Q;
         };
 
         ir::IRFunction*                                          m_fn { nullptr };
@@ -200,6 +218,18 @@ namespace xiao::x86_64
             if ( fits_i8( imm ) ) m_builder.push( Imm8 { dst, static_cast< int8_t >( imm ) } );
             else
                 m_builder.push( Imm32 { dst, static_cast< decltype( Imm32::imm ) >( imm ) } ); //! let this function take narrow imms
+        }
+
+        template < typename S, typename... Args >
+        void push_sized( const ir::Type ty, const Args&... args )
+        {
+            switch ( ir::bit_width( ty ) )
+            {
+                case 8: m_builder.push( typename S::b { args... } ); break;
+                case 16: m_builder.push( typename S::w { args... } ); break;
+                case 32: m_builder.push( typename S::l { args... } ); break;
+                default: m_builder.push( typename S::q { args... } ); break;
+            }
         }
 
         void push_test( const Reg r, const ir::Type ty )
@@ -305,7 +335,8 @@ namespace xiao::x86_64
                 case ishl:
                 case ushr:
                 case sshr:
-                    if ( const auto v = const_value( rhs ); i == 1 && v ) return static_cast< int32_t >( *v & 63 );
+                    if ( const auto v = const_value( rhs ); i == 1 && v )
+                        return static_cast< int32_t >( *v & ir::bit_width( type_of( lhs ) ) - 1 );
                     return std::nullopt;
                 default: return std::nullopt;
             }
@@ -612,17 +643,21 @@ namespace xiao::x86_64
         {
             constexpr auto rcx = Reg::from_preg( RCX );
 
+            const auto ty  = type_of( inst.result );
             const auto dst = reg_for( inst.result );
             mov( dst, reg_for( operand( inst, 0 ) ) );
 
             if ( const auto imm = fold_operand( inst, 1 ) )
             {
-                m_builder.push( ByImm { GprMem { dst }, static_cast< int8_t >( *imm ) } );
+                push_sized< ByImm >( ty, GprMem { dst }, static_cast< int8_t >( *imm ) );
                 return;
             }
 
             mov( rcx, reg_for( operand( inst, 1 ) ) );
-            m_builder.push( ByCl { GprMem { dst }, rcx } );
+            if ( const auto bits = ir::bit_width( ty ); bits < 32 )
+                m_builder.push( inst::andl_mi8 { GprMem { rcx }, static_cast< int8_t >( bits - 1 ) } );
+
+            push_sized< ByCl >( ty, GprMem { dst }, rcx );
         }
 
         void lower_select( const ir::IRInst& inst )
