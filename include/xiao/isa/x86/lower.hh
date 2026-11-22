@@ -199,7 +199,7 @@ namespace xiao::x86_64
         {
             if ( fits_i8( imm ) ) m_builder.push( Imm8 { dst, static_cast< int8_t >( imm ) } );
             else
-                m_builder.push( Imm32 { dst, imm } );
+                m_builder.push( Imm32 { dst, static_cast< decltype( Imm32::imm ) >( imm ) } ); //! let this function take narrow imms
         }
 
         void push_test( const Reg r, const ir::Type ty )
@@ -257,6 +257,25 @@ namespace xiao::x86_64
             return static_cast< int32_t >( *v );
         }
 
+        [[nodiscard]] static int64_t sext_to( const ir::Type ty, const int64_t value ) noexcept
+        {
+            const auto w = ir::bit_width( ty );
+            if ( w >= 64 ) return value;
+
+            const auto shft = 64 - w;
+            return static_cast< int64_t >( static_cast< uint64_t >( value ) << shft ) >> shft;
+        }
+
+        [[nodiscard]] std::optional< int32_t > cmp_imm( const ir::Type ty, const ir::ValueRef ref ) const noexcept
+        {
+            if ( ir::bit_width( ty ) == 64 ) return const_imm32( ref );
+
+            const auto value = const_value( ref );
+            if ( !value ) return std::nullopt;
+
+            return static_cast< int32_t >( sext_to( ty, *value ) );
+        }
+
         [[nodiscard]] std::optional< int32_t > fold_operand( const ir::IRInst& inst, const uint16_t i ) const noexcept
         {
             using enum ir::IROp;
@@ -272,10 +291,16 @@ namespace xiao::x86_64
                 case band:
                 case bor:
                 case bxor:
-                case icmp:
                     if ( i == 1 ) return const_imm32( rhs );
                     if ( !const_imm32( rhs ) ) return const_imm32( lhs );
                     return std::nullopt;
+                case icmp:
+                {
+                    const auto ty = type_of( lhs );
+                    if ( i == 1 ) return cmp_imm( ty, rhs );
+                    if ( !cmp_imm( ty, rhs ) ) return cmp_imm( ty, lhs );
+                    return std::nullopt;
+                }
                 case isub: return i == 1 ? const_imm32( rhs ) : std::nullopt;
                 case ishl:
                 case ushr:
@@ -384,21 +409,46 @@ namespace xiao::x86_64
             }
         }
 
+        void push_cmp_imm( const Reg r, const ir::Type ty, const int32_t imm )
+        {
+            const GprMem dst { r };
+            switch ( ir::bit_width( ty ) )
+            {
+                case 8: m_builder.push( inst::cmpb_mi8 { dst, static_cast< int8_t >( imm ) } ); break;
+                case 16: push_imm< inst::cmpw_mi8, inst::cmpw_mi16 >( dst, imm ); break;
+                case 32: push_imm< inst::cmpl_mi8, inst::cmpl_mi32 >( dst, imm ); break;
+                default: push_imm< inst::cmpq_mi8, inst::cmpq_mi32 >( dst, imm ); break;
+            }
+        }
+
+        void push_cmp( const Reg a, const Reg b, const ir::Type ty )
+        {
+            switch ( ir::bit_width( ty ) )
+            {
+                case 8: m_builder.push( inst::cmpb_mr { GprMem { a }, b } ); break;
+                case 16: m_builder.push( inst::cmpw_mr { GprMem { a }, b } ); break;
+                case 32: m_builder.push( inst::cmpl_mr { GprMem { a }, b } ); break;
+                default: m_builder.push( inst::cmpq_mr { GprMem { a }, b } ); break;
+            }
+        }
+
         CC emit_cmp( const ir::IRInst& inst )
         {
+            const auto ty = type_of( operand( inst, 0 ) );
+
             if ( const auto imm = fold_operand( inst, 1 ) )
             {
-                push_imm< inst::cmpq_mi8, inst::cmpq_mi32 >( GprMem { reg_for( operand( inst, 0 ) ) }, *imm );
+                push_cmp_imm( reg_for( operand( inst, 0 ) ), ty, *imm );
                 return icmp_cc( inst.cc );
             }
 
             if ( const auto imm = fold_operand( inst, 0 ) )
             {
-                push_imm< inst::cmpq_mi8, inst::cmpq_mi32 >( GprMem { reg_for( operand( inst, 1 ) ) }, *imm );
+                push_cmp_imm( reg_for( operand( inst, 1 ) ), ty, *imm );
                 return icmp_cc( swap_cc( inst.cc ) );
             }
 
-            m_builder.push( inst::cmpq_mr { GprMem { reg_for( operand( inst, 0 ) ) }, reg_for( operand( inst, 1 ) ) } );
+            push_cmp( reg_for( operand( inst, 0 ) ), reg_for( operand( inst, 1 ) ), ty );
             return icmp_cc( inst.cc );
         }
 

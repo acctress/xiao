@@ -15,6 +15,7 @@ System V, and input it cannot compile returns a `CodegenError` instead of produc
 ### Added
 
 **Intermediate representation**
+- `icmp` on `i8`, `i16` and `i32` operands, compared at their own width
 - SSA form with block parameters, built with `IRBuilder` and printed as text
 - Integer types `i8`, `i16`, `i32`, `i64` and `ptr`
 - Arithmetic, bitwise operations, shifts, conversions, `icmp` and `select`
@@ -54,8 +55,6 @@ System V, and input it cannot compile returns a `CodegenError` instead of produc
 
 - Floating point types are rejected with `CodegenError::Unsupported`. They are planned for 0.2.0.
 - Varargs, `br_table`, atomics and traps are not supported yet.
-- `icmp`, the division operations, `ushr` and `sshr` need `i64` operands. Narrow values have to be
-  extended first.
 - The verifier rejects a `windows_fastcall` function that calls a `system_v` function.
 - Object files are COFF only. ELF and Mach-O are not supported.
 - There is no thread-local data or unwind information.

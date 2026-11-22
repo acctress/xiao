@@ -310,8 +310,8 @@ namespace xt
                         {
                             const auto a  = get( op( i, 0 ) );
                             const auto c  = get( op( i, 1 ) );
-                            const auto sa = static_cast< int64_t >( a );
-                            const auto sc = static_cast< int64_t >( c );
+                            const auto sa = static_cast< int64_t >( sext( ty( op( i, 0 ) ), a ) );
+                            const auto sc = static_cast< int64_t >( sext( ty( op( i, 1 ) ), c ) );
                             bool       r { };
                             switch ( i.cc )
                             {

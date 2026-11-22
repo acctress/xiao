@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <format>
 #include <limits>
+#include <utility>
 #include <vector>
 
 using namespace xt;
@@ -71,6 +72,44 @@ namespace
 
     ValueRef narrowed( ir::IRBuilder& b, const Type ty, const ValueRef v )
     { return ty == Type::i64 ? v : b.ireduce( ty, v ); }
+
+    int64_t narrow_value( const Type ty, const int64_t v )
+    { return static_cast< int64_t >( sext( ty, mask( ty, u( v ) ) ) ); }
+
+    const std::vector< int64_t >& narrow_constants( )
+    {
+        static const std::vector< int64_t > values { 0,      1,      -1,     42,     127,        -128,        128,        255,
+                                                     300,    -300,   0x7fff, 0x8000, 0xffff,     0x7fffffff,  0x80000000, 0xffffffff };
+        return values;
+    }
+
+    template < typename T >
+    void check_native_narrow_params( const Type ty )
+    {
+        for ( const auto cc : all_ccs )
+        {
+            auto v = compile< int64_t( T, T ) >( Type::i64, { ty, ty },
+                                                 [ & ]( ir::IRBuilder& b, const Args& a )
+                                                 {
+                                                     b.ret( b.uextend( Type::i64, b.icmp( cc, a[ 0 ], a[ 1 ] ) ) );
+                                                 } );
+            auto j = compile< int64_t( T, T ) >( Type::i64, { ty, ty },
+                                                 [ & ]( ir::IRBuilder& b, const Args& a )
+                                                 {
+                                                     branch_on( b, b.icmp( cc, a[ 0 ], a[ 1 ] ), 1, 2 );
+                                                 } );
+            for ( const auto x : edge_values( ) )
+                for ( const auto y : edge_values( ) )
+                {
+                    const auto tx = static_cast< T >( x );
+                    const auto ty_ = static_cast< T >( y );
+                    const bool want = eval( cc, static_cast< int64_t >( tx ), static_cast< int64_t >( ty_ ) );
+                    CAPTURE( ty, cc, x, y );
+                    CHECK( v( tx, ty_ ) == ( want ? 1 : 0 ) );
+                    CHECK( j( tx, ty_ ) == ( want ? 1 : 2 ) );
+                }
+        }
+    }
 }
 
 TEST_CASE( "icmp as a value for every condition over edge values", "[jit][cmp]" )
@@ -298,6 +337,97 @@ TEST_CASE( "icmp of extended narrow values", "[jit][cmp]" )
                     CHECK( z( x, y ) == ( eval( cc, zx, zy ) ? 1 : 0 ) );
                 }
         }
+}
+
+TEST_CASE( "icmp on reduced narrow operands ignores the upper bits", "[jit][cmp]" )
+{
+    for ( const auto ty : { Type::i8, Type::i16, Type::i32 } )
+        for ( const auto cc : all_ccs )
+        {
+            auto v = compile< int64_t( int64_t, int64_t ) >(
+                Type::i64, { Type::i64, Type::i64 },
+                [ & ]( ir::IRBuilder& b, const Args& a )
+                {
+                    b.ret( b.uextend( Type::i64, b.icmp( cc, b.ireduce( ty, a[ 0 ] ), b.ireduce( ty, a[ 1 ] ) ) ) );
+                } );
+            auto j = compile< int64_t( int64_t, int64_t ) >( Type::i64, { Type::i64, Type::i64 },
+                                                             [ & ]( ir::IRBuilder& b, const Args& a )
+                                                             {
+                                                                 branch_on( b, b.icmp( cc, b.ireduce( ty, a[ 0 ] ), b.ireduce( ty, a[ 1 ] ) ), 1, 2 );
+                                                             } );
+            for ( const auto x : edge_values( ) )
+                for ( const auto y : edge_values( ) )
+                {
+                    const bool want = eval( cc, narrow_value( ty, x ), narrow_value( ty, y ) );
+                    CAPTURE( ty, cc, x, y );
+                    CHECK( v( x, y ) == ( want ? 1 : 0 ) );
+                    CHECK( j( x, y ) == ( want ? 1 : 2 ) );
+                }
+        }
+}
+
+TEST_CASE( "icmp on native narrow parameters", "[jit][cmp]" )
+{
+    SECTION( "i8" ) { check_native_narrow_params< int8_t >( Type::i8 ); }
+    SECTION( "i16" ) { check_native_narrow_params< int16_t >( Type::i16 ); }
+    SECTION( "i32" ) { check_native_narrow_params< int32_t >( Type::i32 ); }
+}
+
+TEST_CASE( "icmp narrow against a constant", "[jit][cmp]" )
+{
+    for ( const auto ty : { Type::i8, Type::i16, Type::i32 } )
+        for ( const auto cc : all_ccs )
+        {
+            DYNAMIC_SECTION( std::format( "{} {}", ty, cc ) )
+            {
+                for ( const auto c : narrow_constants( ) )
+                    for ( const auto raw : { u( c ), mask( ty, u( c ) ) } )
+                    {
+                        auto r = compile< int64_t( int64_t ) >(
+                            Type::i64, { Type::i64 },
+                            [ & ]( ir::IRBuilder& b, const Args& a )
+                            {
+                                b.ret( b.uextend( Type::i64, b.icmp( cc, b.ireduce( ty, a[ 0 ] ), b.iconst( ty, raw ) ) ) );
+                            } );
+                        auto l = compile< int64_t( int64_t ) >(
+                            Type::i64, { Type::i64 },
+                            [ & ]( ir::IRBuilder& b, const Args& a )
+                            {
+                                b.ret( b.uextend( Type::i64, b.icmp( cc, b.iconst( ty, raw ), b.ireduce( ty, a[ 0 ] ) ) ) );
+                            } );
+                        auto j = compile< int64_t( int64_t ) >( Type::i64, { Type::i64 },
+                                                                [ & ]( ir::IRBuilder& b, const Args& a )
+                                                                {
+                                                                    branch_on( b, b.icmp( cc, b.ireduce( ty, a[ 0 ] ), b.iconst( ty, raw ) ), 1, 2 );
+                                                                } );
+                        const auto nc = narrow_value( ty, c );
+                        for ( const auto x : edge_values( ) )
+                        {
+                            const auto nx = narrow_value( ty, x );
+                            CAPTURE( c, raw, x );
+                            CHECK( r( x ) == ( eval( cc, nx, nc ) ? 1 : 0 ) );
+                            CHECK( l( x ) == ( eval( cc, nc, nx ) ? 1 : 0 ) );
+                            CHECK( j( x ) == ( eval( cc, nx, nc ) ? 1 : 2 ) );
+                        }
+                    }
+            }
+        }
+}
+
+TEST_CASE( "icmp between two narrow constants", "[jit][cmp]" )
+{
+    for ( const auto ty : { Type::i8, Type::i16, Type::i32 } )
+        for ( const auto cc : all_ccs )
+            for ( const auto [ c, d ] : { std::pair< int64_t, int64_t > { -1, 1 }, { 0x80, 0x7f }, { 0xffff, 0 }, { 0x80000000, 0x7fffffff } } )
+            {
+                auto f = compile< int64_t( ) >( Type::i64, { },
+                                                [ & ]( ir::IRBuilder& b, const Args& )
+                                                {
+                                                    b.ret( b.uextend( Type::i64, b.icmp( cc, b.iconst( ty, u( c ) ), b.iconst( ty, u( d ) ) ) ) );
+                                                } );
+                CAPTURE( ty, cc, c, d );
+                CHECK( f( ) == ( eval( cc, narrow_value( ty, c ), narrow_value( ty, d ) ) ? 1 : 0 ) );
+            }
 }
 
 TEST_CASE( "select with an icmp condition picks the right operand", "[jit][cmp]" )

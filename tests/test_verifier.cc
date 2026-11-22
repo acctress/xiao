@@ -603,7 +603,7 @@ TEST_CASE( "verifier rejects narrow division, remainder and comparison", "[verif
     CHECK( errs == Errs { std::format( "{}: operands are {} and {}, extend narrow values to i64 first", name, ty, ty ) } );
 }
 
-TEST_CASE( "verifier rejects narrow icmp operands", "[verifier]" )
+TEST_CASE( "verifier accepts narrow icmp operands", "[verifier]" )
 {
     const Type ty   = GENERATE( Type::i8, Type::i16, Type::i32 );
     const auto errs = errors_of( Type::i8, { ty, ty },
@@ -611,7 +611,30 @@ TEST_CASE( "verifier rejects narrow icmp operands", "[verifier]" )
                                  {
                                      b.ret( b.icmp( ir::ICmpCC::eq, b.param( 0 ), b.param( 1 ) ) );
                                  } );
-    CHECK( errs == Errs { std::format( "icmp: operands are {} and {}, extend narrow values to i64 first", ty, ty ) } );
+    CHECK( errs.empty( ) );
+}
+
+TEST_CASE( "verifier accepts narrow icmp against a constant of the same type", "[verifier]" )
+{
+    const Type ty   = GENERATE( Type::i8, Type::i16, Type::i32 );
+    const auto errs = errors_of( Type::i8, { ty },
+                                 [ & ]( ir::IRBuilder& b )
+                                 {
+                                     b.ret( b.icmp( ir::ICmpCC::slt, b.iconst( ty, 1 ), b.param( 0 ) ) );
+                                 } );
+    CHECK( errs.empty( ) );
+}
+
+TEST_CASE( "verifier rejects icmp operands of different widths", "[verifier]" )
+{
+    const auto [ a, c ] = GENERATE( std::pair { Type::i8, Type::i32 }, std::pair { Type::i16, Type::i64 }, std::pair { Type::i32, Type::i64 },
+                                    std::pair { Type::i8, Type::ptr } );
+    const auto errs     = errors_of( Type::i8, { a, c },
+                                     []( ir::IRBuilder& b )
+                                     {
+                                         b.ret( b.icmp( ir::ICmpCC::eq, b.param( 0 ), b.param( 1 ) ) );
+                                     } );
+    CHECK( errs == Errs { std::format( "icmp: operand types {} and {} don't match", a, c ) } );
 }
 
 TEST_CASE( "verifier reports both mismatch and narrowness for a mixed division", "[verifier]" )

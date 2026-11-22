@@ -101,8 +101,8 @@ namespace xiao::ir
                 case IROp::idiv:
                 case IROp::udiv:
                 case IROp::srem:
-                case IROp::urem:
-                case IROp::icmp: verify_binary( fn, inst, true ); break;
+                case IROp::urem: verify_binary( fn, inst, true ); break;
+                case IROp::icmp: verify_binary( fn, inst, false ); break;
                 case IROp::ishl:
                 case IROp::ushr:
                 case IROp::sshr: verify_shift( fn, inst ); break;
