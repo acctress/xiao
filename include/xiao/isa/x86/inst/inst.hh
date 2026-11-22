@@ -32,6 +32,7 @@ namespace xiao::x86_64
             switch ( m.amode_kind )
             {
                 case AmodeKind::Real: return;
+                case AmodeKind::OutgoingArg: break;
                 case AmodeKind::IncomingArg: m.disp += offsets.incoming_base; break;
                 case AmodeKind::Slot:
                     assert( m.slot >= 0 && static_cast< std::size_t >( m.slot ) < offsets.slots.size( )

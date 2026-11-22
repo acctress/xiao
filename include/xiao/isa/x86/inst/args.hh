@@ -38,6 +38,7 @@ namespace xiao::x86_64
     {
         Real,
         IncomingArg,
+        OutgoingArg,
         Slot
     };
 
@@ -59,6 +60,9 @@ namespace xiao::x86_64
 
     [[nodiscard]] static constexpr AddressMode incoming_arg( const int32_t offset ) noexcept
     { return { .disp = offset, .amode_kind = AmodeKind::IncomingArg }; }
+
+    [[nodiscard]] static constexpr AddressMode outgoing_arg( const int32_t offset ) noexcept
+    { return { .disp = offset, .amode_kind = AmodeKind::OutgoingArg }; }
 
     [[nodiscard]] static constexpr AddressMode stack_slot( const int32_t slot, const int32_t offset ) noexcept
     { return { .disp = offset, .amode_kind = AmodeKind::Slot, .slot = slot }; }

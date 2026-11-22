@@ -67,15 +67,14 @@ namespace xiao::x86_64
                                                    return i.is_call( );
                                                } );
 
-        const auto calls_fc = []( const X86Inst& i )
+        uint32_t outgoing { };
+        for ( const auto& i : vcode.insts )
         {
-            if ( const auto* c = i.inner.get_if< inst::Call >( ) ) return c->info->cc == CallConv::WindowsFastcall;
-            if ( const auto* c = i.inner.get_if< inst::CallInd >( ) ) return c->info->cc == CallConv::WindowsFastcall;
-            return false;
-        };
+            if ( const auto* c = i.inner.get_if< inst::Call >( ) ) outgoing = std::max( outgoing, c->info->stack_arg_bytes );
+            if ( const auto* c = i.inner.get_if< inst::CallInd >( ) ) outgoing = std::max( outgoing, c->info->stack_arg_bytes );
+        }
 
-        const uint32_t shadow = std::ranges::any_of( vcode.insts, calls_fc ) ? 32 : 0;
-        uint32_t       cursor = shadow + 8 * allocs.spill_slots;
+        uint32_t cursor = outgoing + 8 * allocs.spill_slots;
 
         frame.slot_offsets.reserve( slots.size( ) );
         for ( const auto& [ size, align_shift ] : slots )
@@ -97,7 +96,7 @@ namespace xiao::x86_64
             frame.stack_adjust    = base + pad;
         }
 
-        frame.spill_base    = shadow;
+        frame.spill_base    = outgoing;
         frame.incoming_base = static_cast< int32_t >( frame.stack_adjust + 8 * frame.saved.size( ) + 8 );
 
         assert( env.scratch[ 0 ].size( ) >= 2 && "[xiao::x86_64::compute_frame] need two int scratch registers for spilling" );

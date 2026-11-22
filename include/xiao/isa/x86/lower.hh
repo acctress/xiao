@@ -674,13 +674,23 @@ namespace xiao::x86_64
 
             const auto csig = m_abi.compute( cc, params, rets );
 
+            const auto arg = [ & ]( const std::size_t idx )
+            {
+                return reg_for( m_fn->operands[ inst.ops_offset + first_arg + idx ] );
+            };
+
+            for ( auto i { 0uz }; i < params.size( ); ++i )
+                if ( const auto& loc = csig.params[ i ]; loc.is_stack( ) )
+                    m_builder.push( inst::movq_mr { GprMem { outgoing_arg( loc.stack_offset( ) ) }, arg( i ) } );
+
             std::vector< PReg > args;
             args.reserve( params.size( ) );
-            for ( auto i { 0 }; i < params.size( ); ++i )
+            for ( auto i { 0uz }; i < params.size( ); ++i )
             {
-                assert( csig.params[ i ].is_reg( ) && "[xiao::lower::emit_call] stack passed args not supported YET" );
-                args.push_back( csig.params[ i ].reg( ) );
-                mov( Reg::from_preg( args.back( ) ), reg_for( m_fn->operands[ inst.ops_offset + first_arg + i ] ) );
+                const auto& loc = csig.params[ i ];
+                if ( !loc.is_reg( ) ) continue;
+                args.push_back( loc.reg( ) );
+                mov( Reg::from_preg( loc.reg( ) ), arg( i ) );
             }
 
             const auto ret_preg = rets.empty( ) ? PReg::invalid( ) : csig.rets[ 0 ].reg( );
@@ -690,8 +700,13 @@ namespace xiao::x86_64
                 clobbers.insert( clobbers.end( ), cls.begin( ), cls.end( ) );
 
             support::Box info {
-                inst::CallInfo { .args = std::move( args ), .ret = ret_preg, .clobbers = std::move( clobbers ), .cc = cc }
+                inst::CallInfo { .args            = std::move( args ),
+                                .ret             = ret_preg,
+                                .clobbers        = std::move( clobbers ),
+                                .cc              = cc,
+                                .stack_arg_bytes = csig.stack_arg_bytes }
             };
+
             if ( target.name ) m_builder.push( inst::Call { .name = *target.name, .info = std::move( info ) } );
             else
                 m_builder.push( inst::CallInd { .target = target.reg, .info = std::move( info ) } );

@@ -58,6 +58,14 @@ namespace
     int64_t h_ptr_diff( const char* const a, const char* const b )
     { return a - b; }
 
+    int64_t h_eight( const int64_t a, const int64_t b, const int64_t c, const int64_t d, const int64_t e, const int64_t f, const int64_t g,
+                     const int64_t h )
+    { return a + 2 * b + 3 * c + 4 * d + 5 * e + 6 * f + 7 * g + 8 * h; }
+
+    int64_t h_narrow_tail( const int64_t a, const int64_t b, const int64_t c, const int64_t d, const int64_t e, const int64_t f,
+                           const int32_t g )
+    { return a + b + c + d + e + f + g; }
+
     jit::JITBuilder host_builder( )
     {
         jit::JITBuilder b { isa::lookup_host( ) };
@@ -77,6 +85,8 @@ namespace
         b.symbol( "h_tick", reinterpret_cast< const void* >( &h_tick ) );
         b.symbol( "h_apply", reinterpret_cast< const void* >( &h_apply ) );
         b.symbol( "h_ptr_diff", reinterpret_cast< const void* >( &h_ptr_diff ) );
+        b.symbol( "h_eight", reinterpret_cast< const void* >( &h_eight ) );
+        b.symbol( "h_narrow_tail", reinterpret_cast< const void* >( &h_narrow_tail ) );
         return b;
     }
 
@@ -1044,7 +1054,6 @@ TEST_CASE( "read eight parameters with the last four on the stack", "[jit][calls
     CHECK( f( 1, 10, 100, 1000, 10000, 100000, 1000000, 10000000 ) == 87654321 );
 }
 
-
 TEST_CASE( "read a narrow parameter passed on the stack", "[jit][calls]" )
 {
     Jit        j { host_builder( ) };
@@ -1066,10 +1075,63 @@ TEST_CASE( "read stack parameters in a function that makes a call", "[jit][calls
     const auto id     = j.define( "f", Type::i64, std::vector< Type >( 8, Type::i64 ),
                                   [ & ]( ir::IRBuilder& b, const Args& a )
                                   {
-                                      const auto fr = j.mod.declare_func_in_func( callee, b );
-                                      b.ret( b.iadd( b.call( fr, Args { a[ 5 ] } ), a[ 7 ] ) );
-                                  } );
+                                  const auto fr = j.mod.declare_func_in_func( callee, b );
+                                  b.ret( b.iadd( b.call( fr, Args { a[ 5 ] } ), a[ 7 ] ) );
+                              } );
     j.finalise( );
     const auto f = j.get< int64_t( int64_t, int64_t, int64_t, int64_t, int64_t, int64_t, int64_t, int64_t ) >( id );
     CHECK( f( 0, 0, 0, 0, 0, 20, 0, 9 ) == 20 * 3 + 1 + 9 );
+}
+
+TEST_CASE( "call a host function with eight arguments", "[jit][calls]" )
+{
+    Jit        j { host_builder( ) };
+    const auto callee = j.import( "h_eight", Type::i64, std::vector< Type >( 8, Type::i64 ) );
+    const auto id     = j.define( "f", Type::i64, { Type::i64, Type::i64 },
+                                  [ & ]( ir::IRBuilder& b, const Args& a )
+                                  {
+                                      const auto fr = j.mod.declare_func_in_func( callee, b );
+                                      Args       xs;
+                                      for ( uint64_t k { 0 }; k < 8; ++k ) xs.push_back( b.iadd( a[ k % 2 ], b.iconst( Type::i64, k * 10 ) ) );
+                                      b.ret( b.call( fr, xs ) );
+                                  } );
+    j.finalise( );
+    const auto f = j.get< int64_t( int64_t, int64_t ) >( id );
+    for ( const auto x : small_values )
+        CHECK( f( x, 3 ) == h_eight( x, 13, x + 20, 33, x + 40, 53, x + 60, 73 ) );
+}
+
+TEST_CASE( "call a host function with a narrow stack argument", "[jit][calls]" )
+{
+    Jit        j { host_builder( ) };
+    const auto callee = j.import( "h_narrow_tail", Type::i64,
+                                  { Type::i64, Type::i64, Type::i64, Type::i64, Type::i64, Type::i64, Type::i32 } );
+    const auto id     = j.define( "f", Type::i64, { Type::i64 },
+                                  [ & ]( ir::IRBuilder& b, const Args& a )
+                                  {
+                                      const auto fr = j.mod.declare_func_in_func( callee, b );
+                                      const auto z  = b.iconst( Type::i64, 0 );
+                                      b.ret( b.call( fr, Args { z, z, z, z, z, z, b.ireduce( Type::i32, a[ 0 ] ) } ) );
+                                  } );
+    j.finalise( );
+    const auto f = j.get< int64_t( int64_t ) >( id );
+    CHECK( f( -1 ) == -1 );
+    CHECK( f( 0x7fffffff ) == 0x7fffffff );
+}
+
+TEST_CASE( "a jit function passes stack arguments to another jit function", "[jit][calls]" )
+{
+    Jit        j { host_builder( ) };
+    const auto callee = j.define( "g", Type::i64, std::vector< Type >( 8, Type::i64 ),
+                                  [ & ]( ir::IRBuilder& b, const Args& a ) { b.ret( b.isub( a[ 7 ], a[ 4 ] ) ); } );
+    const auto id     = j.define( "f", Type::i64, { Type::i64, Type::i64 },
+                                  [ & ]( ir::IRBuilder& b, const Args& a )
+                                  {
+                                      const auto fr = j.mod.declare_func_in_func( callee, b );
+                                      const auto z  = b.iconst( Type::i64, 0 );
+                                      const auto r  = b.call( fr, Args { z, z, z, z, a[ 0 ], z, z, a[ 1 ] } );
+                                      b.ret( b.iadd( r, a[ 0 ] ) );
+                                  } );
+    j.finalise( );
+    CHECK( j.get< int64_t( int64_t, int64_t ) >( id )( 5, 100 ) == 100 );
 }

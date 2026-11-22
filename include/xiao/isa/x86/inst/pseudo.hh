@@ -103,6 +103,7 @@ namespace xiao::x86_64::inst
         PReg                ret { };
         std::vector< PReg > clobbers { };
         CallConv            cc { };
+        uint32_t            stack_arg_bytes { };
     };
 
     struct Call

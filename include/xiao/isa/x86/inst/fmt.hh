@@ -113,6 +113,7 @@ namespace xiao::x86_64
         switch ( mem.amode_kind )
         {
             case AmodeKind::IncomingArg: out += "in"; break;
+            case AmodeKind::OutgoingArg: out += "out"; break;
             case AmodeKind::Slot: std::format_to( std::back_inserter( out ), "ss{}", mem.slot ); break;
             case AmodeKind::Real:
                 if ( mem.base.valid( ) ) out += fmt_gpr( mem.base, 64 );
