@@ -9,9 +9,9 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/acctress/xiao/actions/workflows/ci.yml"><img src="https://github.com/acctress/xiao/actions/workflows/ci.yml/badge.svg?branch=cxx" alt="CI"></a>
+  <a href="https://github.com/acctress/xiao/actions/workflows/ci.yml"><img src="https://github.com/acctress/xiao/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
-  <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/acctress/xiao/cxx/.github/badges/loc.json" alt="Lines of code">
+  <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/acctress/xiao/main/.github/badges/loc.json" alt="Lines of code">
 </p>
 
 ## Overview

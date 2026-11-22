@@ -2,7 +2,7 @@ name: loc badge
 
 on:
   push:
-    branches: [ cxx ]
+    branches: [ main ]
     paths: [ "include/**" ]
   workflow_dispatch:
 
