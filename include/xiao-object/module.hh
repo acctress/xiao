@@ -155,7 +155,9 @@ namespace xiao::object
 
             uint32_t section { };
             uint32_t offset { };
-            if ( !bytes && decl.writable )
+
+            if ( const bool has_relocs = !data.function_relocs( ).empty( ) || !data.data_relocs( ).empty( );
+                 !bytes && decl.writable && !has_relocs )
             {
                 section = section_for( SectionKind::UninitialisedData );
                 offset  = m_object.reserve( section, static_cast< uint32_t >( data.size( ) ), align );

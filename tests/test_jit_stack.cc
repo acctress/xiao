@@ -189,7 +189,7 @@ TEST_CASE( "stack slots get their requested alignment", "[jit][stack]" )
     const bool with_call = GENERATE( false, true );
     Jit        j { host_builder( ) };
     const auto write = j.import( "h_write", Type::unit, { Type::ptr, Type::i64 } );
-    const auto id    = j.define( "f", Type::i64, { Type::i64 },
+    const auto id    = j.define( "f", Type::ptr, { Type::i64 },
                                  [ & ]( ir::IRBuilder& b, const Args& a )
                                  {
                                   const auto s0 = b.create_stack_slot( 3, 1 );
@@ -313,4 +313,28 @@ TEST_CASE( "interpreter agrees with the jit on stack slots", "[jit][stack][inter
             const uint64_t args[] = { u( x ), u( y ) };
             CHECK( u( c( x, y ) ) == Interp { }.run( ir_of( *c.jit ), args ) );
         }
+}
+
+TEST_CASE( "a frame larger than one guard page is probed", "[jit][stack]" )
+{
+    const auto c = compile< int64_t( int64_t ) >( Type::i64, { Type::i64 },
+                                                  []( ir::IRBuilder& b, const Args& a )
+                                                  {
+                                                      const auto p = b.stack_addr( Type::ptr, b.create_stack_slot( 512 * 1024, 8 ) );
+                                                      b.store( a[ 0 ], p );
+                                                      b.ret( b.load( Type::i64, p ) );
+                                                  } );
+    for ( const auto v : values ) CHECK( c( v ) == v );
+}
+
+TEST_CASE( "a frame of a few guard pages is probed without a loop", "[jit][stack]" )
+{
+    const auto c = compile< int64_t( int64_t ) >( Type::i64, { Type::i64 },
+                                                  []( ir::IRBuilder& b, const Args& a )
+                                                  {
+                                                      const auto p = b.stack_addr( Type::ptr, b.create_stack_slot( 3 * 4096, 8 ) );
+                                                      b.store( a[ 0 ], p );
+                                                      b.ret( b.load( Type::i64, p ) );
+                                                  } );
+    for ( const auto v : values ) CHECK( c( v ) == v );
 }

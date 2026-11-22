@@ -512,7 +512,7 @@ TEST_CASE( "addresses of two data objects differ as on the host", "[jit][data]" 
     Jit        j;
     const auto a  = define_bytes( j, "a", { 1, 2, 3, 4, 5 } );
     const auto c  = define_zeros( j, "c", 100, true );
-    const auto id = j.define( "diff", Type::i64, { },
+    const auto id = j.define( "diff", Type::ptr, { },
                               [ & ]( ir::IRBuilder& b, const Args& )
                               {
                                   const auto pa = b.symbol_value( Type::ptr, j.mod.declare_data_in_func( a, b ) );

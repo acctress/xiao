@@ -25,7 +25,7 @@ namespace xiao::codegen
     struct VCodeBlock
     {
         uint32_t insts_offset { };
-        uint16_t insts_count { };
+        uint32_t insts_count { };
         uint32_t succs_offset { };
         uint8_t  succs_count { };
         uint32_t params_offset { };
@@ -71,7 +71,7 @@ namespace xiao::codegen
         void end_block( const std::span< const BlockId > succs, const std::span< const VReg > branch_args = { } )
         {
             auto& b       = m_blocks[ m_cur.id ];
-            b.insts_count = static_cast< uint16_t >( m_insts.size( ) - b.insts_offset );
+            b.insts_count = static_cast< uint32_t >( m_insts.size( ) - b.insts_offset );
             b.succs_count = static_cast< uint8_t >( succs.size( ) );
 
             for ( const auto s : succs ) m_succs.push_back( s );

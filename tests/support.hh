@@ -259,7 +259,7 @@ namespace xt
             for ( ;; )
             {
                 const auto& b = fn.blocks[ block ];
-                for ( uint16_t ii { 0 }; ii < b.insts_count; ++ii )
+                for ( uint32_t ii { 0 }; ii < b.insts_count; ++ii )
                 {
                     if ( ++steps > step_limit ) throw InterpError { "step limit" };
 

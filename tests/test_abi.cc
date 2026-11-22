@@ -338,3 +338,135 @@ TEST_CASE( "x86 isa compiles a trivial function", "[abi][isa]" )
     CHECK( code->relocs.empty( ) );
     CHECK( code->alignment == 16 );
 }
+
+TEST_CASE( "x86 isa probes large frames unless probing is off", "[abi][isa]" )
+{
+    ir::IRModule irm;
+    const auto   ref = irm.declare( "f", Type::i64, { Type::i64 } );
+    {
+        ir::IRBuilder b { *irm.get( ref ) };
+        b.switch_to_block( b.add_block( { Type::i64 } ) );
+        const auto addr = b.stack_addr( Type::ptr, b.create_stack_slot( 3 * 4096, 8 ) );
+        b.store( b.param( 0 ), addr );
+        b.ret( b.load( Type::i64, addr ) );
+        b.finalise( );
+    }
+
+    const std::array< uint8_t, 7 > probe { 0xC7, 0x04, 0x24, 0x00, 0x00, 0x00, 0x00 };
+    const auto has_probe = [ & ]( const CompiledCode& c ) { return !std::ranges::search( c.code, probe ).empty( ); };
+
+    const X86Isa on;
+    const auto   probed = on.compile_function( *irm.get( ref ) );
+    REQUIRE( probed.has_value( ) );
+    CHECK( has_probe( *probed ) );
+
+    const X86Isa off { Flags { .enable_probe_stack = false } };
+    const auto   plain = off.compile_function( *irm.get( ref ) );
+    REQUIRE( plain.has_value( ) );
+    CHECK_FALSE( has_probe( *plain ) );
+}
+
+TEST_CASE( "x86 isa refuses functions that use floats", "[abi][isa]" )
+{
+    ir::IRModule irm;
+    const auto   ref = irm.declare( "f", Type::f64, { Type::f64, Type::f64 } );
+    {
+        ir::IRBuilder b { *irm.get( ref ) };
+        b.switch_to_block( b.add_block( { Type::f64, Type::f64 } ) );
+        b.ret( b.param( 1 ) );
+        b.finalise( );
+    }
+    const X86Isa isa;
+    const auto   code = isa.compile_function( *irm.get( ref ) );
+    REQUIRE_FALSE( code.has_value( ) );
+    CHECK( code.error( ).kind == codegen::CodegenError::Kind::Unsupported );
+}
+
+namespace
+{
+    void build_bad_ret( ir::IRModule& irm, ir::FunctionRef& ref )
+    {
+        ref = irm.declare( "f", Type::i64, { } );
+        ir::IRBuilder b { *irm.get( ref ) };
+        b.switch_to_block( b.add_block( { } ) );
+        b.ret( b.iconst( Type::i8, 1 ) );
+        b.finalise( );
+    }
+}
+
+TEST_CASE( "context compile reports verifier errors", "[abi][isa][verifier]" )
+{
+    ir::IRModule    irm;
+    ir::FunctionRef ref { };
+    build_bad_ret( irm, ref );
+
+    const X86Isa     isa;
+    codegen::Context ctx { *irm.get( ref ) };
+    const auto       r = ctx.compile( isa );
+    REQUIRE_FALSE( r.has_value( ) );
+    CHECK( r.error( ).kind == codegen::CodegenError::Kind::Verifier );
+    CHECK( r.error( ).messages == std::vector< std::string > { "ret: value type is i8, the function's signature wants i64" } );
+    REQUIRE( ctx.error( ) != nullptr );
+    CHECK( ctx.error( )->kind == codegen::CodegenError::Kind::Verifier );
+    CHECK( ctx.compiled( ) == nullptr );
+}
+
+TEST_CASE( "context compile skips the verifier when it is disabled", "[abi][isa][verifier]" )
+{
+    ir::IRModule    irm;
+    ir::FunctionRef ref { };
+    build_bad_ret( irm, ref );
+
+    const X86Isa     isa { codegen::Flags { .enable_verifier = false } };
+    codegen::Context ctx { *irm.get( ref ) };
+    CHECK( ctx.compile( isa ).has_value( ) );
+    CHECK( ctx.error( ) == nullptr );
+}
+
+TEST_CASE( "context compile clears an earlier error on success", "[abi][isa][verifier]" )
+{
+    ir::IRModule    irm;
+    ir::FunctionRef ref { };
+    build_bad_ret( irm, ref );
+
+    codegen::Context ctx { *irm.get( ref ) };
+    REQUIRE_FALSE( ctx.compile( X86Isa { } ).has_value( ) );
+    REQUIRE( ctx.compile( X86Isa { codegen::Flags { .enable_verifier = false } } ).has_value( ) );
+    CHECK( ctx.error( ) == nullptr );
+}
+
+TEST_CASE( "x86 isa reports stack slots over the implementation limit", "[abi][isa]" )
+{
+    ir::IRModule irm;
+    const auto   ref = irm.declare( "f", Type::i64, { Type::i64 } );
+    {
+        ir::IRBuilder b { *irm.get( ref ) };
+        b.switch_to_block( b.add_block( { Type::i64 } ) );
+        const auto p = b.stack_addr( Type::ptr, b.create_stack_slot( 0x80000000u, 8 ) );
+        b.store( b.param( 0 ), p );
+        b.ret( b.load( Type::i64, p ) );
+        b.finalise( );
+    }
+    REQUIRE( verify( *irm.get( ref ) ).empty( ) );
+
+    const X86Isa isa;
+    const auto   code = isa.compile_function( *irm.get( ref ) );
+    REQUIRE_FALSE( code.has_value( ) );
+    CHECK( code.error( ).kind == codegen::CodegenError::Kind::ImplLimitExceeded );
+    CHECK( code.error( ).messages == std::vector< std::string > { "stack slots need 2147483648 bytes, over the limit of 1073741824" } );
+}
+
+TEST_CASE( "x86 isa limit check passes an ordinary function", "[abi][isa]" )
+{
+    ir::IRModule irm;
+    const auto   ref = irm.declare( "f", Type::i64, { } );
+    {
+        ir::IRBuilder b { *irm.get( ref ) };
+        b.switch_to_block( b.add_block( { } ) );
+        ( void ) b.create_stack_slot( 64, 8 );
+        b.ret( b.iconst( Type::i64, 0 ) );
+        b.finalise( );
+    }
+    CHECK_FALSE( x86_64::exceeded_limit( *irm.get( ref ) ).has_value( ) );
+}
+

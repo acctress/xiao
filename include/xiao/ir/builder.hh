@@ -7,6 +7,7 @@
 #include <xiao/ir/function.hh>
 #include <xiao/support/arena.hh>
 #include <algorithm>
+#include <bit>
 #include <vector>
 
 #include <print>
@@ -132,7 +133,7 @@ namespace xiao::ir
         [[nodiscard]] StackSlotRef create_stack_slot( const uint32_t size, const uint32_t align )
         {
             assert( std::has_single_bit( align ) && "[xiao::IRBuilder::create_stack_slot] alignment must be n^2" );
-            m_stack_slots.push_back( StackSlotData { .size = size, .align_shift = static_cast< uint8_t >( std::countr_zero( align ) ) } );
+            m_stack_slots.push_back( StackSlotData { .size = size, .align_shift = static_cast< uint8_t >( std::countr_zero( std::bit_ceil( align ) ) ) } );
             return StackSlotRef { static_cast< uint32_t >( m_stack_slots.size( ) - 1 ) };
         }
 
@@ -265,7 +266,7 @@ namespace xiao::ir
                 const auto start           = m_block_inst_starts[ i ] == ~0u ? 0u : m_block_inst_starts[ i ];
                 const auto end             = m_block_inst_ends[ i ] == ~0u ? start : m_block_inst_ends[ i ];
                 m_blocks[ i ].insts_offset = start;
-                m_blocks[ i ].insts_count  = static_cast< uint16_t >( end - start );
+                m_blocks[ i ].insts_count  = end - start;
             }
 
             m_fn.blocks          = copy_to_arena< IRBlock >( arena, m_blocks );

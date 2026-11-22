@@ -15,7 +15,7 @@ namespace xiao::ir
     struct IRBlock
     {
         uint32_t insts_offset { };  //! Offset into owning IRFunction's instruction pool.
-        uint16_t insts_count { };   //! Count of instructions in this IRBlock.
+        uint32_t insts_count { };   //! Count of instructions in this IRBlock.
         uint32_t succs_offset { };  //! Offset into owning IRFunction's successor pool.
         uint8_t  succs_count { };   //! Count of successors in this IRBlock.
         uint32_t params_offset { }; //! Offset into owning IRFunction's parameters pool.

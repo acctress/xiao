@@ -1,6 +1,6 @@
 #pragma once
 
-#include <xiao/codegen/call_conv.hh>
+#include <xiao/codegen/flags.hh>
 #include <xiao/codegen/machbuffer.hh>
 #include <xiao/codegen/machenv.hh>
 #include <xiao/codegen/vcode.hh>
@@ -28,6 +28,7 @@ namespace xiao::x86_64
         std::array< PReg, 2 >  scratch { };
         std::vector< int32_t > slot_offsets { };
         int32_t                incoming_base { };
+        uint32_t               probe_guard_size { };
 
         [[nodiscard]] int32_t spill_offset( const int32_t slot ) const noexcept
         { return static_cast< int32_t >( spill_base ) + slot * 8; }
@@ -37,7 +38,8 @@ namespace xiao::x86_64
     };
 
     [[nodiscard]] inline FrameLayout compute_frame( const VCode< X86Inst >& vcode, const regalloc::Allocations& allocs,
-                                                    const MachineEnv& env, const std::span< const ir::StackSlotData > slots = { } )
+                                                    const MachineEnv& env, const std::span< const ir::StackSlotData > slots = { },
+                                                    const Flags& flags = { } )
     {
         FrameLayout frame { };
 
@@ -87,7 +89,7 @@ namespace xiao::x86_64
         }
 
         const uint32_t base = ( cursor + 7 ) & ~7u;
-        assert( base < 4096 && "[xiao::x86_64::compute_frame] frames of 4096 bytes or more need stack probes" );
+        assert( base <= INT32_MAX - 4096 && "[xiao::x86_64::compute_frame] frame does not fit a 32 bit displacement" );
 
         if ( frame.has_calls || base > 0 )
         {
@@ -96,7 +98,8 @@ namespace xiao::x86_64
             frame.stack_adjust    = base + pad;
         }
 
-        frame.spill_base    = outgoing;
+        frame.spill_base = outgoing;
+        if ( flags.enable_probe_stack ) frame.probe_guard_size = 1u << flags.probe_stack_size_log2;
         frame.incoming_base = static_cast< int32_t >( frame.stack_adjust + 8 * frame.saved.size( ) + 8 );
 
         assert( env.scratch[ 0 ].size( ) >= 2 && "[xiao::x86_64::compute_frame] need two int scratch registers for spilling" );
@@ -125,8 +128,62 @@ namespace xiao::x86_64
             inst::addq_mi32 { rsp, imm }.emit( buf );
     }
 
+    inline constexpr uint32_t k_probe_max_unroll = 4;
+
+    [[nodiscard]] inline uint32_t probe_size( const FrameLayout& frame ) noexcept
+    { return frame.stack_adjust + static_cast< uint32_t >( 8 * frame.saved.size( ) ) + ( frame.has_calls ? 8u : 0u ); }
+
+    inline void emit_probe_stack_unroll( MachBuffer< LabelUse >& buf, const uint32_t guard, const uint32_t probe_count )
+    {
+        const GprMem top { AddressMode { .base = Reg::from_preg( RSP ) } };
+        for ( uint32_t i { }; i < probe_count; ++i )
+        {
+            emit_rsp_adjust( buf, 5, guard );
+            inst::movl_mi32 { top, 0 }.emit( buf );
+        }
+
+        emit_rsp_adjust( buf, 0, guard * probe_count );
+    }
+
+    inline void emit_probe_stack_loop( MachBuffer< LabelUse >& buf, const uint32_t guard, const uint32_t size )
+    {
+        const auto   tmp = Reg::from_preg( R11 );
+        const auto   rsp = Reg::from_preg( RSP );
+        const GprMem top { AddressMode { .base = rsp } };
+        const auto   probe_count = ( size + guard - 1 ) / guard;
+        const auto   span        = guard * probe_count;
+
+        inst::movq_mr { GprMem { tmp }, rsp }.emit( buf );
+        inst::subq_mi32 { GprMem { tmp }, static_cast< int32_t >( span ) }.emit( buf );
+
+        const auto loop = buf.new_label( );
+        buf.bind_label( loop );
+
+        emit_rsp_adjust( buf, 5, guard );
+        inst::movl_mi32 { top, 0 }.emit( buf );
+        inst::cmpq_rm { tmp, GprMem { rsp } }.emit( buf );
+        emit_jcc( buf, cc_nibble( CC::NE ), loop );
+        emit_rsp_adjust( buf, 0, span );
+    }
+
+    inline void emit_probe_stack( MachBuffer< LabelUse >& buf, const FrameLayout& frame )
+    {
+        const auto guard = frame.probe_guard_size;
+        if ( guard == 0 ) return;
+
+        const auto size        = probe_size( frame );
+        const auto probe_count = size / guard;
+        if ( probe_count == 0 ) return;
+
+        if ( probe_count <= k_probe_max_unroll ) emit_probe_stack_unroll( buf, guard, probe_count );
+        else
+            emit_probe_stack_loop( buf, guard, size );
+    }
+
     inline void emit_prologue( MachBuffer< LabelUse >& buf, const FrameLayout& frame )
     {
+        emit_probe_stack( buf, frame );
+
         for ( const auto pr : frame.saved ) inst::pushq_r { Reg::from_preg( pr ) }.emit( buf );
 
         if ( frame.stack_adjust ) emit_rsp_adjust( buf, 5, frame.stack_adjust );

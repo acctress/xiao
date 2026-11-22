@@ -1044,16 +1044,17 @@ TEST_CASE( "lower call with a different callee convention", "[lower][call]" )
                                  []( ir::IRBuilder& b, const Args& a )
                                  {
                                  const auto fn
-                                     = b.import_function( { 0, 3 }, { Type::i64, Type::i64 }, Type::i64, CallConv::SystemV, true );
+                                     = b.import_function( { 0, 3 }, { Type::i64, Type::i64 }, Type::i64, CallConv::WindowsFastcall, true );
                                  const ValueRef args[] = { a[ 0 ], a[ 1 ] };
                                  b.ret( b.call( fn, args ) );
-                                 } );
+                                 },
+                                 CallConv::SystemV );
     const auto calls = all_of< inst::Call >( l.vc );
     REQUIRE( calls.size( ) == 1 );
-    CHECK( calls[ 0 ]->info->args == std::vector< PReg > { RDI, RSI } );
-    CHECK( calls[ 0 ]->info->clobbers.size( ) == 9 + 16 );
-    CHECK( listing( l.vc )[ 2 ] == "mov rdi, v128" );
-    CHECK( listing( l.vc )[ 3 ] == "mov rsi, v129" );
+    CHECK( calls[ 0 ]->info->args == std::vector< PReg > { RCX, RDX } );
+    CHECK( calls[ 0 ]->info->clobbers.size( ) == 7 + 6 );
+    CHECK( listing( l.vc )[ 2 ] == "mov rcx, v128" );
+    CHECK( listing( l.vc )[ 3 ] == "mov rdx, v129" );
     check_regalloc( l );
 }
 

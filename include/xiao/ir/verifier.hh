@@ -4,7 +4,11 @@
 
 #pragma once
 
+#include <xiao/ir/dominators.hh>
 #include <xiao/ir/visitor.hh>
+#include <string_view>
+#include <optional>
+#include <vector>
 
 namespace xiao::ir
 {
@@ -25,6 +29,7 @@ namespace xiao::ir
 
         void on_function( IRFunction& fn )
         {
+            index_function( fn );
             verify_stack_slots( fn );
 
             if ( fn.blocks.empty( ) ) return;
@@ -55,7 +60,7 @@ namespace xiao::ir
 
             const auto& l = fn.insts[ block.insts_offset + block.insts_count - 1 ];
 
-            if ( const bool is_term = l.op == IROp::ret || l.op == IROp::br || l.op == IROp::brif; !is_term )
+            if ( !is_terminator( l.op ) )
             {
                 errs.push_back( { std::format( "block does not end with a terminator: {}", l ) } );
                 return;
@@ -64,8 +69,20 @@ namespace xiao::ir
             if ( l.op == IROp::br || l.op == IROp::brif ) verify_branch( fn, block, l );
         }
 
-        void on_inst( IRFunction& fn, IRBlock&, IRInst& inst )
+        void on_inst( IRFunction& fn, IRBlock& block, IRInst& inst )
         {
+            for ( uint16_t i { }; i < inst.ops_count; ++i )
+                if ( const auto [ id ] = fn.operands[ inst.ops_offset + i ]; id >= fn.values.size( ) )
+                {
+                    errs.push_back(
+                        { std::format( "{}: operand {} is v{}, but the function has {} values", inst.op, i, id, fn.values.size( ) ) } );
+                    return;
+                }
+
+            if ( is_terminator( inst.op ) && &inst != &fn.insts[ block.insts_offset + block.insts_count - 1 ] )
+                errs.push_back( { std::format( "{}: terminator before the end of the block", inst.op ) } );
+
+            const auto bfr = errs.size( );
             switch ( inst.op )
             {
                 case IROp::call: verify_call( fn, inst ); break;
@@ -99,19 +116,46 @@ namespace xiao::ir
                 case IROp::func_addr: verify_func_addr( fn, inst ); break;
                 case IROp::call_indirect: verify_call_indirect( fn, inst ); break;
                 case IROp::stack_addr: verify_stack_addr( fn, inst ); break;
+                case IROp::ret: verify_ret( fn, inst ); break;
                 default: break;
             }
+
+            if ( errs.size( ) == bfr ) verify_dominance( fn, static_cast< uint32_t >( &block - fn.blocks.data( ) ), inst );
         }
 
     private:
+        std::optional< DomTree > m_dom { };
+        std::vector< uint32_t >  m_inst_block { };
+        std::vector< uint32_t >  m_param_block { };
+
         [[nodiscard]] static Type operand_type( const IRFunction& fn, const IRInst& inst, const uint16_t i )
         { return fn.values[ fn.operands[ inst.ops_offset + i ].id ].type; }
+
+        [[nodiscard]] static bool is_terminator( const IROp op ) noexcept
+        { return op == IROp::ret || op == IROp::br || op == IROp::brif; }
 
         [[nodiscard]] bool expect_operands( const IRInst& inst, const uint16_t n )
         {
             if ( inst.ops_count == n ) return true;
             errs.push_back( { std::format( "{}: {} operands, expected {}", inst.op, inst.ops_count, n ) } );
             return false;
+        }
+
+        void index_function( const IRFunction& fn )
+        {
+            m_dom.emplace( fn );
+            m_inst_block.assign( fn.insts.size( ), DomTree::NONE );
+            m_param_block.assign( fn.values.size( ), DomTree::NONE );
+
+            for ( uint32_t bi { }; bi < fn.blocks.size( ); ++bi )
+            {
+                const auto& block = fn.blocks[ bi ];
+
+                for ( uint32_t i { }; i < block.insts_count; ++i ) m_inst_block[ block.insts_offset + i ] = bi;
+                for ( uint16_t p { }; p < block.params_count; ++p )
+                    if ( const auto value = fn.block_params[ block.params_offset + p ].id; value < m_param_block.size( ) )
+                        m_param_block[ value ] = bi;
+            }
         }
 
         void verify_binary( const IRFunction& fn, const IRInst& inst, const bool needs_64bit )
@@ -205,6 +249,8 @@ namespace xiao::ir
             }
 
             const auto& sig = fn.signatures[ inst.imm ];
+            verify_call_conv( fn, "call_indirect", sig.cc );
+
             if ( inst.ops_count != sig.params_count + 1 )
             {
                 errs.push_back(
@@ -294,6 +340,12 @@ namespace xiao::ir
                 errs.push_back( { std::format( "store.{}: only integer stores supported YET", ty ) } );
         }
 
+        void verify_call_conv( const IRFunction& fn, const std::string_view what, const codegen::CallConv callee )
+        {
+            if ( fn.sig.cc == codegen::CallConv::WindowsFastcall && callee == codegen::CallConv::SystemV )
+                errs.push_back( { std::format( "{}: windows_fastcall calling system_v not supported yet", what ) } );
+        }
+
         void verify_call( const IRFunction& fn, const IRInst& inst )
         {
             if ( inst.imm >= fn.ext_funcs.size( ) )
@@ -303,6 +355,8 @@ namespace xiao::ir
             }
 
             const auto& ext = fn.ext_funcs[ inst.imm ];
+            verify_call_conv( fn, "call", ext.cc );
+
             if ( inst.ops_count != ext.params_count )
             {
                 errs.push_back( { std::format( "call fn{}: {} args, expected {}", inst.imm, inst.ops_count, ext.params_count ) } );
@@ -387,6 +441,38 @@ namespace xiao::ir
 
             if ( const auto got = operand_type( fn, inst, 0 ); got != need )
                 errs.push_back( { std::format( "ret: value type is {}, the function's signature wants {}", got, need ) } );
+        }
+
+        void verify_dominance( const IRFunction& fn, const uint32_t u_block, const IRInst& inst )
+        {
+            if ( !m_dom->is_reachable( u_block ) ) return;
+
+            const auto use = static_cast< uint32_t >( &inst - fn.insts.data( ) );
+            for ( uint16_t i { }; i < inst.ops_count; ++i )
+            {
+                const auto value = fn.operands[ inst.ops_offset + i ].id;
+                const auto def   = fn.values[ value ].inst.id;
+
+                if ( def == ~0u )
+                {
+                    if ( const auto pb = m_param_block[ value ]; pb != DomTree::NONE && !m_dom->block_dominates( pb, u_block ) )
+                        errs.push_back(
+                            { std::format( "{}: uses v{}, a param of b{} which does not dominate b{}", inst.op, value, pb, u_block ) } );
+
+                    continue;
+                }
+
+                if ( def == use )
+                {
+                    errs.push_back( { std::format( "{}: v{} uses itself", inst.op, value ) } );
+                    continue;
+                }
+
+                const auto db = def < m_inst_block.size( ) ? m_inst_block[ def ] : DomTree::NONE;
+                const bool ok = db == u_block ? def < use : db != DomTree::NONE && m_dom->block_dominates( db, u_block );
+
+                if ( !ok ) errs.push_back( { std::format( "{}: uses v{} from a definition that does not dominate it", inst.op, value ) } );
+            }
         }
     };
 } // namespace xiao::ir

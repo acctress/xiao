@@ -17,7 +17,7 @@ target_include_directories(xiao_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 
 target_link_libraries(xiao_tests PRIVATE xiao::xiao Catch2::Catch2WithMain)
 
-if (XIAO_X86_GEN_TESTS)
+if (XIAO_X86_GEN_TESTS AND TARGET zydis)
     target_sources(xiao_tests PRIVATE "${XIAO_X86_GEN_TESTS}")
 endif()
 

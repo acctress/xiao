@@ -1,4 +1,5 @@
 #include "support.hh"
+#include "catch2/generators/catch_generators.hpp"
 
 #include <xiao-object/coff.hh>
 #include <xiao-object/module.hh>
@@ -779,4 +780,50 @@ TEST_CASE( "coff object links into a runnable executable", "[coff][link]" )
 #endif
     CHECK( rc == 42 );
     std::filesystem::remove_all( dir );
+}
+
+namespace
+{
+    object::Object object_with_relocs( const uint32_t n, uint32_t& callee )
+    {
+        object::Object o;
+        const auto     t = o.add_section( ".text", SectionKind::Text, 16 );
+        append_bytes( o, t, std::vector< uint8_t >( 4 * n, 0 ) );
+        callee = o.add_symbol( { .name = "callee", .scope = SymbolScope::Undefined, .is_function = true } );
+        for ( uint32_t i { 0 }; i < n; ++i )
+            o.add_reloc( t, { .offset = 4 * i, .symbol = callee, .kind = RelocationKind::Rel32, .addend = -4 } );
+        return o;
+    }
+} // namespace
+
+TEST_CASE( "coff sections with 65535 or more relocations use the overflow record", "[coff]" )
+{
+    const uint32_t n = GENERATE( 65535u, 70000u );
+    uint32_t       callee { };
+    const auto     bytes = object::coff::write( object_with_relocs( n, callee ) );
+    const auto     c     = parse( bytes );
+    const auto&    s     = c.sections[ 0 ];
+
+    CHECK( s.nrelocs == 0xFFFF );
+    CHECK( ( s.flags & object::coff::scn_lnk_nreloc_ovfl ) != 0 );
+    CHECK( rd32( bytes, s.relocs ) == n + 1 );
+    CHECK( rd32( bytes, s.relocs + 4 ) == 0 );
+    CHECK( rd16( bytes, s.relocs + 8 ) == 0 );
+    CHECK( rd32( bytes, s.relocs + 10 ) == 0 );
+    CHECK( rd32( bytes, s.relocs + 14 ) == 2 + callee );
+    CHECK( rd32( bytes, s.relocs + 10 * n ) == 4 * ( n - 1 ) );
+    CHECK( aux_u16( c.symbols[ 0 ].aux[ 0 ], 4 ) == 0xFFFF );
+}
+
+TEST_CASE( "coff sections with 65534 relocations do not overflow", "[coff]" )
+{
+    uint32_t    callee { };
+    const auto  bytes = object::coff::write( object_with_relocs( 65534, callee ) );
+    const auto  c     = parse( bytes );
+    const auto& s     = c.sections[ 0 ];
+
+    CHECK( s.nrelocs == 65534 );
+    CHECK( ( s.flags & object::coff::scn_lnk_nreloc_ovfl ) == 0 );
+    CHECK( rd32( bytes, s.relocs ) == 0 );
+    CHECK( aux_u16( c.symbols[ 0 ].aux[ 0 ], 4 ) == 65534 );
 }

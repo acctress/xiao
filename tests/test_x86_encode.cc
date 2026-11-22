@@ -7,7 +7,9 @@
 #include <xiao/isa/x86/inst/inst.hh>
 #include <xiao/isa/x86/inst/regs.hh>
 
+#if defined( XIAO_HAS_ZYDIS )
 #include <Zydis.h>
+#endif
 
 #include <array>
 #include <format>
@@ -27,18 +29,7 @@ namespace
 
     constexpr std::array< PReg, 16 > gprs = { RAX, RCX, RDX, RBX, RSP, RBP, RSI, RDI, R8, R9, R10, R11, R12, R13, R14, R15 };
 
-    constexpr std::array< const char*, 16 > q_names
-        = { "rax", "rcx", "rdx", "rbx", "rsp", "rbp", "rsi", "rdi", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15" };
-    constexpr std::array< const char*, 16 > d_names
-        = { "eax", "ecx", "edx", "ebx", "esp", "ebp", "esi", "edi", "r8d", "r9d", "r10d", "r11d", "r12d", "r13d", "r14d", "r15d" };
-    constexpr std::array< const char*, 16 > w_names
-        = { "ax", "cx", "dx", "bx", "sp", "bp", "si", "di", "r8w", "r9w", "r10w", "r11w", "r12w", "r13w", "r14w", "r15w" };
-    constexpr std::array< const char*, 16 > b_names
-        = { "al", "cl", "dl", "bl", "spl", "bpl", "sil", "dil", "r8b", "r9b", "r10b", "r11b", "r12b", "r13b", "r14b", "r15b" };
-
     constexpr std::array< CC, 10 > all_ccs = { CC::E, CC::NE, CC::L, CC::LE, CC::G, CC::GE, CC::B, CC::BE, CC::A, CC::AE };
-
-    constexpr std::array< int, 4 > all_sizes = { 8, 16, 32, 64 };
 
     [[nodiscard]] Reg r( const PReg p )
     { return Reg::from_preg( p ); }
@@ -48,6 +39,18 @@ namespace
 
     [[nodiscard]] GprMem mem( const AddressMode& m )
     { return GprMem { m }; }
+
+#if defined( XIAO_HAS_ZYDIS )
+    constexpr std::array< const char*, 16 > q_names
+        = { "rax", "rcx", "rdx", "rbx", "rsp", "rbp", "rsi", "rdi", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15" };
+    constexpr std::array< const char*, 16 > d_names
+        = { "eax", "ecx", "edx", "ebx", "esp", "ebp", "esi", "edi", "r8d", "r9d", "r10d", "r11d", "r12d", "r13d", "r14d", "r15d" };
+    constexpr std::array< const char*, 16 > w_names
+        = { "ax", "cx", "dx", "bx", "sp", "bp", "si", "di", "r8w", "r9w", "r10w", "r11w", "r12w", "r13w", "r14w", "r15w" };
+    constexpr std::array< const char*, 16 > b_names
+        = { "al", "cl", "dl", "bl", "spl", "bpl", "sil", "dil", "r8b", "r9b", "r10b", "r11b", "r12b", "r13b", "r14b", "r15b" };
+
+    constexpr std::array< int, 4 > all_sizes = { 8, 16, 32, 64 };
 
     [[nodiscard]] std::string q( const PReg p )
     { return q_names[ p.hw( ) ]; }
@@ -101,6 +104,7 @@ namespace
         if ( index.valid( ) ) s += std::format( "+{}*{}", q( index ), 1 << scale );
         return s + disp_text( disp ) + "]";
     }
+#endif
 
     [[nodiscard]] Bytes enc( const X86Inst& inst, const std::vector< PReg >& pregs, const std::vector< int32_t >& slot_offsets = { } )
     {
@@ -123,6 +127,7 @@ namespace
     [[nodiscard]] Bytes take( const Buffer& buf )
     { return { buf.data( ).begin( ), buf.data( ).end( ) }; }
 
+#if defined( XIAO_HAS_ZYDIS )
     struct Decoded
     {
         bool        ok { };
@@ -186,6 +191,7 @@ namespace
 
     const std::vector< int32_t > displacements
         = { 0, 1, -1, 8, -8, 127, -128, 128, -129, 0x100, -0x100, 0x7fffffff, std::numeric_limits< int32_t >::min( ) };
+#endif
 
     [[nodiscard]] X86Inst load_of( const PReg d, const AddressMode& m, const int bits )
     {
@@ -220,6 +226,7 @@ namespace
         }
     }
 
+#if defined( XIAO_HAS_ZYDIS )
     template < typename Imm8, typename Imm32 >
     [[nodiscard]] X86Inst alu_imm( const PReg d, const int32_t imm )
     {
@@ -232,6 +239,7 @@ namespace
         if ( fits_i8( imm ) ) return inst::imulq_rmi8 { r( d ), rm( d ), static_cast< int8_t >( imm ) };
         return inst::imulq_rmi32 { r( d ), rm( d ), imm };
     }
+#endif
 } // namespace
 
 TEST_CASE( "encode modrm packs fields", "[x86][encode][helpers]" )
@@ -838,6 +846,7 @@ TEST_CASE( "frame emit_move handles every location pair", "[x86][encode][frame]"
     CHECK( move( slot( 2 ), slot( 3 ) ) == Bytes { 0x4C, 0x8B, 0x5C, 0x24, 0x30, 0x4C, 0x89, 0x5C, 0x24, 0x38 } );
 }
 
+#if defined( XIAO_HAS_ZYDIS )
 TEST_CASE( "frame emit_edits sequences a register swap through scratch", "[x86][encode][frame]" )
 {
     FrameLayout frame { };
@@ -865,6 +874,7 @@ TEST_CASE( "frame emit_edits keeps priority groups separate", "[x86][encode][fra
     emit_edits( buf, frame, edits );
     CHECK( decode_all( take( buf ) ) == std::vector< std::string > { "mov rcx, rax", "mov rdx, rcx" } );
 }
+#endif
 
 TEST_CASE( "frame emit_edits drops self moves", "[x86][encode][frame]" )
 {
@@ -880,6 +890,7 @@ TEST_CASE( "frame emit_edits drops self moves", "[x86][encode][frame]" )
     CHECK( buf.size( ) == 0 );
 }
 
+#if defined( XIAO_HAS_ZYDIS )
 TEST_CASE( "frame rsp adjust picks imm8 or imm32", "[x86][encode][frame]" )
 {
     const auto adj = []( const uint8_t ext, const uint32_t n )
@@ -896,6 +907,7 @@ TEST_CASE( "frame rsp adjust picks imm8 or imm32", "[x86][encode][frame]" )
     CHECK( decode_all( adj( 5, 40 ) ) == std::vector< std::string > { "sub rsp, 0x28" } );
     CHECK( decode_all( adj( 0, 4096 ) ) == std::vector< std::string > { "add rsp, 0x1000" } );
 }
+#endif
 
 TEST_CASE( "frame prologue and epilogue mirror each other", "[x86][encode][frame]" )
 {
@@ -923,6 +935,7 @@ TEST_CASE( "frame prologue with nothing to do is empty", "[x86][encode][frame]" 
     CHECK( epi.size( ) == 0 );
 }
 
+#if defined( XIAO_HAS_ZYDIS )
 TEST_CASE( "frame prologue saves every callee saved register", "[x86][encode][frame]" )
 {
     FrameLayout frame { };
@@ -1302,4 +1315,70 @@ TEST_CASE( "zydis sweep spill loads stores and moves", "[x86][encode][zydis][fra
             if ( decode_all( take( buf ) ) != std::vector< std::string > { std::format( "mov {}, {}", q( to ), q( from ) ) } ) ++failures;
         }
     CHECK( failures == 0 );
+}
+#endif
+
+TEST_CASE( "frame prologue below one guard page has no probe", "[x86][encode][frame]" )
+{
+    FrameLayout frame { };
+    frame.stack_adjust     = 4088;
+    frame.probe_guard_size = 4096;
+    Buffer pro;
+    emit_prologue( pro, frame );
+    CHECK( take( pro ) == Bytes { 0x48, 0x81, 0xEC, 0xF8, 0x0F, 0x00, 0x00 } );
+}
+
+TEST_CASE( "frame prologue unrolls up to four probes", "[x86][encode][frame]" )
+{
+    FrameLayout frame { };
+    frame.stack_adjust     = 2 * 4096;
+    frame.probe_guard_size = 4096;
+    Buffer pro;
+    emit_prologue( pro, frame );
+    CHECK( take( pro ) == Bytes { 0x48, 0x81, 0xEC, 0x00, 0x10, 0x00, 0x00, 0xC7, 0x04, 0x24, 0x00, 0x00, 0x00, 0x00,
+                                  0x48, 0x81, 0xEC, 0x00, 0x10, 0x00, 0x00, 0xC7, 0x04, 0x24, 0x00, 0x00, 0x00, 0x00,
+                                  0x48, 0x81, 0xC4, 0x00, 0x20, 0x00, 0x00,
+                                  0x48, 0x81, 0xEC, 0x00, 0x20, 0x00, 0x00 } );
+
+    frame.stack_adjust = 4 * 4096;
+    Buffer four;
+    emit_prologue( four, frame );
+    CHECK( four.size( ) == 4 * 14 + 7 + 7 );
+}
+
+TEST_CASE( "frame prologue probes five or more pages with a loop", "[x86][encode][frame]" )
+{
+    FrameLayout frame { };
+    frame.stack_adjust     = 5 * 4096;
+    frame.probe_guard_size = 4096;
+    Buffer pro;
+    emit_prologue( pro, frame );
+    pro.resolve_labels( );
+    CHECK( take( pro ) == Bytes { 0x49, 0x89, 0xE3,
+                                  0x49, 0x81, 0xEB, 0x00, 0x50, 0x00, 0x00,
+                                  0x48, 0x81, 0xEC, 0x00, 0x10, 0x00, 0x00,
+                                  0xC7, 0x04, 0x24, 0x00, 0x00, 0x00, 0x00,
+                                  0x4C, 0x3B, 0xDC,
+                                  0x0F, 0x85, 0xE9, 0xFF, 0xFF, 0xFF,
+                                  0x48, 0x81, 0xC4, 0x00, 0x50, 0x00, 0x00,
+                                  0x48, 0x81, 0xEC, 0x00, 0x50, 0x00, 0x00 } );
+}
+
+TEST_CASE( "frame prologue has no probe when probing is off", "[x86][encode][frame]" )
+{
+    FrameLayout frame { };
+    frame.stack_adjust = 5 * 4096;
+    Buffer pro;
+    emit_prologue( pro, frame );
+    CHECK( take( pro ) == Bytes { 0x48, 0x81, 0xEC, 0x00, 0x50, 0x00, 0x00 } );
+}
+
+TEST_CASE( "frame probe size counts saved registers and the callee return address", "[x86][frame]" )
+{
+    FrameLayout frame { };
+    frame.stack_adjust = 4080;
+    frame.saved        = { RBX };
+    CHECK( probe_size( frame ) == 4088 );
+    frame.has_calls = true;
+    CHECK( probe_size( frame ) == 4096 );
 }

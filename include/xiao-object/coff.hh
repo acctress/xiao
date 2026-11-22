@@ -35,6 +35,7 @@ namespace xiao::object::coff
     inline constexpr uint32_t scn_mem_execute            = 0x20000000;
     inline constexpr uint32_t scn_mem_read               = 0x40000000;
     inline constexpr uint32_t scn_mem_write              = 0x80000000;
+    inline constexpr uint32_t scn_lnk_nreloc_ovfl        = 0x01000000;
 
     //! x64 relocation types: https://learn.microsoft.com/en-us/windows/win32/debug/pe-format#type-indicators
     inline constexpr uint16_t rel_amd64_addr64 = 0x0001;
@@ -175,6 +176,16 @@ namespace xiao::object::coff
 
         assert( sections.size( ) < 0xFFFF && "[xiao::object::coff::write] too many sections" );
 
+        const auto overflows = []( const Section& s )
+        {
+            return s.relocs.size( ) >= 0xFFFF;
+        };
+
+        const auto count16 = [ & ]( const Section& s )
+        {
+            return overflows( s ) ? uint16_t { 0xFFFF } : static_cast< uint16_t >( s.relocs.size( ) );
+        };
+
         struct Layout
         {
             uint32_t data { };
@@ -187,7 +198,8 @@ namespace xiao::object::coff
         for ( std::size_t i { 0 }; i < sections.size( ); ++i )
         {
             const auto& s = sections[ i ];
-            assert( s.relocs.size( ) < 0xFFFF && "[xiao::object::coff::write] too many relocations in one section" );
+
+            assert( s.relocs.size( ) < 0xFFFFFFFF && "[xiao::object::coff::write] too many relocations in one section" );
 
             if ( s.kind != SectionKind::UninitialisedData && s.size( ) > 0 )
             {
@@ -198,7 +210,7 @@ namespace xiao::object::coff
             if ( !s.relocs.empty( ) )
             {
                 layout[ i ].relocs  = cursor;
-                cursor             += relocation_size * static_cast< uint32_t >( s.relocs.size( ) );
+                cursor             += relocation_size * static_cast< uint32_t >( s.relocs.size( ) + ( overflows( s ) ? 1 : 0 ) );
             }
         }
 
@@ -239,9 +251,9 @@ namespace xiao::object::coff
             out.u32( layout[ i ].data );
             out.u32( layout[ i ].relocs );
             out.u32( 0 );
-            out.u16( static_cast< uint16_t >( s.relocs.size( ) ) );
+            out.u16( count16( s ) );
             out.u16( 0 );
-            out.u32( section_flags( s ) );
+            out.u32( section_flags( s ) | ( overflows( s ) ? scn_lnk_nreloc_ovfl : 0u ) );
         }
 
         for ( std::size_t i { 0 }; i < sections.size( ); ++i )
@@ -258,6 +270,14 @@ namespace xiao::object::coff
             {
                 //! Relocation records: https://learn.microsoft.com/en-us/windows/win32/debug/pe-format#coff-relocations-object-only
                 out.pad_to( layout[ i ].relocs );
+
+                if ( overflows( s ) )
+                {
+                    out.u32( static_cast< uint32_t >( s.relocs.size( ) + 1 ) );
+                    out.u32( 0 );
+                    out.u16( 0 );
+                }
+
                 for ( const auto& r : s.relocs )
                 {
                     assert( r.symbol < symbols.size( ) && "[xiao::object::coff::write] relocation against an unknown symbol" );
@@ -292,7 +312,7 @@ namespace xiao::object::coff
             out.u8( 1 );
 
             out.u32( s.size( ) );
-            out.u16( static_cast< uint16_t >( s.relocs.size( ) ) );
+            out.u16( count16( s ) );
             out.u16( 0 );
             out.u32( 0 );
             out.u16( 0 );

@@ -1444,9 +1444,10 @@ TEST_CASE( "verifier visit_module accumulates errors across functions", "[verifi
     ir::IRVerifier v;
     v.visit_module( irm );
     CHECK_FALSE( v.ok( ) );
-    REQUIRE( v.errs.size( ) == 2 );
+    REQUIRE( v.errs.size( ) == 3 );
     CHECK( v.errs[ 0 ].msg == "entry block param 0 is i32, signature says i64" );
     CHECK( v.errs[ 1 ].msg == "iconst: type f64 is not an integer type" );
+    CHECK( v.errs[ 2 ].msg == "ret: 0 operands, expected 1" );
 }
 
 TEST_CASE( "visitor hooks fire in order for every block, instruction and operand", "[visitor]" )
@@ -1553,4 +1554,106 @@ TEST_CASE( "visitor visits blocks in creation order regardless of fill order", "
     CHECK( r.log
            == std::vector< std::string > { "fn 0", "block 0", "inst br", "block_end", "block 2", "inst ret", "block_end", "block 1",
                                            "inst br", "block_end", "fn_end 0" } );
+}
+
+TEST_CASE( "verifier rejects ret without a value in a function that returns one", "[verifier]" )
+{
+    CHECK( errors_of( Type::i64, { },
+                      []( ir::IRBuilder& b )
+                      {
+                          b.ret( );
+                      } )
+           == Errs { "ret: 0 operands, expected 1" } );
+}
+
+TEST_CASE( "verifier rejects ret with a value in a unit function", "[verifier]" )
+{
+    CHECK( errors_of( Type::unit, { },
+                      []( ir::IRBuilder& b )
+                      {
+                          b.ret( b.iconst( Type::i64, 1 ) );
+                      } )
+           == Errs { "ret: 1 operands, expected 0" } );
+}
+
+TEST_CASE( "verifier rejects ret whose value type differs from the signature", "[verifier]" )
+{
+    CHECK( errors_of( Type::i64, { },
+                      []( ir::IRBuilder& b )
+                      {
+                          b.ret( b.iconst( Type::i8, 1 ) );
+                      } )
+           == Errs { "ret: value type is i8, the function's signature wants i64" } );
+}
+
+TEST_CASE( "verifier rejects a terminator before the end of a block", "[verifier]" )
+{
+    CHECK( errors_of( Type::i64, { Type::i64 },
+                      []( ir::IRBuilder& b )
+                      {
+                          b.ret( b.param( 0 ) );
+                          b.ret( b.param( 0 ) );
+                      } )
+           == Errs { "ret: terminator before the end of the block" } );
+}
+
+TEST_CASE( "verifier rejects an operand that is not a value of the function", "[verifier]" )
+{
+    Fn f { Type::i64, { Type::i64 } };
+    f.build(
+        []( ir::IRBuilder& b )
+        {
+            b.switch_to_block( b.add_block( { Type::i64 } ) );
+            b.ret( b.iadd( b.param( 0 ), b.param( 0 ) ) );
+        } );
+    f.fn->operands[ f.fn->insts[ 0 ].ops_offset + 1 ] = ValueRef { 999 };
+    CHECK( f.errors( ) == Errs { "iadd: operand 1 is v999, but the function has 3 values" } );
+}
+
+TEST_CASE( "verifier rejects a use that its definition does not dominate", "[verifier]" )
+{
+    Fn       f { Type::i64, { Type::i64 } };
+    ValueRef only_left { };
+    f.build(
+        [ & ]( ir::IRBuilder& b )
+        {
+            const auto entry = b.add_block( { Type::i64 } );
+            const auto left  = b.add_block( { } );
+            const auto right = b.add_block( { } );
+            const auto merge = b.add_block( { } );
+            b.switch_to_block( entry );
+            b.brif( b.param( 0 ), left, Args { }, right, Args { } );
+            b.switch_to_block( left );
+            only_left = b.iadd( b.param( 0 ), b.param( 0 ) );
+            b.br( merge );
+            b.switch_to_block( right );
+            b.br( merge );
+            b.switch_to_block( merge );
+            b.ret( only_left );
+        } );
+    CHECK( f.errors( ) == Errs { std::format( "ret: uses v{} from a definition that does not dominate it", only_left.id ) } );
+}
+
+TEST_CASE( "verifier accepts a value used in a loop body that its header defines", "[verifier]" )
+{
+    Fn f { Type::i64, { Type::i64 } };
+    f.build(
+        []( ir::IRBuilder& b )
+        {
+            const auto entry  = b.add_block( { Type::i64 } );
+            const auto header = b.add_block( { } );
+            const auto body   = b.add_block( { } );
+            const auto exit   = b.add_block( { } );
+            b.switch_to_block( entry );
+            b.br( header );
+            b.switch_to_block( header );
+            const auto x = b.iadd( b.param( 0 ), b.param( 0 ) );
+            b.brif( x, body, Args { }, exit, Args { } );
+            b.switch_to_block( body );
+            ( void ) b.isub( x, b.param( 0 ) );
+            b.br( header );
+            b.switch_to_block( exit );
+            b.ret( x );
+        } );
+    CHECK( f.errors( ).empty( ) );
 }

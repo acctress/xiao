@@ -147,7 +147,7 @@ namespace
         if ( ty == Type::i64 ) return v;
         return is_signed ? b.sextend( Type::i64, v ) : b.uextend( Type::i64, v );
     }
-}
+} // namespace
 
 TEST_CASE( "binary ops with both operands in registers match the reference", "[jit][arith]" )
 {
@@ -350,12 +350,12 @@ TEST_CASE( "unary bnot and ineg match the reference", "[jit][arith]" )
                                                []( ir::IRBuilder& b, const Args& a )
                                                {
                                                 b.ret( b.bnot( a[ 0 ] ) );
-                                               } );
+                                            } );
     auto g    = compile< int64_t( int64_t ) >( Type::i64, { Type::i64 },
                                                []( ir::IRBuilder& b, const Args& a )
                                                {
                                                 b.ret( b.ineg( a[ 0 ] ) );
-                                               } );
+                                            } );
     auto both = compile< int64_t( int64_t ) >( Type::i64, { Type::i64 },
                                                []( ir::IRBuilder& b, const Args& a )
                                                {
@@ -410,7 +410,7 @@ TEST_CASE( "iconst of narrow types returns the truncated value", "[jit][arith]" 
                                          [ & ]( ir::IRBuilder& b, const Args& )
                                          {
                                             b.ret( b.iconst( Type::i8, u( c ) ) );
-                                         } );
+                                        } );
         auto f16 = compile< int16_t( ) >( Type::i16, { },
                                           [ & ]( ir::IRBuilder& b, const Args& )
                                           {
@@ -438,7 +438,7 @@ TEST_CASE( "shifts by register counts mask the count to six bits", "[jit][arith]
                                                                      [ & ]( ir::IRBuilder& b, const Args& a )
                                                                      {
                                                                  b.ret( ( b.*op.build )( a[ 0 ], a[ 1 ] ) );
-                                                                     } );
+                                                             } );
             for ( const auto x : edge_values( ) )
                 for ( const auto c : shift_counts( ) )
                 {
@@ -639,7 +639,7 @@ namespace
             CHECK( un( tx ) == static_cast< T >( ~u( tx ) + ( 0 - u( tx ) ) ) );
         }
     }
-}
+} // namespace
 
 TEST_CASE( "i8 arithmetic with native i8 parameters and return", "[jit][arith]" )
 { check_native_narrow< int8_t >( Type::i8 ); }
@@ -854,4 +854,17 @@ TEST_CASE( "long dependent arithmetic chain matches the interpreter", "[jit][ari
                 CAPTURE( x, y, z );
                 CHECK( u( f( x, y, z ) ) == Interp { }.run( fn, args ) );
             }
+}
+
+TEST_CASE( "a block with more than 65535 machine instructions compiles correctly", "[jit]" )
+{
+    constexpr uint32_t adds { 40000 };
+    const auto         c = compile< int64_t( int64_t ) >( Type::i64, { Type::i64 },
+                                                          [ & ]( ir::IRBuilder& b, const Args& a )
+                                                          {
+                                                      auto x = a[ 0 ];
+                                                      for ( uint32_t i { 0 }; i < adds; ++i ) x = b.iadd( x, a[ 0 ] );
+                                                      b.ret( x );
+                                                  } );
+    CHECK( c( 1 ) == static_cast< int64_t >( adds ) + 1 );
 }

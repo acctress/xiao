@@ -186,7 +186,7 @@ namespace xiao::ir
             std::vector< uint8_t >  blocked( fn.values.size( ), 0 );
             std::vector< uint32_t > uses( fn.values.size( ), 0 );
             for ( const auto& b : fn.blocks )
-                for ( uint16_t ii { 0 }; ii < b.insts_count; ++ii )
+                for ( uint32_t ii { 0 }; ii < b.insts_count; ++ii )
                 {
                     const auto& in = fn.insts[ b.insts_offset + ii ];
                     for ( uint16_t k { 0 }; k < in.ops_count; ++k )
@@ -281,7 +281,7 @@ namespace xiao::ir
                 }
                 std::format_to( out, ":\n" );
 
-                for ( uint16_t ii { 0 }; ii < b.insts_count; ++ii )
+                for ( uint32_t ii { 0 }; ii < b.insts_count; ++ii )
                 {
                     const auto& in  = fn.insts[ b.insts_offset + ii ];
                     const auto  res = std::format( "%v{} = ", in.result.id );

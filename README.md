@@ -11,9 +11,6 @@
 <p align="center">
   <a href="https://github.com/acctress/xiao/actions/workflows/ci.yml"><img src="https://github.com/acctress/xiao/actions/workflows/ci.yml/badge.svg?branch=cxx" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
-  <img src="https://img.shields.io/badge/language-C%2B%2B23-blue" alt="C++23">
-  <img src="https://img.shields.io/badge/target-x86--64-lightgrey" alt="x86-64">
-  <img src="https://img.shields.io/github/last-commit/acctress/xiao" alt="Last commit">
   <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/acctress/xiao/cxx/.github/badges/loc.json" alt="Lines of code">
 </p>
 
@@ -225,13 +222,68 @@ no dependencies.
 
 ## Status
 
-xiao is in early development. The following are not yet supported:
+xiao is in early development. The current release is 0.1.0, which compiles integer code for
+x86-64 on Windows x64 and System V, both tested in CI. Input that xiao cannot compile returns a
+`CodegenError`. See the [changelog](CHANGELOG.md) for what each release contains.
 
-- Targets other than x86-64. Windows x64 is tested; System V is implemented but untested.
-- Floating point types.
-- Arguments passed on the stack.
+The following are not yet supported:
+
+- Targets other than x86-64.
+- Floating point types. They are rejected with `CodegenError::Unsupported` and are planned for
+  0.2.0.
+- Varargs, `br_table`, atomics and traps.
+- Narrow operands for `icmp`, the division operations, `ushr` and `sshr`, which need `i64`.
+- Calls from a `windows_fastcall` function to a `system_v` function.
 - ELF and Mach-O object files.
 - Thread-local data and unwind information.
+
+## API stability
+
+Xiao follows Semantic Versioning, so while xiao is `0.x` a breaking change only happens in a minor bump, so `0.1` to `0.2`, every breaking change which is made to xiao is listed in `CHANGELOG.md`, along with everything else.
+
+Patch releases (`0.1.x`) never break the stable API, enforced by SemVer.
+
+xiao is header-only, so this is a promise about source compatibility, not ABI. A program should
+use one version of xiao throughout; mixing two in the same binary is not supported.
+
+### Stable
+
+The following are covered by the promise above. Xiao's version is updated in `xiao/version.hh`, CMake fetches this and updates the project version.
+
+| Area | API |
+|---|---|
+| Version | `XIAO_VERSION_MAJOR`, `_MINOR`, `_PATCH` and `XIAO_VERSION_STRING`, and `xiao::version` |
+| IR | `IRModule`, `IRBuilder`, `Type`, the reference handles (`ValueRef`, `BlockRef`, `FuncRef` and so on) and `ExternalName` |
+| Verifier | Running `IRVerifier` and reading its messages |
+| Code generation | `Context`, `CodegenError` and its kinds, `Flags`, `CallConv`, and reading `CompiledCode` and its `RelocKind`s |
+| Targets | `isa::lookup_host` and `codegen::host_call_conv`. `TargetIsa` can be called, but implementing your own target is not supported |
+| Modules | `FuncId`, `DataId`, `Linkage`, `Signature`, `signature_of`, `DataDescription`, `ModuleError` and the `Module` interface |
+| xiao-jit | `JITBuilder` and `JITModule` |
+| xiao-object | `ObjectBuilder`, `ObjectModule` and `ObjectProduct` |
+
+### Visible but not stable
+
+These are public in C++, but may change in any release, including patch releases:
+
+- The data members of `IRFunction` and the layout of `IRBlock`, `IRInst` and `Value`. They can be
+  read, but code should not depend on their layout.
+- The IR text printed by `IRModule::fmt`. It is meant for debugging and is not a file format.
+- `ir::DomTree` and `IRVisitor`.
+- The object file model in `xiao-object/object.hh`, `coff.hh` and `dump.hh`. Use `ObjectModule`
+  to write object files.
+- `xiao-disasm`, which is optional, needs Zydis and is not installed by the CMake package.
+
+### Internal
+
+Everything else is internal and may change or be removed at any time. This includes:
+
+- Anything in a `detail` namespace.
+- `xiao/isa/x86`, including `x86_64::inst` and the generated `inst/gen/insts.hh`. The x86 backend
+  is reached through `isa::lookup_host`.
+- `xiao/regalloc` and `xiao/support`.
+- The backend parts of `xiao/codegen`: `abi`, `machbuffer`, `machenv`, `machinst`, `operand`,
+  `reg` and `vcode`.
+- `IRModule::arena()`, which exposes `support::Arena`.
 
 ## Acknowledgements
 
